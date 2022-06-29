@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>操作系统思维导图 | Blog of Icecorn</title>
+  <meta name="description" content="操作系统线程是什么？ 线程是os能调度的最小单位，它包含在进程中，是进程的实际运作单位，但是它不拥有资源（实际上就是为了将进程拥有资源和接受os调度这两个事分开才有的线程，同时一个进程可拥有多个线程，可以是进程并发的处理任务）  有什么？ 一个线程执行状态（运行，就绪等） 线程上下文，一个独立的程序计数器（记录下一条指令地址） 用于局部变量的一些静态存储空间（栈空间）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统思维导图">
+<meta property="og:url" content="http://icecorn.github.io/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="操作系统线程是什么？ 线程是os能调度的最小单位，它包含在进程中，是进程的实际运作单位，但是它不拥有资源（实际上就是为了将进程拥有资源和接受os调度这两个事分开才有的线程，同时一个进程可拥有多个线程，可以是进程并发的处理任务）  有什么？ 一个线程执行状态（运行，就绪等） 线程上下文，一个独立的程序计数器（记录下一条指令地址） 用于局部变量的一些静态存储空间（栈空间）">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-03-16T11:37:26.000Z">
+<meta property="article:modified_time" content="2022-06-29T14:18:13.925Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="思维导图">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.5px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="title">操作系统思维导图</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-16T11:37:26.000Z" itemprop="datePublished">2022-03-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E4%B8%93%E9%A2%98-%E5%9B%9B%E7%A7%8D%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|专题-四种类型转换的使用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" class="title">C++ Primer笔记|第十五章-面向对象程序设计</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/08/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|第十四章 重载运算与类型转换</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-08T12:25:30.000Z" itemprop="datePublished">2022-03-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E6%8B%B7%E8%B4%9D%E6%8E%A7%E5%88%B6/" class="title">C++ Primer笔记|第十三章-拷贝控制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.</span> <span class="toc-text">操作系统</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">线程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.1.1.</span> <span class="toc-text">是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.1.2.</span> <span class="toc-text">有什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A5%BD%E5%A4%84%EF%BC%9F"><span class="toc-number">1.1.3.</span> <span class="toc-text">好处？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.1.4.</span> <span class="toc-text">两种线程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B"><span class="toc-number">1.2.</span> <span class="toc-text">进程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F-1"><span class="toc-number">1.2.1.</span> <span class="toc-text">是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E4%BB%80%E4%B9%88%EF%BC%9F-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">有什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E6%8E%A7%E5%88%B6%E5%9D%97%EF%BC%88%E7%94%B1os%E5%88%9B%E5%BB%BA%E5%92%8C%E7%AE%A1%E7%90%86%EF%BC%89"><span class="toc-number">1.2.3.</span> <span class="toc-text">进程控制块（由os创建和管理）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="toc-number">1.2.4.</span> <span class="toc-text">进程状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E5%88%87%E6%8D%A2"><span class="toc-number">1.2.5.</span> <span class="toc-text">进程切换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%8E%A7%E5%88%B6%E8%B5%84%E6%BA%90%EF%BC%9F%E9%80%9A%E8%BF%87%E7%BB%B4%E6%8A%A4%E4%B8%80%E4%BA%9B%E8%A1%A8%E3%80%82"><span class="toc-number">1.3.</span> <span class="toc-text">如何控制资源？通过维护一些表。</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E8%A1%A8"><span class="toc-number">1.3.1.</span> <span class="toc-text">内存表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E8%A1%A8"><span class="toc-number">1.3.2.</span> <span class="toc-text">进程表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IO%E8%A1%A8"><span class="toc-number">1.3.3.</span> <span class="toc-text">IO表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%A1%A8"><span class="toc-number">1.3.4.</span> <span class="toc-text">文件表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E6%80%A7%EF%BC%9A%E4%BA%92%E6%96%A5%E5%92%8C%E5%90%8C%E6%AD%A5"><span class="toc-number">1.4.</span> <span class="toc-text">并发性：互斥和同步</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E6%96%A5"><span class="toc-number">1.4.1.</span> <span class="toc-text">互斥</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E6%80%A7%EF%BC%9A%E6%AD%BB%E9%94%81%E5%92%8C%E9%A5%A5%E9%A5%BF"><span class="toc-number">1.5.</span> <span class="toc-text">并发性：死锁和饥饿</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%BB%E9%94%81%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.5.1.</span> <span class="toc-text">死锁是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B5%84%E6%BA%90%E5%88%86%E7%B1%BB"><span class="toc-number">1.5.2.</span> <span class="toc-text">资源分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%AD%BB%E9%94%81%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">1.5.3.</span> <span class="toc-text">解决死锁的方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%B2%E5%AD%A6%E5%AE%B6%E5%B0%B1%E9%A4%90%E9%97%AE%E9%A2%98"><span class="toc-number">1.5.4.</span> <span class="toc-text">哲学家就餐问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.6.</span> <span class="toc-text">内存管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9C%80%E6%B1%82"><span class="toc-number">1.6.1.</span> <span class="toc-text">需求</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E5%8C%BA"><span class="toc-number">1.6.2.</span> <span class="toc-text">内存分区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="toc-number">1.6.3.</span> <span class="toc-text">虚拟内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%A4%84%E7%90%86"><span class="toc-number">1.6.4.</span> <span class="toc-text">操作系统处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6"><span class="toc-number">1.7.</span> <span class="toc-text">调度</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6"><span class="toc-number">1.7.1.</span> <span class="toc-text">单处理器调度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E5%A4%84%E7%90%86%E5%99%A8%E8%B0%83%E5%BA%A6"><span class="toc-number">1.7.2.</span> <span class="toc-text">多处理器调度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E6%97%B6%E8%B0%83%E5%BA%A6"><span class="toc-number">1.7.3.</span> <span class="toc-text">实时调度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="toc-number">1.7.4.</span> <span class="toc-text">调度算法</span></a></li></ol></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-操作系统/操作系统" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      操作系统思维导图
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="article-date">
+	  <time datetime="2022-03-16T11:37:26.000Z" itemprop="datePublished">2022-03-16</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a>, <a class="article-tag-link-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.5k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 8(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        
+
+	<div class="row">
+    <embed src="http://icecorn.github.io/file/os.pdf" width="100%" height="550" type="application/pdf">
+	</div>
+
+
+
+
+<h1 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h1><h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><h3 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h3><ul>
+<li>线程是os能调度的最小单位，它包含在进程中，是进程的实际运作单位，但是它不拥有资源（实际上就是为了将进程拥有资源和接受os调度这两个事分开才有的线程，同时一个进程可拥有多个线程，可以是进程并发的处理任务）</li>
+</ul>
+<h3 id="有什么？"><a href="#有什么？" class="headerlink" title="有什么？"></a>有什么？</h3><ul>
+<li>一个线程执行状态（运行，就绪等）</li>
+<li>线程上下文，一个独立的程序计数器（记录下一条指令地址）</li>
+<li>用于局部变量的一些静态存储空间（栈空间）要注意这个栈空间是私有的</li>
+<li>与进程内其他线程共享的内存和资源的访问权限</li>
+</ul>
+<h3 id="好处？"><a href="#好处？" class="headerlink" title="好处？"></a>好处？</h3><ul>
+<li>使cpu的调度时间片粒度更小，运行一个进程时，可以分成更小的时间片给进程的各个线程</li>
+<li>线程间切换时间要小于进程间切换</li>
+<li>提高了不同执行程序通信的效率，因为进程内的线程共享内存，直接改就行，而不用内核接入切换进程再通信来完成</li>
+</ul>
+<h3 id="两种线程"><a href="#两种线程" class="headerlink" title="两种线程"></a>两种线程</h3><ul>
+<li><p>用户态线程</p>
+<ul>
+<li>这种线程对os来说是未知的，切换线程不需要状态切换，但一个进程同时只能运行一个线程。一个线程阻塞，进程就阻塞。</li>
+</ul>
+</li>
+<li><p>内核态线程</p>
+<ul>
+<li>这种线程实际上就是mini进程，线程切换和进程一样会触发中断进行状态切换。当然它们也就可以再多个处理器上真正的并行执行。</li>
+</ul>
+</li>
+</ul>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><h3 id="是什么？-1"><a href="#是什么？-1" class="headerlink" title="是什么？"></a>是什么？</h3><ul>
+<li>一个能分配给处理器执行的程序实体</li>
+</ul>
+<h3 id="有什么？-1"><a href="#有什么？-1" class="headerlink" title="有什么？"></a>有什么？</h3><ul>
+<li>1.程序代码</li>
+<li>2.数据集（系统资源）</li>
+<li>3.进程控制块</li>
+</ul>
+<h3 id="进程控制块（由os创建和管理）"><a href="#进程控制块（由os创建和管理）" class="headerlink" title="进程控制块（由os创建和管理）"></a>进程控制块（由os创建和管理）</h3><ul>
+<li>标识符：进程唯一标识符</li>
+<li>状态：执行状态</li>
+<li>优先级：相对其他进程的优先顺序</li>
+<li>程序计数器：程序中即将执行的下一条指令地址</li>
+<li>内存指针：相关代码和数据集以及和其他进程共享内存块的指针</li>
+<li>上下文：执行时处理器寄存器中的数据</li>
+<li>IO信息：IO请求，使用的文件列表等</li>
+<li>记账信息：包括处理器时间总和，时钟数总和等</li>
+</ul>
+<h3 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h3><ul>
+<li>运行态：进程执行中，单核的话只有一个进程为运行态</li>
+<li>就绪态：准备好了，有机会就执行</li>
+<li>阻塞态：在某事发生前不能执行，如IO完成</li>
+<li>新建态：刚创建的进程，通常进程控制块建好了，但没有加载到内存中</li>
+<li>退出态：释放了的进程</li>
+<li>挂起态：不属于上述5个标准的状态，挂起态是把阻塞长的进程换到磁盘中，把能直接执行的进程换到内存中，避免让cpu闲下来</li>
+</ul>
+<h3 id="进程切换"><a href="#进程切换" class="headerlink" title="进程切换"></a>进程切换</h3><ul>
+<li><p>中断</p>
+<ul>
+<li>时钟中断：就是时间片到点了</li>
+<li>IO中断：要等打印机了==</li>
+<li>内存失效：要使用到虚存了，要从磁盘里调</li>
+</ul>
+</li>
+<li><p>陷阱：处理一个错误或异常条件</p>
+</li>
+<li><p>系统调用：调用操作系统函数</p>
+</li>
+<li><p>以上三种发生了，处理器都会执行一次模式切换（用户态转到内核态），将控制权交给os例程，os处理完，可以恢复被中断的进程或切换到其他进程</p>
+</li>
+</ul>
+<h2 id="如何控制资源？通过维护一些表。"><a href="#如何控制资源？通过维护一些表。" class="headerlink" title="如何控制资源？通过维护一些表。"></a>如何控制资源？通过维护一些表。</h2><h3 id="内存表"><a href="#内存表" class="headerlink" title="内存表"></a>内存表</h3><ul>
+<li>页表</li>
+<li>段表</li>
+</ul>
+<h3 id="进程表"><a href="#进程表" class="headerlink" title="进程表"></a>进程表</h3><ul>
+<li>主进程表：包含每个进程的表项（至少包含一个指向进程映像的指针）</li>
+<li>进程映像：包括程序，数据，栈，属性</li>
+<li>进程可以一部分存在内存，一部分放在外存，这些信息都要存在进程表里。一切目的都是让cpu能够找到而已</li>
+</ul>
+<h3 id="IO表"><a href="#IO表" class="headerlink" title="IO表"></a>IO表</h3><h3 id="文件表"><a href="#文件表" class="headerlink" title="文件表"></a>文件表</h3><h2 id="并发性：互斥和同步"><a href="#并发性：互斥和同步" class="headerlink" title="并发性：互斥和同步"></a>并发性：互斥和同步</h2><h3 id="互斥"><a href="#互斥" class="headerlink" title="互斥"></a>互斥</h3><ul>
+<li><p>通过编程语言来实现</p>
+<ul>
+<li>信号量机制（实际的实现还是硬件或软件方法）</li>
+<li>消息机制</li>
+<li>管程</li>
+<li>生产者/消费者问题</li>
+<li>读/写者问题</li>
+</ul>
+</li>
+<li><p>硬件实现</p>
+<ul>
+<li>中断禁用（临界区禁用中断）</li>
+<li>专用的机器指令</li>
+</ul>
+</li>
+<li><p>软件实现</p>
+<ul>
+<li>通过进程来实现</li>
+</ul>
+</li>
+</ul>
+<h2 id="并发性：死锁和饥饿"><a href="#并发性：死锁和饥饿" class="headerlink" title="并发性：死锁和饥饿"></a>并发性：死锁和饥饿</h2><h3 id="死锁是什么？"><a href="#死锁是什么？" class="headerlink" title="死锁是什么？"></a>死锁是什么？</h3><ul>
+<li><p>产生死锁的3个必要非充分条件</p>
+<ul>
+<li>互斥</li>
+<li>占有且等待</li>
+<li>不可抢占</li>
+</ul>
+</li>
+<li><p>充分条件：循环等待（是上边3个必要条件导致的结果）</p>
+</li>
+</ul>
+<h3 id="资源分类"><a href="#资源分类" class="headerlink" title="资源分类"></a>资源分类</h3><ul>
+<li>可重用资源（IO，内存等等）</li>
+<li>可消耗资源（中断，IO缓冲区消息等）</li>
+</ul>
+<h3 id="解决死锁的方法"><a href="#解决死锁的方法" class="headerlink" title="解决死锁的方法"></a>解决死锁的方法</h3><ul>
+<li><p>预防</p>
+<ul>
+<li><p>一次性请求所有资源</p>
+<ul>
+<li>缺点：</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>1.因阻塞导致占有这么多资源都不能用，别的进程也不能用<br>2.事先不知道需要哪些资源</p>
+<pre><code>- 抢占
+
+    - 缺点：
+</code></pre>
+<p>1.要求两个进程优先级不同<br>2.资源状态要容易保存和恢复</p>
+<pre><code>- 资源排序
+
+    - 缺点：
+</code></pre>
+<p>1.和一次性请求所有资源一样，会拒绝资源访问，浪费资源可使用的时间</p>
+<ul>
+<li><p>避免</p>
+<ul>
+<li>操作以便发现至少一条安全路径</li>
+</ul>
+</li>
+</ul>
+<p>1.若一个进程请求会导致死锁，则不启动该进程<br>2.若一个进程增加资源请求会导致死锁，则不允许这一资源分配</p>
+<pre><code>    - 资源分配拒绝策略
+</code></pre>
+<p>（银行家算法）</p>
+<pre><code>        - 优点：
+</code></pre>
+<p>无需死锁预防中的抢占和回滚进程<br>            - 限制：<br>1.必须事先声明每个进程请求的最大资源<br>2.所讨论的进程必须是无关的，即它们的执行顺序没有任何同步要求的限制<br>3.分配的资源数量必须是固定的<br>4.在占有资源时，进程不能退出</p>
+<ul>
+<li><p>检测</p>
+<ul>
+<li><p>周期性检测死锁的存在</p>
+</li>
+<li><p>恢复</p>
+<ul>
+<li>1.取消所有死锁进程（os最常用方法）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>2.每个死锁进程回滚，并重启所有进程<br>3.连续取消死锁进程直到不再存在死锁<br>4.连续抢占资源直到不在存在死锁</p>
+<h3 id="哲学家就餐问题"><a href="#哲学家就餐问题" class="headerlink" title="哲学家就餐问题"></a>哲学家就餐问题</h3><h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><h3 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h3><ul>
+<li>重定位</li>
+<li>保护</li>
+<li>共享</li>
+<li>逻辑组织</li>
+<li>物理组织</li>
+</ul>
+<h3 id="内存分区"><a href="#内存分区" class="headerlink" title="内存分区"></a>内存分区</h3><ul>
+<li><p>固定分区</p>
+</li>
+<li><p>动态分区</p>
+</li>
+<li><p>伙伴系统</p>
+</li>
+<li><p>分页</p>
+<ul>
+<li>进程分成页<br>内存分成页框（大小相等）<br>每一页很小，windows是4kb<br>进程可以拥有不连续的很多页，通过维护一个页表来找到它们</li>
+</ul>
+</li>
+<li><p>分段</p>
+<ul>
+<li><p>进程和内存被分成很多段<br>段的大小可以不相等</p>
+<ul>
+<li>特点：<br>可以由程序员控制，一般将每个段定义一组逻辑信息，然后映射到内存中去。而分页是定死的，程序员控制不了</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>分段和分页区别</p>
+<ul>
+<li><p>1.页是信息的物理单位,分页是为了实现非连续分配,以便解决内存碎片问题,或者说分页是由于系统管理的需要.段是信息的逻辑单位,它含有一组意义相对完整的信息,分段的目的是为了更好地实现共享,满足用户的需要.</p>
+</li>
+<li><p>2.页的大小固定,由系统确定,将逻辑地址划分为页号和页内地址是由机器硬件实现的.而段的长度却不固定,决定于用户所编写的程序,通常由编译程序在对源程序进行编译时根据信息的性质来划分.</p>
+</li>
+<li><p>3.分页的作业地址空间是一维的.分段的地址空间是二维的.</p>
+<ul>
+<li>意思是分页的话，给个虚拟地址就能找到物理地址（因为页是一样大的，可以算出来），而分段的话，需要给段号和虚拟地址才能算出来物理地址，因为段是不定长的嘛</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>段页式</p>
+<ul>
+<li>首先将进程按逻辑分成段<br>再将每段分成页<br>查找需要段号，页号，偏移量</li>
+</ul>
+</li>
+</ul>
+<h3 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h3><ul>
+<li>好处：</li>
+</ul>
+<p>1.可以使有限的内存存放更多进程<br>2.可以使程序比整个内存都大，比如某些游戏<br>3.不需要程序的所有页或段都在内存之中</p>
+<h3 id="操作系统处理"><a href="#操作系统处理" class="headerlink" title="操作系统处理"></a>操作系统处理</h3><ul>
+<li><p>为了防止缺页中断太过频繁，os有很多算法来进行内存调度</p>
+<ul>
+<li><p>读取策略：<br>进程页可以在请求时读取，或预先分页，按簇一次读取多页</p>
+</li>
+<li><p>放置策略：<br>对纯分段系统，读取的段必须匹配内存的空间</p>
+</li>
+<li><p>置换策略：<br>内存装满后，必须决定置换哪些页</p>
+</li>
+<li><p>驻留集管理：<br>换入特定进程时，os决定给他分配多少内存，既可以静态分配，也可以动态地变化</p>
+</li>
+<li><p>清除策略：<br>修改过的进程页可在置换时写出，或使用预约式清楚策略，按簇一次写出多页</p>
+</li>
+<li><p>加载控制：<br>主要关注任何给定时刻驻留在内存中的进程数量</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h2><h3 id="单处理器调度"><a href="#单处理器调度" class="headerlink" title="单处理器调度"></a>单处理器调度</h3><ul>
+<li><p>处理器调度类型</p>
+<ul>
+<li>长程调度：<br>决定哪些进程可以进入系统中处理（读入内存）</li>
+<li>中程调度：<br>是交换功能的一部分，就是决定进程的一部分读入内存或换出到磁盘</li>
+<li>短程调度：<br>真正决定当前cpu处理哪个进程（运行态）的调度</li>
+</ul>
+</li>
+</ul>
+<h3 id="多处理器调度"><a href="#多处理器调度" class="headerlink" title="多处理器调度"></a>多处理器调度</h3><ul>
+<li><p>粒度</p>
+</li>
+<li><p>进程调度</p>
+</li>
+<li><p>线程调度</p>
+<ul>
+<li><p>负载分配</p>
+<ul>
+<li>先来先服务</li>
+<li>最少线程数优先</li>
+<li>可抢占的最少线程数优先</li>
+</ul>
+</li>
+<li><p>组调度</p>
+</li>
+<li><p>专用处理器分配</p>
+</li>
+<li><p>动态调度</p>
+</li>
+</ul>
+</li>
+<li><p>多核线程调度</p>
+</li>
+</ul>
+<h3 id="实时调度"><a href="#实时调度" class="headerlink" title="实时调度"></a>实时调度</h3><h3 id="调度算法"><a href="#调度算法" class="headerlink" title="调度算法"></a>调度算法</h3><ul>
+<li><p>进程优先级</p>
+</li>
+<li><p>决策模式：抢占/非抢占</p>
+</li>
+<li><p>调度策略</p>
+<ul>
+<li>先来先服务</li>
+<li>轮转</li>
+<li>最短进程优先</li>
+<li>最短剩余时间</li>
+<li>最高响应比优先</li>
+<li>反馈法</li>
+<li>公平共享调度（进程组）</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" title="操作系统思维导图" target="_blank" rel="external">http://icecorn.github.io/2022/03/16/操作系统/操作系统/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E4%B8%93%E9%A2%98-%E5%9B%9B%E7%A7%8D%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" title="C++ Primer笔记|专题-四种类型转换的使用"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
