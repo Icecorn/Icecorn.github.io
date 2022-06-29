@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>计算机网络--应用层 | Blog of Icecorn</title>
+  <meta name="description" content="计算机网络–应用层本章主要掌握各种应用层协议的使用方法和实现方法 常见的基于UDP和TCP的应用  1 域名系统DNS我们打开一个网页比如百度通常是使用www.baidu.com而不是它的ip地址加端口号，这就是靠域名服务器进行域名解析实现的。主机发送DNS请求报文（使用UDP）给**域名服务器**，收到响应中的ip地址后可与目的主机进行通信。  全球只用一个域名服务器显然是不现实的，所以域名服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络--应用层">
+<meta property="og:url" content="http://icecorn.github.io/2022/02/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E5%BA%94%E7%94%A8%E5%B1%82/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="计算机网络–应用层本章主要掌握各种应用层协议的使用方法和实现方法 常见的基于UDP和TCP的应用  1 域名系统DNS我们打开一个网页比如百度通常是使用www.baidu.com而不是它的ip地址加端口号，这就是靠域名服务器进行域名解析实现的。主机发送DNS请求报文（使用UDP）给**域名服务器**，收到响应中的ip地址后可与目的主机进行通信。  全球只用一个域名服务器显然是不现实的，所以域名服务">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419210323.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419170454.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419174635.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419180528.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419185159.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419190059.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419190831.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419191111.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419192922.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419195202.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419201257.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419203549.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419203910.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419205843.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419210211.png">
+<meta property="article:published_time" content="2022-02-16T11:25:30.000Z">
+<meta property="article:modified_time" content="2022-06-29T10:21:15.875Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419210323.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/02/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E5%BA%94%E7%94%A8%E5%B1%82/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/02/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E5%BA%94%E7%94%A8%E5%B1%82/" class="title">计算机网络--应用层</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-02-16T11:25:30.000Z" itemprop="datePublished">2022-02-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/02/14/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E8%BF%90%E8%BE%93%E5%B1%82/" class="title">计算机网络--运输层</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-02-14T06:16:07.000Z" itemprop="datePublished">2022-02-14</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/02/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%B1%82/" class="title">计算机网络--网络层</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-02-13T08:53:09.000Z" itemprop="datePublished">2022-02-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/02/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" class="title">计算机网络--数据链路层</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-02-11T09:25:10.000Z" itemprop="datePublished">2022-02-11</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/02/10/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%89%A9%E7%90%86%E5%B1%82/" class="title">计算机网络--物理层</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-02-10T06:35:54.000Z" itemprop="datePublished">2022-02-10</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E2%80%93%E5%BA%94%E7%94%A8%E5%B1%82"><span class="toc-number">1.</span> <span class="toc-text">计算机网络–应用层</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9FDNS"><span class="toc-number">1.1.</span> <span class="toc-text">1 域名系统DNS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E6%96%87%E4%BB%B6%E4%BC%A0%E9%80%81%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.2.</span> <span class="toc-text">2 文件传送协议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-FTP%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1 FTP协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-TFTP%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2 TFTP协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E8%BF%9C%E7%A8%8B%E7%BB%88%E7%AB%AF%E5%8D%8F%E8%AE%AETELNET"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3 远程终端协议TELNET</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%87%E7%BB%B4%E7%BD%91%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.3.</span> <span class="toc-text">3 万维网协议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E5%AE%9A%E4%BD%8D%E7%AC%A6URL"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1 统一资源定位符URL</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AEHTTP"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2 超文本传输协议HTTP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E4%B8%87%E7%BB%B4%E7%BD%91%E6%96%87%E6%A1%A3"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3 万维网文档</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-%E4%B8%87%E7%BB%B4%E7%BD%91%E7%9A%84%E4%BF%A1%E6%81%AF%E6%A3%80%E7%B4%A2%E7%B3%BB%E7%BB%9F"><span class="toc-number">1.3.4.</span> <span class="toc-text">3.4 万维网的信息检索系统</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%94%B5%E5%AD%90%E9%82%AE%E4%BB%B6"><span class="toc-number">1.4.</span> <span class="toc-text">4 电子邮件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%8A%A8%E6%80%81%E4%B8%BB%E6%9C%BA%E9%85%8D%E7%BD%AE%E5%8D%8F%E8%AE%AEDHCP"><span class="toc-number">1.5.</span> <span class="toc-text">5 动态主机配置协议DHCP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-P2P%E5%BA%94%E7%94%A8"><span class="toc-number">1.6.</span> <span class="toc-text">6 P2P应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E9%9B%86%E4%B8%AD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84P2P%E5%B7%A5%E4%BD%9C%E6%96%B9%E5%BC%8F"><span class="toc-number">1.6.1.</span> <span class="toc-text">6.1 集中服务器的P2P工作方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E5%85%A8%E5%88%86%E5%B8%83%E5%BC%8F%E7%BB%93%E6%9E%84P2P%E5%85%B1%E4%BA%AB%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.6.2.</span> <span class="toc-text">6.2 全分布式结构P2P共享程序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="toc-number">1.7.</span> <span class="toc-text">7 应用进程和系统调用</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-计算机网络--应用层" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      计算机网络--应用层
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/02/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E5%BA%94%E7%94%A8%E5%B1%82/" class="article-date">
+	  <time datetime="2022-02-16T11:25:30.000Z" itemprop="datePublished">2022-02-16</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/02/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E5%BA%94%E7%94%A8%E5%B1%82/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.9k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 9(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="计算机网络–应用层"><a href="#计算机网络–应用层" class="headerlink" title="计算机网络–应用层"></a>计算机网络–应用层</h1><p>本章主要掌握各种应用层协议的使用方法和实现方法</p>
+<p>常见的基于UDP和TCP的应用</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419210323.png"></p>
+<h2 id="1-域名系统DNS"><a href="#1-域名系统DNS" class="headerlink" title="1 域名系统DNS"></a>1 域名系统DNS</h2><p>我们打开一个网页比如百度通常是使用<a target="_blank" rel="noopener" href="http://www.baidu.com而不是它的ip地址加端口号,这就是靠域名服务器进行域名解析实现的.主机发送dns请求报文(使用udp)给**域名服务器**,收到响应中的ip地址后可与目的主机进行通信./">www.baidu.com而不是它的ip地址加端口号，这就是靠域名服务器进行域名解析实现的。主机发送DNS请求报文（使用UDP）给**域名服务器**，收到响应中的ip地址后可与目的主机进行通信。</a></p>
+<hr>
+<p>全球只用一个域名服务器显然是不现实的，所以域名服务器实际上是一个分布式系统，并且按如下划分了域名空间</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419170454.png"></p>
+<p><strong>权限域名服务器</strong>：负责一个区的域名服务器，一般是一个公司内部的，比如可以划分abc.com和y.abc.com</p>
+<p><strong>本地域名服务器</strong>：又叫做<strong>默认域名服务器</strong>，一般是离主机最近的服务器</p>
+<hr>
+<p>主机向本地域名服务器的查询一般采用<strong>递归查询</strong></p>
+<p>本地服务器向根服务器的查询一般采用<strong>迭代查询</strong>，当然也可以用递归查询</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419174635.png"></p>
+<p><strong>递归查询</strong>就是自己只发送一次查询报文然后剩下的一层层处理最后拿个结果就好了（小弟派小弟层层转包）</p>
+<p><strong>迭代查询</strong>是自己发送查询接收响应反复操作最后得到结果（事必躬亲）</p>
+<hr>
+<h2 id="2-文件传送协议"><a href="#2-文件传送协议" class="headerlink" title="2 文件传送协议"></a>2 文件传送协议</h2><p>FTP基于TCP，TFTP基于UDP</p>
+<h3 id="2-1-FTP协议"><a href="#2-1-FTP协议" class="headerlink" title="2.1 FTP协议"></a>2.1 FTP协议</h3><p>FTP使用客户服务器方式，FTP服务器由一个<strong>主进程</strong>和<strong>若干个从属进程</strong>组成，这是因为FTP服务器要接收好多个客户的请求，每次和一个客户连接后马上给这个客户分配几个从属进程，快点把主进程空出来给别的客户访问</p>
+<p>对于一个主机来说，与服务器一般建立两个TCP连接，一个<strong>控制进程</strong>，一个<strong>数据传送进程</strong>，通信中控制进程一直连接着吗，因此FTP控制信息是<strong>带外</strong>的</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419180528.png" alt="一个主机与服务器的通信"></p>
+<p>TCP只能整体传送文件，这就有了<strong>网络文件系统NFS</strong>，它可以允许应用程序只读取并修改指定位置的信息，减少了通信量</p>
+<hr>
+<h3 id="2-2-TFTP协议"><a href="#2-2-TFTP协议" class="headerlink" title="2.2 TFTP协议"></a>2.2 TFTP协议</h3><p>基于UDP的超级简单的协议，只支持传输不支持交互</p>
+<p>优点：</p>
+<ul>
+<li>多个主机同时从服务器下载东西（因为UDP可以一对多嘛，可以理解类似于多播）</li>
+<li>开销小，占内存小，这就适合很多不需要太多功能的开源硬件</li>
+</ul>
+<p>另外虽然UDP是不可靠传输，但TFTP类似与停止等待协议，这就是靠应用层实现传输控制来保证的</p>
+<hr>
+<h3 id="2-3-远程终端协议TELNET"><a href="#2-3-远程终端协议TELNET" class="headerlink" title="2.3 远程终端协议TELNET"></a>2.3 远程终端协议TELNET</h3><p>用来远程控制桌面的东东，只需要知道怎么用以及它是基于TCP的就ok</p>
+<hr>
+<h2 id="3-万维网协议"><a href="#3-万维网协议" class="headerlink" title="3 万维网协议"></a>3 万维网协议</h2><p>就是我们熟悉的www啦，了解万维网，主要了解一下几个问题：</p>
+<ul>
+<li>怎样标志分布在整个互联网上的各种万维网文档？ URL</li>
+<li>用什么协议实现万维网的连接？  HTTP</li>
+<li>不同风格的文档在不同主机怎么显示？  HTML</li>
+<li>怎样查找需要的信息？  搜索引擎</li>
+</ul>
+<hr>
+<h3 id="3-1-统一资源定位符URL"><a href="#3-1-统一资源定位符URL" class="headerlink" title="3.1 统一资源定位符URL"></a>3.1 统一资源定位符URL</h3><p>相当于互联网上任一文件的指针，一般形式为：</p>
+<p>&lt;协议&gt;://&lt;主机&gt;:&lt;端口&gt;/&lt;路径&gt;</p>
+<p>协议常见的有http，ftp等，端口和路径可以省略</p>
+<hr>
+<h3 id="3-2-超文本传输协议HTTP"><a href="#3-2-超文本传输协议HTTP" class="headerlink" title="3.2 超文本传输协议HTTP"></a>3.2 超文本传输协议HTTP</h3><p>HTTP是<strong>面向事务</strong>的应用层协议，基于TCP</p>
+<p>特点：</p>
+<ul>
+<li><strong>无连接的</strong>：意思就是http不用先建立连接再通信，因为是基于TCP的，由TCP来保证可靠传输</li>
+<li><strong>无状态的</strong>： 意思是同一个客户再来访问结果还是一样，服务器不会记得</li>
+<li><strong>面向文本</strong>： 意思是http报文中的每一个字段都是一些ASCII码，长度是由用户输入决定的</li>
+</ul>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419185159.png"></p>
+<hr>
+<p>http首先要与服务器建立TCP连接，这就需要3次握手，由传输层的知识我们知道这样就会导致客户实际收到消息时需要2RTT的时间间隔，而http1.0协议使用<strong>非持续传输</strong>，意思就是访问这个网页（服务器不同路径）上的任何一个元素都需要重新建立TCP连接，这就会浪费好多个2RTT时间</p>
+<p>所以http1.1采用了<strong>持续连接</strong>，意思就是访问同一个服务器上东西的时候TCP连接不用断开，就用着一个就完事了，省下来很多<strong>握手时间</strong>，具体方式还分为<strong>流水线</strong>和<strong>非流水线</strong>方式，不赘述了</p>
+<hr>
+<p><strong>代理服务器</strong>，又叫做<strong>万维网高速缓存</strong></p>
+<p>这玩意就是保存了一个局域网内最近主机的请求和响应信息，当又有主机访问相同的资源的时候就不用再去远端查找了。这就减少了链路的通信量。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419190059.png"></p>
+<hr>
+<p><strong>HTTP的报文结构</strong></p>
+<p>主要就是<strong>请求报文</strong>和<strong>响应报文</strong></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419190831.png"></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419191111.png"></p>
+<hr>
+<h3 id="3-3-万维网文档"><a href="#3-3-万维网文档" class="headerlink" title="3.3 万维网文档"></a>3.3 万维网文档</h3><p><strong>超文本标记语言HTML</strong>：用于在浏览器上显示数据</p>
+<p><strong>可扩展标记语言XML</strong>： 用于传输数据</p>
+<p><strong>可扩展超文本标记语言XHTML</strong>： 更严格的html版本</p>
+<p><strong>层叠样式表CSS</strong>： 用于定义html文档布局</p>
+<hr>
+<p><strong>动态文档</strong></p>
+<p>上述都是<strong>静态文档</strong>，而<strong>动态文档</strong>只是文档的生成方法不同，静态文档只要放在服务器上就ok了，动态文档允许客户和服务器进行交互，也就是说服务器获取到客户的信息后进行一系列处理之后生成文档</p>
+<p>这就需要在服务器中新增加一个应用程序叫做<strong>CGI程序</strong>，也叫作CGI脚本。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419192922.png"></p>
+<hr>
+<p><strong>活动文档</strong></p>
+<p>它是用来满足更复杂的需求比如动画交互之类的，如果一直让服务器来传送的话太浪费资源，所以<strong>活动文档</strong>相当于是在服务器上的一个静态文档，类似一个浏览器可执行的小应用程序，现在常用的JS脚本</p>
+<hr>
+<h3 id="3-4-万维网的信息检索系统"><a href="#3-4-万维网的信息检索系统" class="headerlink" title="3.4 万维网的信息检索系统"></a>3.4 万维网的信息检索系统</h3><p>分为两种：</p>
+<p><strong>全文检索搜索</strong>： 比如谷歌百度这种，本质是使用爬虫在数据库里搜索相关信息</p>
+<p><strong>分类目录搜索</strong>： 比如门户网站这些，已经给你分配好了的专栏</p>
+<hr>
+<h2 id="4-电子邮件"><a href="#4-电子邮件" class="headerlink" title="4 电子邮件"></a>4 电子邮件</h2><p>主要涉及<strong>简单邮件传送协议SMTP</strong>，<strong>互联网邮件扩充MIME</strong>，<strong>邮局协议POP3</strong>，<strong>网际报文存取协议IMAP</strong></p>
+<p><strong>要注意的是这些都是基于TCP的</strong></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419195202.png"></p>
+<p>上图基本给出了用户代理，发送方和接收方邮件服务器的作用</p>
+<hr>
+<p><strong>由于SMTP有以下缺点</strong>：</p>
+<ul>
+<li>不能传送可执行文件和其他的二进制对象</li>
+<li>只能传送7位的ASCII码，导致其他国家文字不能传输</li>
+<li>SMTP服务器会拒绝超出一定长度的邮件</li>
+<li>将制表符tab转换为若干个空格</li>
+</ul>
+<p>由此提出了<strong>互联网扩充协议MIME</strong></p>
+<p>具体看书吧，记住有了MIME实现了上述这些功能就行了</p>
+<hr>
+<p><strong>两种接收协议的特点</strong>：</p>
+<p>POP3：</p>
+<p>优点：简单</p>
+<p>缺点：邮件读了后就自动删除了</p>
+<p>IMAP：</p>
+<p>优点：可以在不同主机上随时处理邮件服务器的邮件，支持阅读部分邮件</p>
+<p>缺点：必须上网连接IMAP服务器才能阅读邮件</p>
+<hr>
+<p>互联网邮箱：</p>
+<p>现在多数都是这些，记住<strong>浏览器和互联网上的邮件服务器通信使用的是HTTP协议，而邮件服务器之间通信使用SMTP即可</strong></p>
+<hr>
+<h2 id="5-动态主机配置协议DHCP"><a href="#5-动态主机配置协议DHCP" class="headerlink" title="5 动态主机配置协议DHCP"></a>5 动态主机配置协议DHCP</h2><p>DCHP使用UDP进行传输。就是动态的分配<strong>IP地址，子网掩码，默认路由地址，域名服务器地址</strong>（就是我们常用的自动配置IP）</p>
+<p>一个新的主机第一次连接到一个网络，按照以下步骤：</p>
+<ul>
+<li>主机发送<strong>广播</strong>（目的地址全1）给网络中的<strong>DCHP中继代理</strong>（一般是一个路由器）</li>
+<li>路由器发送<strong>单播</strong>告诉DCHP服务器</li>
+<li>DCHP发送响应给主机A</li>
+</ul>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419201257.png"></p>
+<p>注意两点：</p>
+<ul>
+<li>主机在一个网络中连了一次网，分配的IP就记录在DCHP服务器中了，下次联网还是这个IP地址</li>
+<li>给了IP地址后，不是一直可以使用的，有一个<strong>租用期</strong>，长短有DCHP服务器控制，过半后主机发送续租报文，服务器同意就续上，不同意就不能用这个IP了</li>
+</ul>
+<h2 id="6-P2P应用"><a href="#6-P2P应用" class="headerlink" title="6 P2P应用"></a>6 P2P应用</h2><h3 id="6-1-集中服务器的P2P工作方式"><a href="#6-1-集中服务器的P2P工作方式" class="headerlink" title="6.1 集中服务器的P2P工作方式"></a>6.1 集中服务器的P2P工作方式</h3><p>在集中式目录服务器中建立一个数据库保存哪个资源都哪些主机有，这是要想下载一个东西就先去集中服务器查找，返回一串主机，在选一个主机进行下载</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419203549.png"></p>
+<hr>
+<h3 id="6-2-全分布式结构P2P共享程序"><a href="#6-2-全分布式结构P2P共享程序" class="headerlink" title="6.2 全分布式结构P2P共享程序"></a>6.2 全分布式结构P2P共享程序</h3><p>使用<strong>洪泛法</strong>，在网络内进行<strong>有限范围的洪泛查询</strong>，具有代表性的就是BT种子了（某播：技术是无罪的==）</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419203910.png"></p>
+<p>P2P的本质就是惠人惠己，比如我们要下载一部小电影，实际上在p2p网络中这个小电影是由好多个<strong>文件块</strong>组成的，有好多主机上边都有这些文件块，可能这个给你一块那个给你一块那么我们就能很快把这个小电影下载完，当然之后我们电脑上有这个文件了（即使一些文件块）也要给别人下载，不能太自私啦。这些和我们互相交互下载文件块的主机叫做<strong>对等方</strong>。</p>
+<p>同时在发送过程中有两个规则：</p>
+<ul>
+<li><strong>最稀有优先</strong>：意思就是小电影中哪个文件块在现在网上拥有的数目最少就要先下载哪个，不然那些主机都下线最后少了这个文件块导致看不了小电影就很难受QAQ</li>
+<li><strong>优先发送对等方选择</strong>：前面说我们也要给别人下载，那么怎么确定优先给谁发呢？当然要优先发给给我们发送文件块的对等方了（按速率排序，互惠互利）。一般保持4个最高速的对等方，这些对等方叫<strong>已疏通的或无障碍的对等方</strong></li>
+</ul>
+<p>还有一个问题就是分布式结构到底怎么确定小电影在哪些主机上有呢？</p>
+<p><strong>洪泛法的效率太低且浪费资源</strong>，所以最好还是建立一个<strong>分布式数据库</strong>，又不能像集中式服务器那样，所以现在有个算法是<strong>分布式散列表</strong>，具体内容再看吧QAQ</p>
+<hr>
+<h2 id="7-应用进程和系统调用"><a href="#7-应用进程和系统调用" class="headerlink" title="7 应用进程和系统调用"></a>7 应用进程和系统调用</h2><p>我们知道程序员的业务逻辑代码基本都是在应用层，对运输层的控制很少（只能设置最大数据长度MSS等），那么进行网络编程时实际上都是使用API（也可以说套接字）来对接操作系统从而实现网络通信</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419205843.png"></p>
+<p>进行TCP的基本API调用流程如下，细节的话联系操作系统</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200419210211.png"></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/02/16/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E5%BA%94%E7%94%A8%E5%B1%82/" title="计算机网络--应用层" target="_blank" rel="external">http://icecorn.github.io/2022/02/16/计算机网络--应用层/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2022/02/14/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E8%BF%90%E8%BE%93%E5%B1%82/" title="计算机网络--运输层"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
