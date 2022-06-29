@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>算法系列（一）|链表，树，递归，回溯 | Blog of Icecorn</title>
+  <meta name="description" content="算法题系列（一）主要掌握知识点，滑动窗口，双指针，动态规划，字符串，数组，二叉树，并查集，单调栈，DFS，BFS等；其中字符串操作(子串)，数组(二维数组遍历)是重点。二维数组要记住leetcode上俄罗斯套娃信封问题，里面有个排序思想能解决二维数组的很多问题，比如堆积木，快递问题，小朋友身高体重问题，主要多刷题，总结刷题思路和模板 常见算法题型递归 一个问题的解可以分解为几个子问题的解 子问题求">
+<meta property="og:type" content="article">
+<meta property="og:title" content="算法系列（一）|链表，树，递归，回溯">
+<meta property="og:url" content="http://icecorn.github.io/2022/05/25/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E9%93%BE%E8%A1%A8%EF%BC%8C%E6%A0%91%EF%BC%8C%E9%80%92%E5%BD%92%EF%BC%8C%E5%9B%9E%E6%BA%AF/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="算法题系列（一）主要掌握知识点，滑动窗口，双指针，动态规划，字符串，数组，二叉树，并查集，单调栈，DFS，BFS等；其中字符串操作(子串)，数组(二维数组遍历)是重点。二维数组要记住leetcode上俄罗斯套娃信封问题，里面有个排序思想能解决二维数组的很多问题，比如堆积木，快递问题，小朋友身高体重问题，主要多刷题，总结刷题思路和模板 常见算法题型递归 一个问题的解可以分解为几个子问题的解 子问题求">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220625130916.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220625131519.png">
+<meta property="article:published_time" content="2022-05-25T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:58:10.034Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220625130916.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/05/25/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E9%93%BE%E8%A1%A8%EF%BC%8C%E6%A0%91%EF%BC%8C%E9%80%92%E5%BD%92%EF%BC%8C%E5%9B%9E%E6%BA%AF/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">25</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">7</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-104/" rel="tag">Games-104</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openGL/" rel="tag">openGL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shader/" rel="tag">shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.33px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.17px;">Games-101</a> <a href="/tags/Games-104/" style="font-size: 13.5px;">Games-104</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.83px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.17px;">Rasterizer</a> <a href="/tags/openGL/" style="font-size: 13px;">openGL</a> <a href="/tags/shader/" style="font-size: 13px;">shader</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.33px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" style="font-size: 13.5px;">游戏引擎</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13px;">算法</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.67px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染只是</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-19T09:25:10.000Z" itemprop="datePublished">2022-06-19</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/10/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%85%89%E7%85%A7%E5%92%8C%E6%9D%90%E8%B4%A85/" class="title">Games-104|第五课-渲染系统-光照与材质</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-10T09:25:10.000Z" itemprop="datePublished">2022-06-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/07/Games-104/Games104-%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E6%95%B0%E6%8D%AE%E7%BB%84%E7%BB%874/" class="title">Games-104|第四课-渲染数据组织</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-07T09:25:10.000Z" itemprop="datePublished">2022-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/" class="title">Games-104|第1-3课-引擎架构分层&amp;数据组织管理</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E9%A2%98%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">算法题系列（一）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E9%A2%98%E5%9E%8B"><span class="toc-number">1.1.</span> <span class="toc-text">常见算法题型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%92%E5%BD%92"><span class="toc-number">1.1.1.</span> <span class="toc-text">递归</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8"><span class="toc-number">1.1.2.</span> <span class="toc-text">链表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%91"><span class="toc-number">1.1.3.</span> <span class="toc-text">树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-number">1.1.4.</span> <span class="toc-text">字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2"><span class="toc-number">1.1.5.</span> <span class="toc-text">搜索</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8API"><span class="toc-number">1.2.</span> <span class="toc-text">常用API</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%98%AF%E5%90%A6%E6%98%AF%E6%95%B0%E5%AD%97%EF%BC%8C%E5%AD%97%E6%AF%8D"><span class="toc-number">1.2.1.</span> <span class="toc-text">是否是数字，字母</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#n%E8%BF%9B%E5%88%B6%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%8D%A2%E6%88%9010%E8%BF%9B%E5%88%B6"><span class="toc-number">1.2.2.</span> <span class="toc-text">n进制字符串转换成10进制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%8D%A2%E6%88%90%E6%95%B4%E6%95%B0"><span class="toc-number">1.2.3.</span> <span class="toc-text">字符串转换成整数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#string%E8%BD%ACC%E9%A3%8E%E6%A0%BC%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-number">1.2.4.</span> <span class="toc-text">string转C风格字符串</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C"><span class="toc-number">1.2.5.</span> <span class="toc-text">字符串常用操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B1%82%E5%92%8C%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.6.</span> <span class="toc-text">求和函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-number">1.3.</span> <span class="toc-text">注意点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D"><span class="toc-number">1.4.</span> <span class="toc-text">字符串匹配</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%AA%E5%BF%83%E9%97%AE%E9%A2%98"><span class="toc-number">1.5.</span> <span class="toc-text">贪心问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#n%E4%B8%AA%E5%BB%BA%E7%AD%91%E8%97%8F3%E4%B8%AA%E4%BA%BA"><span class="toc-number">1.5.1.</span> <span class="toc-text">n个建筑藏3个人</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E6%BA%AF%E6%B3%95"><span class="toc-number">1.6.</span> <span class="toc-text">回溯法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%BA%BB%E5%B0%86%E9%97%AE%E9%A2%98"><span class="toc-number">1.6.1.</span> <span class="toc-text">麻将问题</span></a></li></ol></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-算法/算法系列（一）链表，树，递归，回溯" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      算法系列（一）|链表，树，递归，回溯
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/05/25/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E9%93%BE%E8%A1%A8%EF%BC%8C%E6%A0%91%EF%BC%8C%E9%80%92%E5%BD%92%EF%BC%8C%E5%9B%9E%E6%BA%AF/" class="article-date">
+	  <time datetime="2022-05-25T09:25:10.000Z" itemprop="datePublished">2022-05-25</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/05/25/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E9%93%BE%E8%A1%A8%EF%BC%8C%E6%A0%91%EF%BC%8C%E9%80%92%E5%BD%92%EF%BC%8C%E5%9B%9E%E6%BA%AF/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.6k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 11(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="算法题系列（一）"><a href="#算法题系列（一）" class="headerlink" title="算法题系列（一）"></a>算法题系列（一）</h1><p>主要掌握知识点，滑动窗口，双指针，动态规划，字符串，数组，二叉树，并查集，单调栈，DFS，BFS等；其中字符串操作(子串)，数组(二维数组遍历)是重点。二维数组要记住leetcode上俄罗斯套娃信封问题，里面有个排序思想能解决二维数组的很多问题，比如堆积木，快递问题，小朋友身高体重问题，主要多刷题，总结刷题思路和模板</p>
+<h2 id="常见算法题型"><a href="#常见算法题型" class="headerlink" title="常见算法题型"></a>常见算法题型</h2><h3 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h3><ul>
+<li>一个问题的解可以分解为几个子问题的解</li>
+<li>子问题求解思路和原问题一致</li>
+<li>存在基线/终止条件</li>
+</ul>
+<p>Lc21题：合并两个有序链表<br>Lc83题：删除链表重复元素</p>
+<h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p><strong>链表判断是否有环</strong></p>
+<p>方法：双指针，遍历，哈希<br>Lc141题：环形链表<br>Lc206题：反转链表<br>Lc234题：回文链表</p>
+<h3 id="树"><a href="#树" class="headerlink" title="树"></a>树</h3><p>一篇解决：<br><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/shu-de-zi-jie-gou-lcof/solution/yi-pian-wen-zhang-dai-ni-chi-tou-dui-che-uhgs/">https://leetcode.cn/problems/shu-de-zi-jie-gou-lcof/solution/yi-pian-wen-zhang-dai-ni-chi-tou-dui-che-uhgs/</a></p>
+<p><strong>解题模板</strong><br>下面给出二叉树对称性递归的解题模板<br><strong>1、递归结束条件：特殊情况的判断</strong><br>如果是单树问题，一般来说只要进行以下判断：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(!root) <span class="keyword">return</span> <span class="literal">true</span>/<span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span>(!root-&gt;left) <span class="keyword">return</span> <span class="literal">true</span>/<span class="literal">false</span>/递归函数;</span><br><span class="line"><span class="keyword">if</span>(!root-&gt;right) <span class="keyword">return</span> <span class="literal">true</span>/<span class="literal">false</span>/递归函数;</span><br></pre></td></tr></table></figure>
+
+
+<p>如果是双树问题(根节点分别为p,q)，一般来说进行以下判断：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(!p &amp;&amp; !q)<span class="keyword">return</span> <span class="literal">true</span>/<span class="literal">false</span>;</span><br><span class="line"><span class="keyword">if</span>(!p || !q)<span class="keyword">return</span> <span class="literal">true</span>/<span class="literal">false</span>;</span><br></pre></td></tr></table></figure>
+
+
+<p>当然也不完全是这些情况，比如有的需要加上节点值的判断，需要具体问题需要具体分析</p>
+<p><strong>2、返回值</strong><br>通常对称性递归的返回值是多个条件的复合判断语句<br>可能是以下几种条件判断的组合：<br>节点非空的判断<br>节点值比较判断<br>(单树)调用根节点左右子树的递归函数进行递归判断<br>(双树)调用两棵树的左右子树的递归函数进行判断</p>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>比较，匹配，解析<br>重点题：回文字符串<br>思路就是以每个字符为中心，像左右发散判断是否回文（分一个字符中心，和两个字符中心）</p>
+<h3 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h3><p><strong>DFS:</strong><br>应用：暴力搜索（其实就是枚举），检测环路<br>dfs可以搜索到所有的解，根据题意应用一些剪枝的策略<br><strong>解题步骤：</strong></p>
+<ul>
+<li>找到搜索的下一个状态（往哪搜索）</li>
+<li>考虑搜索跳出的条件</li>
+<li>设置搜索状态（标记已经搜索过了）</li>
+<li>考虑剪枝情况优化搜索</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220625130916.png"></p>
+<p>经典题目：迷宫路径，宝石最大价值（暴力+剪枝）</p>
+<p><strong>BFS：</strong></p>
+<p>应用：bfs主要用来算最短路径，找一个“值”，火烧法，通过queue来实现</p>
+<p>经典题：二叉树层序遍历，每层的最大值，在while循环里获取当前queue的size，for循环size次<br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220625131519.png"></p>
+<p><strong>回溯法：</strong></p>
+<p>一篇解决：<br><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/subsets/solution/c-zong-jie-liao-hui-su-wen-ti-lei-xing-dai-ni-gao-/">https://leetcode.cn/problems/subsets/solution/c-zong-jie-liao-hui-su-wen-ti-lei-xing-dai-ni-gao-/</a></p>
+<p>回溯和dfs的区别是，dfs是无脑往下一个状态搜，回溯是搜索达到结束条件后，撤销这一步的选择，然后再继续搜，通常带有一些“状态东西“，比如一个vector之类的（想一下麻将胡牌问题）</p>
+<p><strong>回溯应用：一般用在要查找所有解，要维护一个和搜索过程无关的状态集合</strong></p>
+<p><strong>解题步骤：</strong></p>
+<ul>
+<li>画出递归树，找到状态变量（回溯函数的参数）</li>
+<li>根据题意，确立结束条件</li>
+<li>找准选择列表（与函数参数相关）</li>
+<li>判断剪枝</li>
+<li>做出选择</li>
+<li>递归调用</li>
+<li>撤销选择</li>
+</ul>
+<p><strong>题型：</strong></p>
+<ul>
+<li><p>子集，组合</p>
+<p>核心在于设置一个标志位int start，从而选定下一步可选集合</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; res;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; path;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">combinationSum</span>(vector&lt;<span class="type">int</span>&gt;&amp; candidates, <span class="type">int</span> target) &#123;</span><br><span class="line">        <span class="comment">//sort(candidates.begin(),candidates.end());</span></span><br><span class="line">        <span class="built_in">backtrace</span>(candidates,<span class="number">0</span>,target);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//第一步</span></span><br><span class="line">   <span class="function"><span class="type">void</span> <span class="title">backtrace</span><span class="params">(vector&lt;<span class="type">int</span>&gt; candidates,<span class="type">int</span> start,<span class="type">int</span> target)</span> </span>&#123;      <span class="comment">//第二步</span></span><br><span class="line">        <span class="keyword">if</span>(target==<span class="number">0</span>)&#123;</span><br><span class="line">            res.<span class="built_in">push_back</span>(path);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//第三步</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=start;i&lt;candidates.<span class="built_in">size</span>();++i)&#123;</span><br><span class="line">            <span class="keyword">if</span>(target&lt;<span class="number">0</span>) <span class="keyword">return</span>;<span class="comment">//第四步</span></span><br><span class="line">            path.<span class="built_in">push_back</span>(candidates[i]);<span class="comment">//第五步</span></span><br><span class="line">            <span class="built_in">backtrace</span>(candidates,i,target-candidates[i]);<span class="comment">//第六步</span></span><br><span class="line">            path.<span class="built_in">pop_back</span>();<span class="comment">//第七步</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>全排列Lc47</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; res;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; path;</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">permuteUnique</span>(vector&lt;<span class="type">int</span>&gt;&amp; nums) &#123;</span><br><span class="line">        <span class="built_in">sort</span>(nums.<span class="built_in">begin</span>(),nums.<span class="built_in">end</span>());</span><br><span class="line">        <span class="type">int</span> n = nums.<span class="built_in">size</span>();</span><br><span class="line">        <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">visited</span><span class="params">(n,<span class="number">0</span>)</span></span>;</span><br><span class="line">        <span class="built_in">backTrace</span>(nums,visited,<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">backTrace</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums,vector&lt;<span class="type">int</span>&gt;&amp; visited,<span class="type">int</span> pos)</span></span>&#123;</span><br><span class="line">        <span class="comment">//这里可以直接path.size()==nums.size(),不用传pos</span></span><br><span class="line">        <span class="keyword">if</span>(pos==nums.<span class="built_in">size</span>())&#123;</span><br><span class="line">            res.<span class="built_in">push_back</span>(path);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;nums.<span class="built_in">size</span>();++i)&#123;</span><br><span class="line">            <span class="keyword">if</span>(!visited[i])&#123;</span><br><span class="line">                <span class="comment">//这个!visited[i-1]没想到，必须前一个也能选才要剪枝</span></span><br><span class="line">                <span class="comment">//注意是i&gt;0,其实不用传pos</span></span><br><span class="line">                <span class="keyword">if</span>(i&gt;<span class="number">0</span>&amp;&amp;nums[i]==nums[i<span class="number">-1</span>]&amp;&amp;!visited[i<span class="number">-1</span>]) <span class="keyword">continue</span>;</span><br><span class="line">                path.<span class="built_in">push_back</span>(nums[i]);</span><br><span class="line">                visited[i] = <span class="number">1</span>;</span><br><span class="line">                <span class="built_in">backTrace</span>(nums,visited,pos+<span class="number">1</span>);</span><br><span class="line">                visited[i] = <span class="number">0</span>;</span><br><span class="line">                path.<span class="built_in">pop_back</span>();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>搜索</p>
+</li>
+</ul>
+<hr>
+<h2 id="常用API"><a href="#常用API" class="headerlink" title="常用API"></a>常用API</h2><h3 id="是否是数字，字母"><a href="#是否是数字，字母" class="headerlink" title="是否是数字，字母"></a>是否是数字，字母</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> a;</span><br><span class="line"><span class="built_in">isdigit</span>(a); <span class="comment">//校验字符是不是十进制数</span></span><br><span class="line"><span class="built_in">isalpha</span>(a); <span class="comment">//校验字符是不是英文字母</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="n进制字符串转换成10进制"><a href="#n进制字符串转换成10进制" class="headerlink" title="n进制字符串转换成10进制"></a><strong>n进制字符串转换成10进制</strong></h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="built_in">stoi</span>(字符串，起始位置，n进制);</span><br><span class="line">示例：</span><br><span class="line"><span class="built_in">stoi</span>(<span class="string">&quot;123&quot;</span>); <span class="comment">//直接一个参数也行 结果123</span></span><br><span class="line"><span class="built_in">stoi</span>(str,<span class="number">0</span>,<span class="number">2</span>);<span class="comment">//将str从位置0到末尾转化为10进制</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="字符串转换成整数"><a href="#字符串转换成整数" class="headerlink" title="字符串转换成整数"></a>字符串转换成整数</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">atoi</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *nptr)</span></span>;       	<span class="comment">//str-&gt;int</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="title">atol</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *nptr)</span></span>;		<span class="comment">//str-&gt;long</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">atoll</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *nptr)</span></span>;	<span class="comment">//str-&gt;long long</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">atoq</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *nptr)</span></span>;	<span class="comment">//str-&gt; long long</span></span><br><span class="line">示例：</span><br><span class="line">ii=<span class="built_in">atoi</span>(<span class="string">&quot;123&quot;</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;ii=%d\n&quot;</span>,ii);</span><br></pre></td></tr></table></figure>
+
+<h3 id="string转C风格字符串"><a href="#string转C风格字符串" class="headerlink" title="string转C风格字符串"></a>string转C风格字符串</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">s.<span class="built_in">c_str</span>();</span><br><span class="line">string s = <span class="string">&quot;Hello World!&quot;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>, s.<span class="built_in">c_str</span>()); <span class="comment">//输出 &quot;Hello World!&quot;</span></span><br><span class="line"></span><br><span class="line">C风格转string可以直接赋值</span><br><span class="line"><span class="type">char</span>* chstr;</span><br><span class="line"><span class="type">char</span> arstr[];</span><br><span class="line">string str = chstr;</span><br><span class="line">string str = arstr;</span><br></pre></td></tr></table></figure>
+
+<h3 id="字符串常用操作"><a href="#字符串常用操作" class="headerlink" title="字符串常用操作"></a>字符串常用操作</h3><p><strong>拼接</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">+号拼接</span><br><span class="line">string str1 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">string str2 = <span class="string">&quot; world&quot;</span>;</span><br><span class="line">str1 += str2; <span class="comment">// str1 = &quot;hello world&quot;</span></span><br><span class="line"></span><br><span class="line">函数拼接</span><br><span class="line">string str1 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">str1.<span class="built_in">append</span>(<span class="string">&quot; world&quot;</span>); <span class="comment">//str1 = &quot;hello world&quot;</span></span><br><span class="line"></span><br><span class="line">string str2 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">str2.<span class="built_in">append</span>(<span class="string">&quot; world&quot;</span>,<span class="number">3</span>);  <span class="comment">//str1 = &quot;hello wo&quot;,参数3代表只要前3个</span></span><br><span class="line"></span><br><span class="line">string str3 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">str3.<span class="built_in">append</span>(<span class="string">&quot; w orld&quot;</span>,<span class="number">2</span>,<span class="number">3</span>);  <span class="comment">//str1 = &quot;hello or&quot;,参数2代表从下标2开始,参数3代表要3个字符</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>查找子串</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">string str1 = <span class="string">&quot;abcdefdef&quot;</span>;</span><br><span class="line">str1.<span class="built_in">find</span>(<span class="string">&quot;def&quot;</span>);  <span class="comment">//结果是3，从左往右找</span></span><br><span class="line">str1.<span class="built_in">rfind</span>(<span class="string">&quot;def&quot;</span>); <span class="comment">//结果是6，从右往左找</span></span><br><span class="line">str1.<span class="built_in">find</span>(<span class="string">&quot;hhh&quot;</span>);  <span class="comment">//结果为-1，没有这个子串结果就是-1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>替换</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">string str1 = <span class="string">&quot;abcdssw&quot;</span>;</span><br><span class="line">str1.<span class="built_in">replace</span>(<span class="number">0</span>,<span class="number">2</span>,<span class="string">&quot;1111&quot;</span>); <span class="comment">//代表主串从0的位置开始，两个字符被替换掉；此处的结果为1111cdssw</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>比较</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">string str1 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">string str2 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">str1.<span class="built_in">compare</span>(str2);  <span class="comment">//结果为0代表相等，否则为不相等</span></span><br><span class="line"></span><br><span class="line">string str1 = <span class="string">&quot;helpo&quot;</span>;</span><br><span class="line">string str2 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">str1.<span class="built_in">compare</span>(str2);  <span class="comment">//结果不为0，为p-l,两个字符的ASCII值求差</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>插入</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">string str1 = <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">str1.<span class="built_in">insert</span>(<span class="number">1</span>,<span class="string">&quot;111&quot;</span>); <span class="comment">//在1的位置插入,结果为&quot;h111ello&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>获取子串</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">string str1 = <span class="string">&quot;hello world&quot;</span>;</span><br><span class="line">str1.<span class="built_in">substr</span>(<span class="number">1</span>,<span class="number">3</span>); <span class="comment">//从下标为1的位置截取长度为3的子串</span></span><br><span class="line"><span class="comment">//结果为ell</span></span><br><span class="line">str1.<span class="built_in">substr</span>(<span class="number">1</span>) <span class="comment">//返回的就是下标1到最后的子串</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>删除子串</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">string str1 = <span class="string">&quot;hello world&quot;</span>;</span><br><span class="line">str1.<span class="built_in">erase</span>(<span class="number">1</span>,<span class="number">3</span>); <span class="comment">//从下标为1的位置起，删除长度为3的子串</span></span><br><span class="line"><span class="comment">//结果为&quot;ho world&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="求和函数"><a href="#求和函数" class="headerlink" title="求和函数"></a>求和函数</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">accumulate</span>(v.<span class="built_in">begin</span>(), v.<span class="built_in">end</span>(), <span class="number">0</span>); <span class="comment">//最后的参数是初始值，一般为0</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//pair的使用</span></span><br><span class="line">pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; p = <span class="built_in">makepair</span>(i,j);</span><br><span class="line"><span class="function">pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; <span class="title">p</span><span class="params">(i,j)</span></span>;</span><br><span class="line">pair-&gt;first;   pair-&gt;second;</span><br><span class="line"></span><br><span class="line"><span class="comment">//矩阵构造  注意右边是vector&lt;int&gt; 不要忘记泛型</span></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>,<span class="type">int</span>&gt;&gt; mat = <span class="built_in">vector</span>(m,<span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(n,<span class="number">0</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">//写递归时注意，前边return true，要在上一级的递归函数中用上</span></span><br><span class="line"><span class="built_in">backtrace</span>()&#123;</span><br><span class="line">    <span class="keyword">if</span>(xxx) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span>(backtrace)<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<hr>
+<h2 id="字符串匹配"><a href="#字符串匹配" class="headerlink" title="字符串匹配"></a>字符串匹配</h2><p>cin&gt;&gt;    一次处理一行</p>
+<p>思路是重新生成字符串，双指针处理，i指针遍历字符串，j指针跟着遍历但找到符合条件要删除的就j–，然后s[j++] = s[i]组成新的字符串，最后返回。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    cin&gt;&gt;n;</span><br><span class="line">    string s;</span><br><span class="line">    <span class="keyword">while</span>(n--)</span><br><span class="line">    &#123;</span><br><span class="line">        cin&gt;&gt;s;</span><br><span class="line">        <span class="type">int</span> j=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;s.<span class="built_in">size</span>();i++)</span><br><span class="line">        &#123;</span><br><span class="line">            s[j++]=s[i];   <span class="comment">//j还没用</span></span><br><span class="line">            <span class="keyword">if</span>(j&gt;=<span class="number">3</span>&amp;&amp;s[j<span class="number">-1</span>]==s[j<span class="number">-2</span>]&amp;&amp;s[j<span class="number">-2</span>]==s[j<span class="number">-3</span>]) </span><br><span class="line">                j--;</span><br><span class="line">            <span class="keyword">if</span>(j&gt;=<span class="number">4</span>&amp;&amp;s[j<span class="number">-1</span>]==s[j<span class="number">-2</span>]&amp;&amp;s[j<span class="number">-3</span>]==s[j<span class="number">-4</span>]) </span><br><span class="line">                j--;</span><br><span class="line">        &#125;</span><br><span class="line">        s.<span class="built_in">erase</span>(s.<span class="built_in">begin</span>()+j,s.<span class="built_in">end</span>());</span><br><span class="line">        cout&lt;&lt;s&lt;&lt;endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="贪心问题"><a href="#贪心问题" class="headerlink" title="贪心问题"></a>贪心问题</h2><h3 id="n个建筑藏3个人"><a href="#n个建筑藏3个人" class="headerlink" title="n个建筑藏3个人"></a>n个建筑藏3个人</h3><p>且最大距离不超过d，处理有序数组的题目</p>
+<p>思路：</p>
+<ul>
+<li>遍历数组，找出每一次可选元素，双指针i j，v[i]-v[j]&lt;=d筛选</li>
+<li>贪心处理，组合问题，假定每一次i的值都被选，那么count=前边的数中选2个人</li>
+</ul>
+<hr>
+<h2 id="回溯法"><a href="#回溯法" class="headerlink" title="回溯法"></a>回溯法</h2><h3 id="麻将问题"><a href="#麻将问题" class="headerlink" title="麻将问题"></a>麻将问题</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line">(<span class="number">720</span>)<span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">card</span><span class="params">(<span class="number">9</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//检查剩余的牌能否组成n个顺子或刻子</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">hasTrible</span><span class="params">(<span class="type">int</span> n)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">0</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;card.<span class="built_in">size</span>(); ++i)&#123;</span><br><span class="line">        <span class="comment">//因为仍是从1开始查验，因此若检查到其牌数&gt;=3，则必定是刻子</span></span><br><span class="line">        <span class="keyword">if</span>(card[i]&gt;<span class="number">2</span>)&#123;   </span><br><span class="line">            card[i] -= <span class="number">3</span>;</span><br><span class="line">            <span class="keyword">if</span>(<span class="built_in">hasTrible</span>(n<span class="number">-1</span>))&#123;   <span class="comment">//检查余下的牌能否组成n-1个顺子或刻子</span></span><br><span class="line">                card[i] += <span class="number">3</span>;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            card[i] += <span class="number">3</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//否则只能是顺子</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(i&lt;card.<span class="built_in">size</span>()<span class="number">-2</span> &amp;&amp; card[i]&gt;<span class="number">0</span> &amp;&amp; card[i+<span class="number">1</span>]&gt;<span class="number">0</span> &amp;&amp; card[i+<span class="number">2</span>]&gt;<span class="number">0</span>)&#123;</span><br><span class="line">                card[i]--;</span><br><span class="line">                card[i+<span class="number">1</span>]--;</span><br><span class="line">                card[i+<span class="number">2</span>]--;</span><br><span class="line">                <span class="keyword">if</span>(<span class="built_in">hasTrible</span>(n<span class="number">-1</span>))&#123;</span><br><span class="line">                    card[i]++;</span><br><span class="line">                    card[i+<span class="number">1</span>]++;</span><br><span class="line">                    card[i+<span class="number">2</span>]++;</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                card[i]++;</span><br><span class="line">                card[i+<span class="number">1</span>]++;</span><br><span class="line">                card[i+<span class="number">2</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//检查14张牌能否和牌</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">isWin</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;<span class="number">9</span>; ++i)&#123;  <span class="comment">//依次把1~9作为雀头拿出来，检查剩下的12张牌能否顺或刻子</span></span><br><span class="line">        <span class="keyword">if</span>(card[i]&lt;<span class="number">2</span>)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        card[i] -= <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">hasTrible</span>(<span class="number">4</span>))&#123;    </span><br><span class="line">            card[i] += <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        card[i] += <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; res;</span><br><span class="line">    <span class="type">int</span> tmp;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;<span class="number">13</span>; ++i)&#123;</span><br><span class="line">        cin &gt;&gt; tmp;</span><br><span class="line">        card[tmp<span class="number">-1</span>]++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;<span class="number">9</span>; ++i)&#123;  <span class="comment">//1~9依次添加，检查是否可以和牌</span></span><br><span class="line">        <span class="keyword">if</span>(card[i]&gt;<span class="number">3</span>)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        card[i]++;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">isWin</span>())           <span class="comment">//如果添加的这张牌可以和牌，则将其加入输出结果</span></span><br><span class="line">            res.<span class="built_in">push_back</span>(i+<span class="number">1</span>);</span><br><span class="line">        card[i]--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(res.<span class="built_in">empty</span>()) res.<span class="built_in">push_back</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;res.<span class="built_in">size</span>(); ++i)</span><br><span class="line">        cout &lt;&lt; res[i] &lt;&lt; <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/05/25/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E9%93%BE%E8%A1%A8%EF%BC%8C%E6%A0%91%EF%BC%8C%E9%80%92%E5%BD%92%EF%BC%8C%E5%9B%9E%E6%BA%AF/" title="算法系列（一）|链表，树，递归，回溯" target="_blank" rel="external">http://icecorn.github.io/2022/05/25/算法/算法系列（一）链表，树，递归，回溯/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/05/31/%E5%BF%AB%E6%89%8B%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93/" title="快手实习总结|渲染&amp;shader"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" title="Linux高性能服务器|第十四章-多线程编程"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

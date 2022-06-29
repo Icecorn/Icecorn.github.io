@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Games-104|第1-3课-引擎架构分层&amp;数据组织管理 | Blog of Icecorn</title>
+  <meta name="description" content="第一课： 现代游戏引擎导论游戏引擎架构与层级 基础元素构建 了解游戏引擎的分层，以及为什么采用这样的架构  渲染系统 Model，Material, Shader, Texture 渲染管线，光影 学习对渲染对象组合不同算法进行渲染  动画系统 学习从3dsmax等导出的动画，如何把它们组装起来，构建工具  物理系统 学习游戏中的物理系统（刚体，软体，流体）  GamePlay 游戏中的核心玩法部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Games-104|第1-3课-引擎架构分层&amp;数据组织管理">
+<meta property="og:url" content="http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第一课： 现代游戏引擎导论游戏引擎架构与层级 基础元素构建 了解游戏引擎的分层，以及为什么采用这样的架构  渲染系统 Model，Material, Shader, Texture 渲染管线，光影 学习对渲染对象组合不同算法进行渲染  动画系统 学习从3dsmax等导出的动画，如何把它们组装起来，构建工具  物理系统 学习游戏中的物理系统（刚体，软体，流体）  GamePlay 游戏中的核心玩法部">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153615.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151730.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151945.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151127.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151252.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528152533.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528152618.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153037.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153308.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528155449.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528155746.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161008.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160951.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160928.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160910.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160845.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161312.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161545.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161901.png">
+<meta property="article:published_time" content="2022-06-05T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T16:08:22.273Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="Games-104">
+<meta property="article:tag" content="游戏引擎">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153615.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">25</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">7</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-104/" rel="tag">Games-104</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openGL/" rel="tag">openGL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shader/" rel="tag">shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.33px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.17px;">Games-101</a> <a href="/tags/Games-104/" style="font-size: 13.5px;">Games-104</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.83px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.17px;">Rasterizer</a> <a href="/tags/openGL/" style="font-size: 13px;">openGL</a> <a href="/tags/shader/" style="font-size: 13px;">shader</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.33px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" style="font-size: 13.5px;">游戏引擎</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13px;">算法</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.67px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染只是</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-19T09:25:10.000Z" itemprop="datePublished">2022-06-19</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/10/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%85%89%E7%85%A7%E5%92%8C%E6%9D%90%E8%B4%A85/" class="title">Games-104|第五课-渲染系统-光照与材质</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-10T09:25:10.000Z" itemprop="datePublished">2022-06-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/07/Games-104/Games104-%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E6%95%B0%E6%8D%AE%E7%BB%84%E7%BB%874/" class="title">Games-104|第四课-渲染数据组织</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-07T09:25:10.000Z" itemprop="datePublished">2022-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/" class="title">Games-104|第1-3课-引擎架构分层&amp;数据组织管理</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E8%AF%BE%EF%BC%9A-%E7%8E%B0%E4%BB%A3%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA"><span class="toc-number">1.</span> <span class="toc-text">第一课： 现代游戏引擎导论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%B1%82%E7%BA%A7"><span class="toc-number">1.1.</span> <span class="toc-text">游戏引擎架构与层级</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E8%AF%BE-%E5%BC%95%E6%93%8E%E6%9E%B6%E6%9E%84%E5%88%86%E5%B1%82%EF%BC%8C%E6%95%B4%E4%BD%93Pipeline"><span class="toc-number">2.</span> <span class="toc-text">第二课 引擎架构分层，整体Pipeline</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7%E5%B1%82"><span class="toc-number">2.1.</span> <span class="toc-text">工具层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%9F%E8%83%BD%E5%B1%82"><span class="toc-number">2.2.</span> <span class="toc-text">功能层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B5%84%E6%BA%90%E5%B1%82"><span class="toc-number">2.3.</span> <span class="toc-text">资源层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%B1%82"><span class="toc-number">2.4.</span> <span class="toc-text">核心层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B3%E5%8F%B0%E5%B1%82"><span class="toc-number">2.5.</span> <span class="toc-text">平台层</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93"><span class="toc-number">2.6.</span> <span class="toc-text">第三方库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%86%E5%B1%82%EF%BC%9F"><span class="toc-number">2.7.</span> <span class="toc-text">为什么要分层？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.8.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E8%AF%BE-%E6%95%B0%E6%8D%AE%E7%BB%84%E7%BB%87%E5%92%8C%E7%AE%A1%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">第三课 数据组织和管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E4%B8%8EGO"><span class="toc-number">3.1.</span> <span class="toc-text">面向对象与GO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%84%E4%BB%B6%E7%B3%BB%E7%BB%9F%E4%B8%8EGO"><span class="toc-number">3.2.</span> <span class="toc-text">组件系统与GO</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tick"><span class="toc-number">3.3.</span> <span class="toc-text">Tick</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Event%EF%BC%88GO%E4%B9%8B%E9%97%B4%E4%BA%A4%E4%BA%92%EF%BC%89"><span class="toc-number">3.4.</span> <span class="toc-text">Event（GO之间交互）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GO%E7%AE%A1%E7%90%86"><span class="toc-number">3.5.</span> <span class="toc-text">GO管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%A4%8D%E6%9D%82%E9%97%AE%E9%A2%98"><span class="toc-number">3.6.</span> <span class="toc-text">其他复杂问题</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Games-104/Games104--游戏引擎导论与架构(1-3)" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Games-104|第1-3课-引擎架构分层&amp;数据组织管理
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/" class="article-date">
+	  <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Games-104/" rel="tag">Games-104</a>, <a class="article-tag-link-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 3.2k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 11(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="第一课：-现代游戏引擎导论"><a href="#第一课：-现代游戏引擎导论" class="headerlink" title="第一课： 现代游戏引擎导论"></a>第一课： 现代游戏引擎导论</h2><h3 id="游戏引擎架构与层级"><a href="#游戏引擎架构与层级" class="headerlink" title="游戏引擎架构与层级"></a>游戏引擎架构与层级</h3><ul>
+<li><p><strong>基础元素构建</strong></p>
+<p>了解游戏引擎的分层，以及为什么采用这样的架构</p>
+</li>
+<li><p><strong>渲染系统</strong></p>
+<p>Model，Material, Shader, Texture</p>
+<p>渲染管线，光影</p>
+<p>学习对渲染对象组合不同算法进行渲染</p>
+</li>
+<li><p><strong>动画系统</strong></p>
+<p>学习从3dsmax等导出的动画，如何把它们组装起来，构建工具</p>
+</li>
+<li><p><strong>物理系统</strong></p>
+<p>学习游戏中的物理系统（刚体，软体，流体）</p>
+</li>
+<li><p><strong>GamePlay</strong></p>
+<p>游戏中的核心玩法部分</p>
+</li>
+<li><p><strong>其他系统</strong></p>
+<p>特效系统，寻路系统，相机系统</p>
+</li>
+<li><p><strong>工具链</strong></p>
+<p>C++反射机制，数据库模式</p>
+</li>
+<li><p><strong>网络游戏</strong></p>
+<p>数据同步</p>
+</li>
+<li><p><strong>前沿技术</strong></p>
+<p>动态捕捉，面向数据变成DOP，任务系统Job System</p>
+<p>全局光照Lumen，多面片Nanite</p>
+</li>
+</ul>
+<hr>
+<h2 id="第二课-引擎架构分层，整体Pipeline"><a href="#第二课-引擎架构分层，整体Pipeline" class="headerlink" title="第二课 引擎架构分层，整体Pipeline"></a>第二课 引擎架构分层，整体Pipeline</h2><p><strong>游戏引擎主要分成5个架构分层以及第三方库，自顶向下分别是：工具层，功能层，资源层，核心层，平台层</strong></p>
+<h3 id="工具层"><a href="#工具层" class="headerlink" title="工具层"></a>工具层</h3><p>引擎最直观的，可以直接交互的层级，及引擎编辑器UI显示，可以直接利用GUI操作编辑一些游戏内容。</p>
+<p>工具层通常以编辑器的形式存在，可用多种编程语言，开发效率优先，更加强调用户的便捷性。由于很多游戏资源是在Maya、3ds Max、Houdini等DCC（别人工具生成的资产）中完成的，工具层通常包含导入、导出器用于导入、导出游戏资源为统一的assets。</p>
+<p>工具链是数据之间的互导。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153615.png"></p>
+<h3 id="功能层"><a href="#功能层" class="headerlink" title="功能层"></a>功能层</h3><p>为了使游戏呈现在屏幕上，需要渲染系统对虚拟世界进行渲染。动画系统将艺术家设计的动作动画在引擎中进行组合、过渡，让游戏人物在游戏动起来。逼真的虚拟世界也离不开物理，物理系统将使用刚体、软体、流体等去表达世界，使得人与人、人与物不会发生碰撞。游戏中的玩法以及NPC人物，也都离不开脚本、事件、AI系统等。为了实现游戏中的人机交互，还需要与输入、输出设备连接。（Rending、Camera、 Animation、physics、Script,FSM and AI）</p>
+<p>功能层将使得整个虚拟世界变得栩栩如生：每隔tick时间，分别执行逻辑与绘制–tickLogic与tickRender。tickLogic主要用于模拟世界，包括处理输入输出，计算物理并进行碰撞检测等；tickRender将tickLogic计算的结果（人物位置等）进行绘制。考虑到功能层需要实现大量功能并对运行时间存在要求，功能层复杂性高，并通常需要借助多线程计算。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151730.png"></p>
+<p><strong>在功能层，一定要区分开tickLogic和tickRender，不要耦合在一起</strong></p>
+<p><strong>复杂性</strong>：功能层非常复杂、庞大，提供了游戏引擎中大部分功能模块，但哪些功能属于游戏，哪些功能属于引擎，界限不明确。</p>
+<p><strong>多线程</strong>：现代计算机CPU通常有多个核心，主流引擎将拆分适合并行计算的任务，分配到多个线程运算，但一些计算互相依赖，不适用于并行执行。在未来，引擎将所有任务变为原子计算，将任务分配到每个核上。</p>
+<p><strong>拆分成更小的粒度，最大限度压榨多核CPU</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151945.png"></p>
+<h3 id="资源层"><a href="#资源层" class="headerlink" title="资源层"></a>资源层</h3><p>游戏引擎中通常包含大量数据和文件，这些文件通常以不同的形式存在，例如Photoshop中的专用格式psd文件或者3ds Max中的max文件，上万、上十万的数据文件由<strong>资源层进行加载与管理。</strong></p>
+<p>Photoshop中的psd、3ds Max中的max等数据格式比较复杂， 包含大量与引擎无关的数据，如psd格式将保存Photoshop中所有的图层，包含通道、参考线、注解和颜色模式等信息。为了避免在使用资源时频繁调度并减少不必要的内存消耗，在导入资源时<strong>进行转换</strong>，将不同资源（纹理、模型几何、动画等）都转换为资产文件，即<strong>assest文件</strong>（.ast）。</p>
+<p>比如引擎中最常使用的贴图数据，可使用png、jpg格式进行存储，上述格式对应相应的压缩算法，但这些压缩算法不是GPU高效的算法，直接在GPU中使用会浪费性能，通常在引擎中被转换成dds格式。dds格式针对纹理设计，支持很多其他图像格式不支持的功能，如Mipmap等。对于一个游戏人物，可能需要绑定网格、动画、贴图、材质等资源，定义Composite asset文件（如XML）关联不同资源，并使用Guid唯一识别号对资产进行管理。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151127.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528151252.png"></p>
+<p>在游戏实际运行时，需要使用**资产管理器*（Asset Manager）*<strong>根据</strong>资产生命周期*（Asset Life Cycle）***对资产进行管理，包括资产实时加载卸载、资源池分配、垃圾回收与延迟加载等。</p>
+<p><strong>资源管理很重要，因为硬件资源显存内存永远是有限的，所以就要把资源合理利用，类似虚拟内存这种，塞尔达每次场景切换都很慢，也许就是垃圾回收部分不太高效？</strong></p>
+<h3 id="核心层"><a href="#核心层" class="headerlink" title="核心层"></a>核心层</h3><p>工具层、功能层、资源层会频繁调用底层代码，使用容器创建、内存分配、数学库、多线程等底层功能，而<strong>核心层</strong>能够提供上述功能。</p>
+<p>核心层是游戏引擎的基础，提供各种功能模块所需的工具，包括数学库、数据结构与容器、内存管理等。对于数学库，当前已有很多成熟的第三方库，例如Eigen。但游戏引擎需要<strong>为效率服务</strong>，可使用<strong>近似计算</strong>或者<strong>SIMD（单指令多数据流，可并行处理多个数据的指令）</strong>提高运算效率。对于数据结构与容器，编程语言中的数据结构可能不满足要求，比如C++一些标准实现会产生内存空洞，引擎中实现的数据结构更加方便内存管理，提高访问效率。对于内存管理，引擎内存管理与操作系统类似，内存性能瓶颈主要在内存池（分配器）、缓存缺失、内存对齐等</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528152533.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528152618.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153037.png"></p>
+<h3 id="平台层"><a href="#平台层" class="headerlink" title="平台层"></a>平台层</h3><p>引擎或者游戏需要发布在不同平台上，可能需要使用不同的图形API。此外，用户使用的输入设备、硬件设备可能也完全不同，这都需要平台层进行处理。平台层使得游戏能兼容不同平台、不同硬件设备，为上层提供平台无关的服务和信息。对于图形API（如OpenGL、DirectX、Vulkan等），平台层需要使用RHI（Render Hardware Interface）去除不同API的差异，上层使用时无需关心渲染使用的是何种API。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528153308.png"></p>
+<h3 id="第三方库"><a href="#第三方库" class="headerlink" title="第三方库"></a>第三方库</h3><p>第三方库或中间件通过SDK的形式或者文件格式转化，各种软件比如PS，3ds Max这些做出资产然后导入游戏引擎变成asset</p>
+<h3 id="为什么要分层？"><a href="#为什么要分层？" class="headerlink" title="为什么要分层？"></a>为什么要分层？</h3><p>为了将游戏引擎解耦并降低复杂度，每一层都将独立，底层提供基础服务，顶层无需知道底层的具体实现，也有利于开发与版本迭代。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>游戏引擎分5层架构</li>
+<li>在架构分层中，越往上越灵活，越往下越稳定</li>
+<li>只能上层调用下层，反过来不行</li>
+<li>虚拟世界由一系列tick时间组成</li>
+</ul>
+<hr>
+<h2 id="第三课-数据组织和管理"><a href="#第三课-数据组织和管理" class="headerlink" title="第三课 数据组织和管理"></a>第三课 数据组织和管理</h2><p><strong>Dynamic Game Objects – 可交互动态物体（人物，坦克等）</strong></p>
+<p><strong>Static Game Objects – 不可交互的静态物体（房子）</strong></p>
+<p><strong>Environments – 环境 Sky天空、Vegetation植被、Terrain地形</strong></p>
+<p><strong>Other Game Obhects – TriggerArea触发检测体、AirWall空气墙、NavigationMesh导航网格、Ruler游戏规则</strong></p>
+<p><strong>这些都可以统一抽象为GameObject（GO）</strong></p>
+<h3 id="面向对象与GO"><a href="#面向对象与GO" class="headerlink" title="面向对象与GO"></a>面向对象与GO</h3><p>GO都可以由属性Property和行为Behaviour组成。可以使用继承的方式来不断的扩展一个GO的新属性。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528155449.png"></p>
+<h3 id="组件系统与GO"><a href="#组件系统与GO" class="headerlink" title="组件系统与GO"></a>组件系统与GO</h3><p>但是对于另外的一些GameObject，通过继承方式不理想，比如一个水陆两栖坦克，既有船的能力，也有坦克的能力，那么它应该继承自谁呢？可以利用组合的方式，通过<strong>Component来</strong>自定义的组合他们的能力；使用组件化思想，用组合代替继承。用组件的方式另外一个好处就是灵活，可替换，需要哪个能力就用哪个组件，不需要就卸掉。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528155746.png"></p>
+<p>以无人机为例，此时各种能力和属性都可以抽成一个个的组件，如 TransformComp（位置），ModelComp（外形），MotorComp（运动），AIComp，PhysicsComp 等，此时无人机里只需要有一个 ComponentBase 的数组即可：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161008.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160951.png"></p>
+<p>**这里注意可能组件也好，面向对象也好，最上层可能都是有一个基类，里面属性和方法都没有，但是也很有必要，因为这类似于句柄，在释放和管理的时候会需要。***注意 Unreal 和 Unity 中的 Object 与上述的 GameObject 并不相同。Unreal 中 AActor 是类似 GameObject 的概念，UObject 更类似于高级语言中的 Object。</p>
+<p>组件模式有什么缺点？</p>
+<p>效率没有直接写一个class高,ECS很重要，就是把同样的组件放一起，后面处理很方便</p>
+<p>组件内部还需要通信，时间代价</p>
+<h3 id="Tick"><a href="#Tick" class="headerlink" title="Tick"></a>Tick</h3><p>每隔一段时间让世界向前走一步：让每个 GameObject 中的每一个 Component 去 Tick 一次。在实际中，现代游戏引擎更多的通常不是逐对象逐组件去 Tick ，而是逐系统，比如先去做所有的和碰撞相关的事情，再去做所有和动画相关的事情，这样用类似流水线的方式，更有效率。</p>
+<p>一个 Tick 的时间过长怎么处理？</p>
+<ul>
+<li>Tick 的时候将步长传入，依赖步长进行数据的补偿；</li>
+<li>直接跳过下一个 Tick；二帧很危险</li>
+<li>通常还是需要进行策略优化；分几批处理，化成几帧处理完毕</li>
+</ul>
+<h3 id="Event（GO之间交互）"><a href="#Event（GO之间交互）" class="headerlink" title="Event（GO之间交互）"></a>Event（GO之间交互）</h3><p>对于GameObject 间的交互，如一个炸弹爆炸，对其他不同的 GO 的影响，早期硬编码如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160928.png"></p>
+<p>这样的代码明显违反设计模式的原则，由此引出 Event（事件），有点类似观察者模式，通过事件派发的方式进行解耦，接收/绑定了这个事件的对象再去处理该事件。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160910.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528160845.png"></p>
+<p>最核心的是可扩展的消息系统，开发者可以在此基础之上定制消息类型和处理消息类型的组件对事件进行处理。</p>
+<p>如何管理GO？发生的事情如何通知到每个GO？</p>
+<h3 id="GO管理"><a href="#GO管理" class="headerlink" title="GO管理"></a>GO管理</h3><p>每个GO都有一个ID唯一标识uid和一个位置（空间位置）</p>
+<p><strong>场景管理</strong></p>
+<ul>
+<li>通过唯一 ID 进行标识管理；</li>
+<li>通过 object 的位置进行管理；</li>
+</ul>
+<p>每个场景中管理GO，如果不管理需要通过遍历场景中半径范围内所有的对象，进行消息的通知。例如一个GO寻找周围GO时就遍历所有的GO。<br>通过画格子优化：将地图分为几块，每块中的物体分别管理。先找邻近的格子，没有就不再找别的格子了。缺点：如果各个格子中GO分布不均，不高效。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161312.png"></p>
+<p>优化方式：四叉树，八叉树，BVH，BSP</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161545.png"></p>
+<h3 id="其他复杂问题"><a href="#其他复杂问题" class="headerlink" title="其他复杂问题"></a>其他复杂问题</h3><p>绑定问题</p>
+<p>比如人和车，人上了车，这两个GO就绑定在一起了，这样一般先tick车，再tick人</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220528161901.png"></p>
+<p>如果按照Component类别来Tick，可能会分散到不同的CPU上，顺序是不能保证的，不同的Tick顺序会产生不同的结果。如果每次输入是一样的，那么结果也需要是一样的。比如实现游戏录像功能。</p>
+<p>根本原因：Component在发送消息，其他Component在当前帧接收到消息还是下一帧接收到消息，接收到消息立即处理，还是等到下一帧处理。都会产生不同结果。</p>
+<p>在实际的事件传递中，时序很重要，如游戏的回放功能，实际是记录用户的输入，如果各用户是依次执行，则没有问题，但如果用户同时进行同一事件的操作则会有问题，因此需要引入一个 “邮局”，各个操作先发到邮局，邮局去保证时序接着进行发送，常用引擎中的类似 PreTick，PostTick 的函数都是为了处理时序问题。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/" title="Games-104|第1-3课-引擎架构分层&amp;数据组织管理" target="_blank" rel="external">http://icecorn.github.io/2022/06/05/Games-104/Games104--游戏引擎导论与架构(1-3)/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/06/07/Games-104/Games104-%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E6%95%B0%E6%8D%AE%E7%BB%84%E7%BB%874/" title="Games-104|第四课-渲染数据组织"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" title="Games-104|第六课-渲染系统-地形大气和云的渲染"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
