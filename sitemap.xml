@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://icecorn.github.io/2022/05/31/%E5%BF%AB%E6%89%8B%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93/</loc>
+    
+    <lastmod>2022-06-29</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://icecorn.github.io/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/</loc>
     
     <lastmod>2022-06-29</lastmod>
@@ -39,15 +48,6 @@
   
   <url>
     <loc>http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/</loc>
-    
-    <lastmod>2022-06-29</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://icecorn.github.io/2022/05/31/%E5%BF%AB%E6%89%8B%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93/</loc>
     
     <lastmod>2022-06-29</lastmod>
     
@@ -592,20 +592,6 @@
   
   <url>
     <loc>http://icecorn.github.io/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/</loc>
-    <lastmod>2022-06-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://icecorn.github.io/categories/%E6%B8%B2%E6%9F%93/</loc>
-    <lastmod>2022-06-29</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://icecorn.github.io/categories/%E6%B8%B2%E6%9F%93/%E5%9B%BE%E5%BD%A2%E5%AD%A6/</loc>
     <lastmod>2022-06-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
