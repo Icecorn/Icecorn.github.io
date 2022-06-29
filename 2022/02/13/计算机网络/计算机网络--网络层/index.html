@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>计算机网络--网络层 | Blog of Icecorn</title>
+  <meta name="description" content="计算机网络–网络层1 网络层的两种服务形式一种是虚电路服务，另一种是数据报服务，虚电路面向连接的通信方式，在分组交换中建立一条虚电路来预留通信双方所需的一切网络资源，这样在网络层实现可靠传输。数据报服务是采用分组传输方式，网络层向上只提供简单的，无连接的，尽最大努力的不可靠传输。 本质是是否要在网络层实现可靠传输的问题，由于现在的终端相比于过去的电话设备具有更强的处理能力，所以现在数据报服务成为主">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络--网络层">
+<meta property="og:url" content="http://icecorn.github.io/2022/02/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%B1%82/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="计算机网络–网络层1 网络层的两种服务形式一种是虚电路服务，另一种是数据报服务，虚电路面向连接的通信方式，在分组交换中建立一条虚电路来预留通信双方所需的一切网络资源，这样在网络层实现可靠传输。数据报服务是采用分组传输方式，网络层向上只提供简单的，无连接的，尽最大努力的不可靠传输。 本质是是否要在网络层实现可靠传输的问题，由于现在的终端相比于过去的电话设备具有更强的处理能力，所以现在数据报服务成为主">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414104232.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414152321.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414160355.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414162049.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414165140.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414165738.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414180341.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414182543.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414183430.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414212811.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414213302.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414214603.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414223831.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414223952.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414224635.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414232323.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414234412.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414235650.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414235738.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200415004337.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200415005114.png">
+<meta property="og:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200415005331.png">
+<meta property="article:published_time" content="2022-02-13T08:53:09.000Z">
+<meta property="article:modified_time" content="2022-06-29T10:20:16.253Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414104232.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/02/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%B1%82/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.5px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E4%B8%93%E9%A2%98-%E5%9B%9B%E7%A7%8D%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|专题-四种类型转换的使用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" class="title">C++ Primer笔记|第十五章-面向对象程序设计</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E6%8B%B7%E8%B4%9D%E6%8E%A7%E5%88%B6/" class="title">C++ Primer笔记|第十三章-拷贝控制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|第十四章 重载运算与类型转换</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/05/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0-%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98/" class="title">C++ Primer笔记|第十二章 动态内存</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-05T12:25:30.000Z" itemprop="datePublished">2022-03-05</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E2%80%93%E7%BD%91%E7%BB%9C%E5%B1%82"><span class="toc-number">1.</span> <span class="toc-text">计算机网络–网络层</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E7%BD%91%E7%BB%9C%E5%B1%82%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%9C%8D%E5%8A%A1%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.1.</span> <span class="toc-text">1 网络层的两种服务形式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%BD%91%E9%99%85%E5%8D%8F%E8%AE%AEIP"><span class="toc-number">1.2.</span> <span class="toc-text">2 网际协议IP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E5%88%86%E7%B1%BB%E7%9A%84IP%E5%9C%B0%E5%9D%80"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1 分类的IP地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-IP%E5%9C%B0%E5%9D%80%E5%92%8C%E7%A1%AC%E4%BB%B6%E5%9C%B0%E5%9D%80"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2 IP地址和硬件地址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E5%9C%B0%E5%9D%80%E8%A7%A3%E6%9E%90%E5%8D%8F%E8%AE%AEARP"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3 地址解析协议ARP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-IP%E6%95%B0%E6%8D%AE%E6%8A%A5%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.2.4.</span> <span class="toc-text">2.4 IP数据报格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-IP%E5%B1%82%E5%88%86%E7%BB%84%E8%BD%AC%E5%8F%91%E6%B5%81%E7%A8%8B"><span class="toc-number">1.2.5.</span> <span class="toc-text">2.5 IP层分组转发流程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%88%92%E5%88%86%E5%AD%90%E7%BD%91%E5%92%8C%E6%9E%84%E6%88%90%E8%B6%85%E7%BD%91"><span class="toc-number">1.3.</span> <span class="toc-text">3 划分子网和构成超网</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%88%92%E5%88%86%E5%AD%90%E7%BD%91"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1 划分子网</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%9E%84%E6%88%90%E8%B6%85%E7%BD%91%EF%BC%88%E6%97%A0%E5%88%86%E7%B1%BB%E7%BC%96%E5%9D%80CIDR%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2 构成超网（无分类编址CIDR）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E7%BD%91%E9%99%85%E6%8E%A7%E5%88%B6%E6%8A%A5%E6%96%87%E5%8D%8F%E8%AE%AEICMP"><span class="toc-number">1.4.</span> <span class="toc-text">4 网际控制报文协议ICMP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-ICMP%E6%8A%A5%E6%96%87%E7%A7%8D%E7%B1%BB"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.1 ICMP报文种类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-ICMP%E5%BA%94%E7%94%A8%E4%B8%BE%E4%BE%8B"><span class="toc-number">1.4.2.</span> <span class="toc-text">4.2 ICMP应用举例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%BA%92%E8%81%94%E7%BD%91%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.5.</span> <span class="toc-text">5 互联网路由选择协议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.5.1.</span> <span class="toc-text">5.1 基本概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%86%85%E9%83%A8%E7%BD%91%E5%85%B3%E5%8D%8F%E8%AE%AERIP"><span class="toc-number">1.5.2.</span> <span class="toc-text">5.2 内部网关协议RIP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%86%85%E9%83%A8%E7%BD%91%E5%85%B3%E5%8D%8F%E8%AE%AEOSPF"><span class="toc-number">1.5.3.</span> <span class="toc-text">5.3 内部网关协议OSPF</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E5%A4%96%E9%83%A8%E7%BD%91%E5%85%B3%E5%8D%8F%E8%AE%AEBGP"><span class="toc-number">1.5.4.</span> <span class="toc-text">5.4 外部网关协议BGP</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-IPv6"><span class="toc-number">1.6.</span> <span class="toc-text">6 IPv6</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-IP%E5%A4%9A%E6%92%AD"><span class="toc-number">1.7.</span> <span class="toc-text">7 IP多播</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E8%99%9A%E6%8B%9F%E4%B8%93%E7%94%A8%E7%BD%91VPN"><span class="toc-number">1.8.</span> <span class="toc-text">8 虚拟专用网VPN</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2NAT"><span class="toc-number">1.9.</span> <span class="toc-text">9 网络地址转换NAT</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E5%A4%9A%E5%8D%8F%E8%AE%AE%E6%A0%87%E8%AE%B0%E4%BA%A4%E6%8D%A2MPLS"><span class="toc-number">1.10.</span> <span class="toc-text">10 多协议标记交换MPLS</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-计算机网络/计算机网络--网络层" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      计算机网络--网络层
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/02/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%B1%82/" class="article-date">
+	  <time datetime="2022-02-13T08:53:09.000Z" itemprop="datePublished">2022-02-13</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/02/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%B1%82/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 7.2k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 25(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="计算机网络–网络层"><a href="#计算机网络–网络层" class="headerlink" title="计算机网络–网络层"></a>计算机网络–网络层</h1><h2 id="1-网络层的两种服务形式"><a href="#1-网络层的两种服务形式" class="headerlink" title="1 网络层的两种服务形式"></a>1 网络层的两种服务形式</h2><p>一种是虚电路服务，另一种是数据报服务，虚电路面向连接的通信方式，在分组交换中建立一条虚电路来预留通信双方所需的一切网络资源，这样在网络层实现可靠传输。数据报服务是采用分组传输方式，网络层向上只提供简单的，无连接的，尽最大努力的不可靠传输。</p>
+<p>本质是是否要在网络层实现可靠传输的问题，由于现在的终端相比于过去的电话设备具有更强的处理能力，所以现在数据报服务成为主流，将可靠传输的实现上移到传输层和用户主机由TCP处理。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414104232.png" alt="两种服务"></p>
+<table>
+<thead>
+<tr>
+<th>对比</th>
+<th>虚电路</th>
+<th>数据报</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>思路</td>
+<td>可靠通信由网络层保证</td>
+<td>可靠通信由用户主机保证</td>
+</tr>
+<tr>
+<td>连接建立</td>
+<td>必须有</td>
+<td>不需要</td>
+</tr>
+<tr>
+<td>终点地址</td>
+<td>仅在建立连接时使用，每个分组使用短的虚电路号</td>
+<td>每个分组都有终点的完整地址</td>
+</tr>
+<tr>
+<td>分组转发</td>
+<td>同一条虚电路分组由同一路由器转发</td>
+<td>每个分组独立选择路由器转发</td>
+</tr>
+<tr>
+<td>结点故障</td>
+<td>所有通过故障结点的虚电路均不能工作</td>
+<td>出故障结点可能会丢失分组，但可以选择其他路由器发送分组</td>
+</tr>
+<tr>
+<td>分组的顺序</td>
+<td>总是按发送顺序到达终点</td>
+<td>到达终点不一定按先后顺序</td>
+</tr>
+<tr>
+<td>端到端差错处理及流量控制</td>
+<td>可以由网络负责也可以由用户主机负责</td>
+<td>由用户主机负责</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-网际协议IP"><a href="#2-网际协议IP" class="headerlink" title="2 网际协议IP"></a>2 网际协议IP</h2><p>IP协议是很重要的协议，它也是一族协议</p>
+<p>除了IP协议外还有与之配套的</p>
+<ul>
+<li>地址解析协议 ARP</li>
+<li>网际控制报文协议 ICMP</li>
+<li>网际组管理协议 IGMP</li>
+</ul>
+<p>要把世界上数以万计的网络连接起来是非常复杂的，并且没有一种网络能够满足所有用户的需求。所以，在网络层使用IP协议构成一个虚拟互连网络，也就是说对于ip协议的网络层，下边的数据链路层和物理层是透明的。</p>
+<hr>
+<h3 id="2-1-分类的IP地址"><a href="#2-1-分类的IP地址" class="headerlink" title="2.1 分类的IP地址"></a>2.1 分类的IP地址</h3><p>IP地址就是给互联网上每一台主机或路由器分配一个全世界范围内唯一的32位的标识符，这里只研究IPv4。</p>
+<p>IP地址的编码方式经历了三个阶段：</p>
+<ul>
+<li>分类的IP地址</li>
+<li>划分子网</li>
+<li>构成超网</li>
+</ul>
+<p>本节研究分类的IP地址，就是将IP地址划分为若干个固定类，每一类地址由两个固定长度字段组成，第一个字段是<strong>网络号</strong>，第二个阻断是<strong>主机号</strong>，全网唯一</p>
+<p>分为以下几类：</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414152321.png" alt="IP地址分类"></p>
+<ul>
+<li>其中A B C类都是单播地址（1对1）</li>
+<li>A B C类地址网络号分别为1,2,3字节，且网络号前边类别位分别为0,10,110</li>
+<li>D类地址是多播地址，类别位1110</li>
+<li>E类地址目前不使用</li>
+</ul>
+<p>采用点分十进制来记录IP，如128.0.0.1</p>
+<hr>
+<p>常见的三类IP地址</p>
+<p>对于A B C类IP地址来说，都有几个不能指派的网络号和主机号</p>
+<p>对A类地址，网络号全0不能指派，用来表示“此网络”，全1也不能指派，用来表示“环回测试”；主机号全0表示“本主机”，全1表示“所有主机”</p>
+<p>对B类和C类地址，因为网络号有类别码10和110故不存在全0全1，但去除掉类别码后的网络号也不能设置为全0，表示的意义和A类一样；主机号也不能全0全1</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414160355.png" alt="一般不使用的特殊IP地址"></p>
+<hr>
+<p>IP地址特点：</p>
+<ul>
+<li>由网络号+主机号组成，分配时只分配网络号，主机号由单位自行分配。另一个好处是路由器转发时可以根据网络号转发分组，减少路由表存储空间</li>
+<li>实际上IP地址标志一台主机和一条链路的接口，这意味着路由器两端连接两个网络就必然拥有两个IP地址，而连接两个网络的主机叫做多归属主机</li>
+<li>一个网络通常是指网络号相同的网络，所以用转发器和网桥连接起来的局域网通常认为是一个网络</li>
+<li>IP地址中，所有分配到网络号的网络都是平等的</li>
+</ul>
+<hr>
+<h3 id="2-2-IP地址和硬件地址"><a href="#2-2-IP地址和硬件地址" class="headerlink" title="2.2 IP地址和硬件地址"></a>2.2 IP地址和硬件地址</h3><p>IP地址是逻辑地址，封装在IP数据报首部</p>
+<p>硬件地址是物理地址，存放在适配器ROM中，封装在MAC帧首部</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414162049.png" alt="IP地址和硬件地址"></p>
+<p>这里只要记住通信时网络层，数据链路层同一层级的传输都是透明的，即不需要考虑封装帧，解析帧之类的。可以理解为网络层直接传送IP数据报，数据链路层只传送MAC帧。</p>
+<p>那么有一个问题是路由器转发IP数据报需要包装成MAC帧格式在数据链路层传输，怎么才能知道要添加的MAC地址是多少呢？换句话说怎样通过目的IP得到目的MAC地址？这就需要使用ARP地址解析协议了。</p>
+<hr>
+<h3 id="2-3-地址解析协议ARP"><a href="#2-3-地址解析协议ARP" class="headerlink" title="2.3 地址解析协议ARP"></a>2.3 地址解析协议ARP</h3><p>主要作用就是根据目的IP地址找出目的MAC地址，实现方法是在每一个主机都设有一个ARP高速缓存，里边保存<strong>本局域网</strong>上各主机和路由器的IP地址到MAC地址映射表。主机A要向B发送IP数据报时，先去高速缓存查找B的映射，如果有直接就找到了，没有的话就要运行ARP根据以下步骤找到B的MAC地址。</p>
+<ol>
+<li>ARP进程在本局域网上广播一个ARP请求分组，主要内容是“我的IP地址是xxx。MAC地址是xxx，我想知道IP地址是XXX的主机的硬件地址”</li>
+<li>本局域网上所有主机的ARP进程都收到消息</li>
+<li>主机B发现A要找的人是自己，，向A发送一个响应分组（注意这里是单播） 内容是“我的IP地址是XXX，我的MAC地址是XXX”，同时把A的映射记录在自己的高速缓存中（这一步是为了以后B向A发消息方便），非B的其他主机当然对A发送的请求分组不理睬</li>
+<li>A收到B的响应，将B的映射记录在高速缓存中</li>
+</ol>
+<p>总结就是一个喊话（广播）找人的过程，且找人必须要先自报家门让别人可以响应，喊道谁的名字谁就答应（单播），并且互相都把对方的映射记录了下来，<strong>这就方便了之后再进行通信，否则每次都要广播喊话再响应浪费资源</strong>。</p>
+<p>另外，ARP高速缓存每一份映射都要设置生存时间（如10~20分钟），这是因为适配器可能会故障，比如B的适配器坏了，MAC地址失效了，A用失效的MAC地址也找不到B，留着没用还浪费资源，所以定期删除重新广播建立联系，确保不会有“死掉”的映射浪费资源</p>
+<p>这里有一个最重要的点就是<strong>ARP协议是运行在同一个局域网上</strong>的，如果如下图H1要向不在同一个局域网的H4发送消息，那么首先ARP协议会找到路由器R1的MAC地址，A将MAC帧封装的IP数据报发给R1，接下来交给R1来找下一跳的路由器R2，再次运次ARP协议找到和R1同属一个网络的路由器R2的MAC地址，如此反复进行ARP解析。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414165140.png" alt="ARP解析"></p>
+<p>那么有一个问题是既然最后在链路上传送的帧最终都是要用MAC地址送出，为什么还要用抽象的IP地址而不直接用MAC地址呢？</p>
+<p>这是因为全世界有各种不同的网络和设备，就有不同的硬件地址，要使这些异构网络通信就必须进行复杂的硬件地址转接工作，而使用IP地址将这些差异屏蔽掉，给用户就带来了极大的方便，对于用户来说只要关注IP地址就好了，反正ARP是自动运行的，对于用户是透明的。</p>
+<hr>
+<h3 id="2-4-IP数据报格式"><a href="#2-4-IP数据报格式" class="headerlink" title="2.4 IP数据报格式"></a>2.4 IP数据报格式</h3><p>这里介绍IPv4，在TCP/IP中，各种数据报格式常常以32位（4字节）为单位来描述。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414165738.png" alt="IP数据报格式"></p>
+<p>IP数据报由首部+数据部分组成，首部前一部分固定长度20字节，后边还有一些可选字段（一般不用，用了必须是4字节的倍数）</p>
+<ul>
+<li>版本 占4位，是指IPv4或IPv6</li>
+<li>首部长度  4位，这里必须要注意的是首部长度表示数的单位是32位（4字节，意思是首部长度是数字1实际上代表4字节），最小必须要20字节（也就是十进制5，二进制0101），最大为60字节（因为只占4位，二进制最大1111，相当于十进制15）</li>
+<li>区分服务  8位，一般不用这个字段</li>
+<li>总长度  16位，单位为字节。最大长度是2的16次幂-1 = 65535字节，实际一般不会这么长。这个总长度指的是<strong>首部+数据部分</strong>。这是因为总程度不能大于数据链路层的最大传送单元MTU，一般MTU = 1500，超过就要进行分片处理。<strong>分片后总长度指的是每一片的首部+数据部分</strong>     另外，大部分路由器必须能够接受长度不超过576的IP数据报，至于支不支持1500的根据路由器而定</li>
+<li>标识  16位，这个字段是每产生一个数据报，计数器+1，将这个数写入标识符。<strong>主要作用是分片后的每一片都是这个标识，接受端根据这个标识把每一片拼在一起</strong></li>
+<li>标志  3位  只有前两位有意义，最低位MF（1代表后边还有分片，0标识没了）；中间位DF（1代表不允许分片，0才允许分片）</li>
+<li>片偏移  13位  分片后每一片在原数据中的位置，意思是代表这片是从原数据何处开始的。片偏移以8个字节为偏移单位，每个分片长度一定是8的整数倍，具体结合问题去看</li>
+<li>生存时间  8位  TTL  现在一般代表跳数，最大值为255，意味着跳了255次路由器就会把它扔掉</li>
+<li>协议  8位  指出数据报携带的数据使用哪种协议，上交给谁。常见的有TCP  UDP  ICMP  IGMP  IP等等</li>
+<li>首部校验和  16位  <strong>只检验首部，不包括数据部分</strong> 。这是因为每经过一个路由器可能分片信息之类的会发生变化，需要校验。不用复杂的CRC算法，使用16位反码相加的方法，具体参考书本</li>
+<li>源地址 32位</li>
+<li>目的地址  32位</li>
+</ul>
+<p>首部可变部分：这里可以添加很多字段支持排错，安全等但是一般不用，<strong>只要记住如果使用必须要填充字节变成4的倍数</strong></p>
+<hr>
+<h3 id="2-5-IP层分组转发流程"><a href="#2-5-IP层分组转发流程" class="headerlink" title="2.5 IP层分组转发流程"></a>2.5 IP层分组转发流程</h3><p>在IP层进行分组转发，主要是根据路由器中的转发表来进行转发，本节不介绍路由器中的转发表是怎么生成和更新的，放在后边处理。</p>
+<p>这里要注意的是每个路由器连接几个子网，并且每个子网都有若干台主机，都记录路由转发表的话数据量过多，所以路由器转发是根据网段（网络号）来转发的，并且从源地址到目的地址不是一蹴而就的（不能从开始就知道整条路径），而是进行若干个下一跳达到终点。</p>
+<p>每条路由最主要的两个信息（目的网络地址，下一跳地址）</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414180341.png" alt="路由转发"></p>
+<p>特定路由： 目的网络地址可以设置一个特定的路由器，直接转发到该路由器即可</p>
+<p>默认路由：  是指路由表中没有指定跳到哪个路由器时直接转发给默认路由器进行处理（路由表中记为0.0.0.0）</p>
+<p><strong>分组转发算法：</strong></p>
+<ol>
+<li>从数据报首部提取目的主机的IP地址D，得出网络地址N</li>
+<li>若N是与此路由器直连的某个地址，则<strong>直接交付</strong> ，不需要经过别的路由器（当然这里必须使用ARP协议解析出目的主机MAC地址，封装后传输，但是研究网络层时看成透明的即可）；否则进行<strong>间接交付</strong> ，执行3</li>
+<li>若路由表中有目的地址为D的<strong>特定路由</strong>，则跳到特定路由</li>
+<li>若路由表中有到网络N的路由，进行下一跳即可</li>
+<li>若都没有，而路由表中有一个<strong>默认路由</strong>，则跳到默认路由，都没有执行6</li>
+<li>报告分组转发出错</li>
+</ol>
+<hr>
+<h2 id="3-划分子网和构成超网"><a href="#3-划分子网和构成超网" class="headerlink" title="3 划分子网和构成超网"></a>3 划分子网和构成超网</h2><h3 id="3-1-划分子网"><a href="#3-1-划分子网" class="headerlink" title="3.1 划分子网"></a>3.1 划分子网</h3><p>本质是拥有许多物理网络的单位，将所属的物理网络划分为若干个<strong>子网</strong>，但是对外表现仍然是一个网络。</p>
+<p>IP地址 = 网络号 + 子网号 + 主机号</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414182543.png" alt="划分子网"></p>
+<p>外部路由器还是按网络号145.13.0.0找到R1，R1对内分为145.13.3.0,145.13.7.-，145.13.21.0三个子网进行转发</p>
+<p>划分子网知识把IP地址主机号这部分再划分一下</p>
+<hr>
+<p>子网掩码：由连续的1和连续的0构成的32位数据</p>
+<p>因为IP首部没有标识子网信息的位置，所以使用子网掩码来解决，每一个路由器的路由表中都要配置一项子网掩码。使用时将目的IP地址和子网掩码<strong>按位与</strong>运算得到子网的网络号，再进行传输。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414183430.png" alt="子网掩码运算"></p>
+<p>要注意的是即使没有划分子网，单使用A B C类划分地址也要有默认的子网掩码</p>
+<p><strong>路由器在交换路由表时，要把自己所连接的子网和对应的子网掩码同时发送交换</strong></p>
+<p>划分子网的目的是增加灵活性，看需求分配主机数不同的子网掩码</p>
+<hr>
+<p>划分子网后路由表必须有三项内容： 目的网络地址，子网掩码，下一跳地址</p>
+<p>分组转发比不划分子网的情况多了用子网掩码按位与操作</p>
+<hr>
+<h3 id="3-2-构成超网（无分类编址CIDR）"><a href="#3-2-构成超网（无分类编址CIDR）" class="headerlink" title="3.2 构成超网（无分类编址CIDR）"></a>3.2 构成超网（无分类编址CIDR）</h3><p>为了应对B类地址即将用完，互联网路由表项目急速增长，IPv4地址空间将要耗尽等问题，提出了无分类域间路由选择CIDR</p>
+<p>取消了分类地址和划分子网，采用网络前缀和主机号两级编址方式</p>
+<p>IP地址 = 网络前缀+主机号</p>
+<p>记为形如10.0.0.0/10  或者 00001010 00*（ *后边是主机号）</p>
+<p>代表前10位是网络前缀，后22位是主机号</p>
+<p>CIDR的好处主要有两个：</p>
+<ul>
+<li>增加了IP地址的数量</li>
+<li>形成地址聚合，从而减少路由表中的条目</li>
+</ul>
+<hr>
+<p>最长前缀匹配：</p>
+<p>使用CIDR，路由表的每个项目由<strong>网络前缀</strong>和<strong>下一跳地址</strong>来组成，而由于地址聚合的性质，同一个目的IP地址在路由表中匹配不同的CIDR可能都符合，这时就要选择匹配成功中的最长前缀的下一跳地址来转发（因为短的包含长的，换句换说长的CIDR是短的精细再分配后的）</p>
+<hr>
+<p>二叉线索查找：</p>
+<p>由于采用最长前缀匹配，那么最长采用的方法就是遍历路由表来找到最长前缀匹配，但过于浪费时间和资源，所以诞生了二叉线索查找的方法更快的找出目的前缀，具体算法参考教材</p>
+<hr>
+<h2 id="4-网际控制报文协议ICMP"><a href="#4-网际控制报文协议ICMP" class="headerlink" title="4 网际控制报文协议ICMP"></a>4 网际控制报文协议ICMP</h2><p>ICMP协议是IP协议族中的，不是高层协议，因为ICMP的报文是装在IP数据报中的，作为数据部分。</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414212811.png" alt="ICMP报文格式"></p>
+<p>类型字段代表协议类型，代码字段细分类型中的具体情况，<strong>校验和保证ICMP报文（即IP数据报数据部分）正确，还记得IP报文首部校验和只计算IP首部不计算IP数据部分吧</strong></p>
+<hr>
+<h3 id="4-1-ICMP报文种类"><a href="#4-1-ICMP报文种类" class="headerlink" title="4.1 ICMP报文种类"></a>4.1 ICMP报文种类</h3><p>种类有两种： <strong>ICMP差错报告报文</strong>    <strong>ICMP询问报文</strong></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414213302.png" alt="常见ICMP报文类型"></p>
+<p><strong>ICMP差错报告报文</strong>主要有四种：</p>
+<ul>
+<li>终点不可达</li>
+<li>时间超过：还记得IP首部生存时间字段吧，TTL为0时丢弃该IP数据报并向源点发送此条ICMP报文</li>
+<li>参数问题：收到的数据报首部有字段值不正确发送</li>
+<li>改变路由（重定向）：主要是默认路由器找到更优秀的线路时发送</li>
+</ul>
+<p>ICMP差错报文格式如下，将要发送差错的IP数据报的首部和紧跟着的8字节（这里是端口号，为上层TCP UDP服务的）拼上ICMP前8字节（差错类型）组成ICMP差错报文发送</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414214603.png" alt="ICMP差错报文格式"></p>
+<p>不该发送ICMP差错报文情况：</p>
+<ul>
+<li>对ICMP差错报文，不再发送ICMP差错报文</li>
+<li>对第一个分片数据报的后续分片不发送</li>
+<li>对多播的数据报不发送</li>
+<li>对特殊地址127.0.0.0/0.0.0.0（环回测试）不发送</li>
+</ul>
+<hr>
+<p><strong>ICMP询问报文</strong>：</p>
+<ul>
+<li>回送请求和回答：测试目的站状态</li>
+<li>时间戳请求和回答：用于时钟同步和时间测量</li>
+</ul>
+<hr>
+<h3 id="4-2-ICMP应用举例"><a href="#4-2-ICMP应用举例" class="headerlink" title="4.2 ICMP应用举例"></a>4.2 ICMP应用举例</h3><p><strong>分组网间探测PING</strong>，测试主机间连通性，PING使用了ICMP询问报文中的回送请求和回答。<strong>注意PING应用是应用层直接使用网络层ICMP协议的一个典型例子，没有通过运输层的TCP或UDP</strong></p>
+<hr>
+<p>traceroute应用，用来跟踪一个分组从源点到终点的路径</p>
+<p>原理是源主机向终点发送一串<strong>IP数据报</strong>，数据报中封装的是无法交付的<strong>UDP用户数据报</strong>。第一个数据报的<strong>TTL</strong>设为1，第二个设为2等等。这样第一个数据报到达路径上第一个路由器R1，TTL变成0，于是R1将第一个数据报丢弃同时向源站发送<strong>ICMP时间超过报文</strong>。同理我们得到第二个路由器R2发回来的<strong>ICMP时间超时报文</strong>等等。当有一个数据报成功到达终点时，又因为UDP用户数据报无法被接受，于是终点会向源点发送<strong>ICMP终点不可达报文</strong>，这样就得到了源点到终点的整条路径。</p>
+<hr>
+<h2 id="5-互联网路由选择协议"><a href="#5-互联网路由选择协议" class="headerlink" title="5 互联网路由选择协议"></a>5 互联网路由选择协议</h2><h3 id="5-1-基本概念"><a href="#5-1-基本概念" class="headerlink" title="5.1 基本概念"></a>5.1 基本概念</h3><p>路由选择协议就是讨论路由表中的路由是怎样得出的</p>
+<p>理想的路由算法：</p>
+<ul>
+<li>算法必须是正确的和完整的</li>
+<li>算法在计算上应简单</li>
+<li>算法应能适应通信量和网络拓扑变化（自适应性，更新路由表）</li>
+<li>稳定性（一段时间内端到端基本保持一条路径）</li>
+<li>公平性（照顾到所有用户）</li>
+<li>能够找出最佳的路径</li>
+</ul>
+<p>从能否适应通信量和网络拓扑变化来划分为两大类：</p>
+<ul>
+<li>静态路由选择策略（非自适应）</li>
+<li>动态路由选择策略</li>
+</ul>
+<hr>
+<p>互联网采用的都是动态的，分布式的路由选择协议</p>
+<p>可以将整个互联网划分成若干个自治系统AS，比如一个大ISP，在这个基础上分为两大类：</p>
+<ul>
+<li>内部网关协议IGP：  研究的是在一个AS中用的什么路由选择协议，主要有RIP和OSPF协议。这种路由选择也叫域内路由选择</li>
+<li>外部网关协议EPG：  研究的是不同AS间主机通信的路由选择，主要用BGP-4协议。这种路由选择也叫域间路由选择</li>
+</ul>
+<p>每个AS内自主决定用什么IGP，而在每个AS的边界都要有一个或者几个路由器不仅运行IGP还要运行EPG实现系统外通信</p>
+<hr>
+<h3 id="5-2-内部网关协议RIP"><a href="#5-2-内部网关协议RIP" class="headerlink" title="5.2 内部网关协议RIP"></a>5.2 内部网关协议RIP</h3><p>RIP是一种<strong>基于距离向量</strong>的路由选择协议，优点是简单</p>
+<p><strong>可以把使用RIP协议的所有路由器想象成一张图，那么距离就是图中顶点到顶点的距离，并且RIP实际上最求的就是最短距离参考，实际上路由表中维护的就是图中每个顶点到其他顶点的最短路径</strong></p>
+<p>RIP将直连的两个路由器距离向量记为1（当然也可以记作0），同时RIP允许一条路径上最多包含15个路由器，因此距离16相当于不可达，这代表<strong>RIP只适用于小型互联网</strong></p>
+<p>不管是RIP还是OSPF都是动态分布式协议，我们要注意三个问题，<strong>和那些路由器交换信息？</strong>  <strong>交换什么信息？</strong>  <strong>什么时候交换信息？</strong></p>
+<p>RIP协议特点：</p>
+<ul>
+<li>只和相邻路由器交换信息</li>
+<li>交换全部的信息，即整个路由表</li>
+<li>按固定时间间隔交换（30s）或者网络拓扑发生变化</li>
+</ul>
+<hr>
+<p>距离向量算法：用相邻路由发来的信息更新自己的路由表，做个例题很容易理解</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414223831.png" alt="R6更新R4发来的信息"></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414223952.png" alt="解答"></p>
+<hr>
+<p>RIP报文格式：</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414224635.png" alt="RIP报文格式"></p>
+<p>主要掌握RIP协议使用<strong>UDP用户数据报</strong>进行传送</p>
+<p>RIP有一个特点是<strong>好消息传播的快，坏消息传播的慢</strong></p>
+<p>这个主要是指R1连接的网1故障了，却收到R2之前记录的信息，从而在R1R2之间反复横跳，直到都变成16不可达，具体查看教材</p>
+<h3 id="5-3-内部网关协议OSPF"><a href="#5-3-内部网关协议OSPF" class="headerlink" title="5.3 内部网关协议OSPF"></a>5.3 内部网关协议OSPF</h3><p>OSPF（开放最短路径优先，因为使用了dijkstra算法）是使用分布式的<strong>链路状态协议</strong></p>
+<p>特点：</p>
+<ul>
+<li>向AS中<strong>所有路由器</strong>发送信息，采用<strong>洪泛法</strong></li>
+<li>发送的信息是与本路由器<strong>相邻的所有路由器的链路状态</strong>以及<strong>代价</strong>（带宽，时延之类的）</li>
+<li>只有<strong>链路状态发生变化</strong>时，才发送信息</li>
+</ul>
+<p>通过这种方式最终所有路由器都能建立一个<strong>链路状态数据库</strong>，实际上就是<strong>全网的拓扑结构图</strong>，在全网是<strong>一致的</strong>。这样每个路由器根据这个数据库生成自己的路由表</p>
+<p>OSPF可以支持很多的路由器接入，为了方便管理将AS划分成一些小的区域，每个区域内路由器数目最好小于200个</p>
+<hr>
+<p>OSPF<strong>直接用IP数据报传送</strong></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414232323.png" alt="OSPF报文格式"></p>
+<p>其他优点：</p>
+<ul>
+<li>建立路径时允许计算代价而不是单单看最短路径</li>
+<li>负载平衡（几条相同代价的线路平均分配通信量）</li>
+</ul>
+<hr>
+<p>OSPF有五种分组类型：</p>
+<p>问候分组，数据库描述分组，链路请求分组，链路状态更新，链路状态确认</p>
+<p>OSPF规定每隔10s相邻站点发送问候分组确定有没有站点挂掉，超过40s没有回应，则用剩下4种分组进行更新操作，更新时采用<strong>可靠的洪泛法</strong></p>
+<hr>
+<h3 id="5-4-外部网关协议BGP"><a href="#5-4-外部网关协议BGP" class="headerlink" title="5.4 外部网关协议BGP"></a>5.4 外部网关协议BGP</h3><p>解决不同AS之间的路由选择问题</p>
+<p>BGP采用<strong>路径向量</strong>路由选择协议，每个AS至少选择一个<strong>BGP发言人</strong>，一般是边界路由器，但也可以不是</p>
+<p>需要知道的是BGP发言人之间<strong>通过建立TCP连接</strong>来交换信息，在主干网上发出生命，例如BGP1：“到达N1可以经过AS1”</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414234412.png" alt="BGP报文格式"></p>
+<hr>
+<h2 id="6-IPv6"><a href="#6-IPv6" class="headerlink" title="6 IPv6"></a>6 IPv6</h2><p>相比IPv4主要变化：</p>
+<ul>
+<li>更大的地址空间：128位</li>
+<li>首部固定为40字节</li>
+<li>扩展的地址层次结构：空间大，可划分层次多</li>
+<li>灵活的首部格式：IPv6精简了首部字段，并且在数据部分支持各种扩展首部</li>
+<li>改进的选项：允许在数据部分增加控制信息</li>
+<li>允许协议继续扩充</li>
+<li>支持即插即用（自动配置）：IPv6不需要DHCP</li>
+<li>支持资源预分配</li>
+<li>首部改为8字节对齐，IPv4是4字节对齐</li>
+</ul>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414235650.png" alt="IPv6数据报一般形式"></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200414235738.png" alt="IPv6首部字段"></p>
+<ul>
+<li>版本： 4位，指明IPv6</li>
+<li>通信量类：  8位，为了区分不同的IPv6数据报的类别或优先级</li>
+<li>流标号：  20位，主要视为流媒体进行资源预分配</li>
+<li>有效载荷长度：  16位，指明数据报除了基本首部的字节数，最大值65535字节</li>
+<li>下一个首部：  8位，可选字段，标识下一个扩展首部的类型</li>
+<li>跳数限制：  8位，就是TTL改个名</li>
+<li>源地址：  128位</li>
+<li>目的地址：  128位</li>
+</ul>
+<p><strong>数据报途中经过的路由器都不处理扩展首部，大大提高了路由器处理效率</strong></p>
+<hr>
+<p>IPv6数据报的目的地址可以是三种类型：</p>
+<ul>
+<li>单播  同ipv4</li>
+<li>多播  同ipv4，ipv6认为广播时特殊的多播</li>
+<li>任播  终点是一组计算机，但只交付其中的一个，通常是最近的</li>
+</ul>
+<hr>
+<p>IPv6使用<strong>冒号十六进制记法</strong></p>
+<p>68E6:8C33:FFFF:FFFF:0:DF34:2376:FFFF</p>
+<p>中间的0可以压缩： </p>
+<p>FF05::B3</p>
+<p>还可以结合点分十进制法表示之前的ipv4地址：</p>
+<p>::128.0.0.1</p>
+<p>CIDR也可以使用：</p>
+<p>12AB:0:0:CD30::/60</p>
+<hr>
+<p>IPv4向IPv6过渡</p>
+<p>两种方法，<strong>双协议栈</strong>    <strong>隧道技术</strong></p>
+<ul>
+<li>双协议栈：将一部分的主机/路由器同时支持两种协议，不支持的网络通过<strong>转换首部</strong>来实现通信，当然不可避免会丢失一些字段</li>
+<li>隧道技术：原理是在经过ipv4网络时，将ipv6数据报文整个封装进ipv4数据报里，出了ipv4网络再去掉。</li>
+</ul>
+<hr>
+<p>ICMPv6是IPv6支持的控制协议，比ipv4的ICMP更加复杂，并且ICMPv6将ARP和IGMP等协议都合并到一起了</p>
+<hr>
+<h2 id="7-IP多播"><a href="#7-IP多播" class="headerlink" title="7 IP多播"></a>7 IP多播</h2><p>多播就是一对多进行传播，需要支持多播的路由器实现。多播的标识符就是IP地址中的D类地址，用一个D类地址标识一个多播组，是<strong>尽最大努力交付的（即不保证多播组中每个主机都收到消息）</strong>，使用的是IGMP协议，故不产生ICMP差错报文</p>
+<p>分为<strong>硬件多播</strong>和<strong>互联网多播</strong></p>
+<p>需要使用<strong>IGMP协议</strong>（使用IP数据报传送报文，即IGMP报文构成IP数据报的数据部分）和<strong>多播路由选择协议</strong>，具体查看教材</p>
+<hr>
+<h2 id="8-虚拟专用网VPN"><a href="#8-虚拟专用网VPN" class="headerlink" title="8 虚拟专用网VPN"></a>8 虚拟专用网VPN</h2><p>实际上一个部门内不是所有的主机都要接入互联网，给这些主机分配全球唯一IP是一种浪费，这时只给这些主机分配本地地址就可以</p>
+<p>所以规定了一些<strong>专用地址</strong>（可重用地址），这些地址只能作为<strong>本地地址</strong>不能作为<strong>全球地址</strong></p>
+<p>由这些专用地址组成的网络叫做<strong>专用网</strong>，假定一个部门在两地拥有两个专用A和B，AB通信的话就要使用公用的互联网作为专用网间的通信载体，这种专用网叫做<strong>虚拟专用网VPN</strong></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200415004337.png" alt="隧道技术实现虚拟专用网"></p>
+<hr>
+<h2 id="9-网络地址转换NAT"><a href="#9-网络地址转换NAT" class="headerlink" title="9 网络地址转换NAT"></a>9 网络地址转换NAT</h2><p>如果专用网内的主机已经分配了本地IP地址，但是又想和互联网连接，这时就要用到网络地址转换NAT了</p>
+<p>方法是将专用网连接到互联网的路由器装上NAT插件，这样的路由器叫<strong>NAT路由器</strong>，它必须有至少一个全球IP地址</p>
+<p>主机A发送数据报时，NAT路由器将数据报中的本地IP地址转换成全球IP地址用于通信，接收到目的服务器响应后将收到数据报中的全球IP地址转换成主机A的本地IP地址</p>
+<p>同一时刻有几个全球IP地址就可以有几个专用网主机与外界通信</p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200415005114.png" alt="NAT路由器工作原理"></p>
+<p><img src="https://gitee.com/Icecorn/blogimages/raw/master/img/20200415005331.png" alt="NAT地址转换表"></p>
+<p>也可以加上端口号，这样就可以实现不同端口访问不同的外界服务器。这时一个全球IP地址就可以分配不同的端口给不同专用网内主机使用了。这样的NAT较做<strong>网络地址与端口号转换NAPT</strong></p>
+<hr>
+<h2 id="10-多协议标记交换MPLS"><a href="#10-多协议标记交换MPLS" class="headerlink" title="10 多协议标记交换MPLS"></a>10 多协议标记交换MPLS</h2><p>一种新的面向连接的协议，看书吧QAQ</p>
+<p>特点：</p>
+<ul>
+<li>支持面向连接的服务质量</li>
+<li>支持流量工程，平衡网络负载</li>
+<li>有效地支持虚拟专用网VPN</li>
+</ul>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/02/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%B1%82/" title="计算机网络--网络层" target="_blank" rel="external">http://icecorn.github.io/2022/02/13/计算机网络/计算机网络--网络层/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/02/14/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E8%BF%90%E8%BE%93%E5%B1%82/" title="计算机网络--运输层"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/02/11/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C--%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82/" title="计算机网络--数据链路层"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

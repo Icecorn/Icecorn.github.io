@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>C++ Primer笔记|第三章-字符串，向量和数组 | Blog of Icecorn</title>
+  <meta name="description" content="第三章 字符串,向量和数组关于string的注意点： size函数返回string对象的长度，返回值是string::size_type类型，这是一种无符号类型。要使用size_type，必须先指定它是由哪种类型定义的。  当把string对象和字符字面值及字符串字面值混合在一条语句中使用时，必须确保每个加法运算符两侧的运算对象中至少有一个是string。 123string s4 &#x3D; s1 +">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ Primer笔记|第三章-字符串，向量和数组">
+<meta property="og:url" content="http://icecorn.github.io/2022/02/20/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E5%90%91%E9%87%8F%E5%92%8C%E6%95%B0%E7%BB%84/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第三章 字符串,向量和数组关于string的注意点： size函数返回string对象的长度，返回值是string::size_type类型，这是一种无符号类型。要使用size_type，必须先指定它是由哪种类型定义的。  当把string对象和字符字面值及字符串字面值混合在一条语句中使用时，必须确保每个加法运算符两侧的运算对象中至少有一个是string。 123string s4 &#x3D; s1 +">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-02-20T12:25:30.000Z">
+<meta property="article:modified_time" content="2022-06-29T12:52:21.527Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="C++ Primer">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/02/20/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E5%90%91%E9%87%8F%E5%92%8C%E6%95%B0%E7%BB%84/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.5px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E4%B8%93%E9%A2%98-%E5%9B%9B%E7%A7%8D%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|专题-四种类型转换的使用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" class="title">C++ Primer笔记|第十五章-面向对象程序设计</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E6%8B%B7%E8%B4%9D%E6%8E%A7%E5%88%B6/" class="title">C++ Primer笔记|第十三章-拷贝控制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|第十四章 重载运算与类型转换</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/05/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0-%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98/" class="title">C++ Primer笔记|第十二章 动态内存</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-05T12:25:30.000Z" itemprop="datePublished">2022-03-05</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%AD%97%E7%AC%A6%E4%B8%B2-%E5%90%91%E9%87%8F%E5%92%8C%E6%95%B0%E7%BB%84"><span class="toc-number">1.</span> <span class="toc-text">第三章 字符串,向量和数组</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8Estring%E7%9A%84%E6%B3%A8%E6%84%8F%E7%82%B9%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">关于string的注意点：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vector%E4%BD%BF%E7%94%A8%E6%B3%A8%E6%84%8F%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">vector使用注意：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E7%BB%84%EF%BC%88Arrays%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">数组（Arrays）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E5%92%8C%E5%88%9D%E5%A7%8B%E5%8C%96%E5%86%85%E7%BD%AE%E6%95%B0%E7%BB%84%EF%BC%88Defining-and-Initializing-Built-in-Arrays%EF%BC%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">定义和初始化内置数组（Defining and Initializing Built-in Arrays）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BF%E9%97%AE%E6%95%B0%E7%BB%84%E5%85%83%E7%B4%A0%EF%BC%88Accessing-the-Elements-of-an-Array%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">访问数组元素（Accessing the Elements of an Array）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%87%E9%92%88%E5%92%8C%E6%95%B0%E7%BB%84%EF%BC%88Pointers-and-Arrays%EF%BC%89"><span class="toc-number">1.3.3.</span> <span class="toc-text">指针和数组（Pointers and Arrays）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#C%E9%A3%8E%E6%A0%BC%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-number">1.3.4.</span> <span class="toc-text">C风格字符串</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8E%E6%97%A7%E4%BB%A3%E7%A0%81%E7%9A%84%E6%8E%A5%E5%8F%A3%EF%BC%88Interfacing-to-Older-Code%EF%BC%89"><span class="toc-number">1.3.5.</span> <span class="toc-text">与旧代码的接口（Interfacing to Older Code）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84%EF%BC%88Multidimensional-Arrays%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">多维数组（Multidimensional Arrays）</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-C++ Primer/C++primer笔记-第三章-字符串，向量和数组" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++ Primer笔记|第三章-字符串，向量和数组
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/02/20/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E5%90%91%E9%87%8F%E5%92%8C%E6%95%B0%E7%BB%84/" class="article-date">
+	  <time datetime="2022-02-20T12:25:30.000Z" itemprop="datePublished">2022-02-20</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/C/">C++</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/02/20/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E5%90%91%E9%87%8F%E5%92%8C%E6%95%B0%E7%BB%84/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 3k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 12(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="第三章-字符串-向量和数组"><a href="#第三章-字符串-向量和数组" class="headerlink" title="第三章 字符串,向量和数组"></a>第三章 字符串,向量和数组</h2><h3 id="关于string的注意点："><a href="#关于string的注意点：" class="headerlink" title="关于string的注意点："></a>关于string的注意点：</h3><ol>
+<li><p><code>size</code>函数返回<code>string</code>对象的长度，返回值是<code>string::size_type</code>类型，这是一种无符号类型。要使用<code>size_type</code>，必须先指定它是由哪种类型定义的。</p>
+</li>
+<li><p>当把<code>string</code>对象和字符字面值及字符串字面值混合在一条语句中使用时，必须确保每个加法运算符两侧的运算对象中至少有一个是<code>string</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">string s4 = s1 + <span class="string">&quot;, &quot;</span>;          <span class="comment">// ok: adding a string and a literal</span></span><br><span class="line">string s5 = <span class="string">&quot;hello&quot;</span> + <span class="string">&quot;, &quot;</span>;     <span class="comment">// error: no string operand</span></span><br><span class="line">string s6 = s1 + <span class="string">&quot;, &quot;</span> + <span class="string">&quot;world&quot;</span>;    <span class="comment">// ok: each + has a string operand</span></span><br></pre></td></tr></table></figure></li>
+<li><p>其实是变量生命周期的问题，在这里记录一下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">string s1 = <span class="built_in">string</span>(<span class="string">&quot;string1&quot;</span>); </span><br><span class="line"></span><br><span class="line">string s2 = <span class="built_in">string</span>(<span class="string">&quot;string2&quot;</span>); </span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">char</span>* p1 = s1.<span class="built_in">substr</span>(<span class="number">1</span>).<span class="built_in">data</span>();    <span class="comment">// substr(1)的意思是取[字符串]从下标1到结尾的部分 </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">char</span>* p2 = s2.<span class="built_in">substr</span>(<span class="number">1</span>).<span class="built_in">data</span>();</span><br><span class="line"></span><br><span class="line">cout &lt;&lt; p1 &lt;&lt; p2 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p>这里输出应该是tring1tring2，却输出了tring2tring2。这是因为s1.substr(1)创建了一个临时对象来存储s1的字串，然后data()获取这个子串内存的指针赋值给p1。但是到下一行，编译器发现刚才的临时对象没用了，就把它析构掉了（注意，析构表明cpu重新获得这块内存的分配权，但是里边的信息01状态不会改变），然后p2进行一样的操作，刚好s2.substr()又分配到了这块内存空间，这就导致最后的结果是p1p2都指向这块内存，而这块内存是tring2！</p>
+<p><strong>所以，在使用接口函数时一定要注意返回值是什么，而且编程时要注意对象的生命周期！</strong> </p>
+</li>
+</ol>
+<hr>
+<h3 id="vector使用注意："><a href="#vector使用注意：" class="headerlink" title="vector使用注意："></a>vector使用注意：</h3><p><code>vector</code>和<code>string</code>对象的下标运算符只能用来访问已经存在的元素，而不能用来添加元素。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; ivec;   <span class="comment">// empty vector</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">decltype</span>(ivec.<span class="built_in">size</span>()) ix = <span class="number">0</span>; ix != <span class="number">10</span>; ++ix)</span><br><span class="line">&#123;</span><br><span class="line">    ivec[ix] = ix;  <span class="comment">// disaster: ivec has no elements</span></span><br><span class="line">    ivec.<span class="built_in">push_back</span>(ix); <span class="comment">// ok: adds a new element with value ix</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>vector原理见stl笔记</p>
+<hr>
+<h3 id="数组（Arrays）"><a href="#数组（Arrays）" class="headerlink" title="数组（Arrays）"></a>数组（Arrays）</h3><p>数组类似<code>vector</code>，但数组的大小确定不变，不能随意向数组中添加元素。</p>
+<p>如果不清楚元素的确切个数，应该使用<code>vector</code>。</p>
+<h4 id="定义和初始化内置数组（Defining-and-Initializing-Built-in-Arrays）"><a href="#定义和初始化内置数组（Defining-and-Initializing-Built-in-Arrays）" class="headerlink" title="定义和初始化内置数组（Defining and Initializing Built-in Arrays）"></a>定义和初始化内置数组（Defining and Initializing Built-in Arrays）</h4><p>数组是一种复合类型，声明形式为<code>a[d]</code>，其中<em>a</em>是数组名称，<em>d</em>是数组维度（dimension）。维度必须是一个常量表达式。</p>
+<p>默认情况下，数组的元素被默认初始化。</p>
+<p>定义数组的时候必须指定数组的类型，不允许用<code>auto</code>关键字由初始值列表推断类型。</p>
+<p>如果定义数组时提供了元素的初始化列表，则允许省略数组维度，编译器会根据初始值的数量计算维度。但如果显式指明了维度，那么初始值的数量不能超过指定的大小。如果维度比初始值的数量大，则用提供的值初始化数组中靠前的元素，剩下的元素被默认初始化。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">unsigned</span> sz = <span class="number">3</span>;</span><br><span class="line"><span class="type">int</span> ia1[sz] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>&#125;;  <span class="comment">// array of three ints with values 0, 1, 2</span></span><br><span class="line"><span class="type">int</span> a2[] = &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>&#125;;   <span class="comment">// an array of dimension 3</span></span><br><span class="line"><span class="type">int</span> a3[<span class="number">5</span>] = &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>&#125;;  <span class="comment">// equivalent to a3[] = &#123;0, 1, 2, 0, 0&#125;</span></span><br><span class="line">string a4[<span class="number">3</span>] = &#123;<span class="string">&quot;hi&quot;</span>, <span class="string">&quot;bye&quot;</span>&#125;;   <span class="comment">// same as a4[] = &#123;&quot;hi&quot;, &quot;bye&quot;, &quot;&quot;&#125;</span></span><br><span class="line"><span class="type">int</span> a5[<span class="number">2</span>] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>&#125;;    <span class="comment">// error: too many initializers</span></span><br></pre></td></tr></table></figure>
+
+<p>可以用字符串字面值初始化字符数组，但字符串字面值结尾处的空字符也会一起被拷贝到字符数组中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> a1[] = &#123;<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;+&#x27;</span>, <span class="string">&#x27;+&#x27;</span>&#125;;        <span class="comment">// list initialization, no null</span></span><br><span class="line"><span class="type">char</span> a2[] = &#123;<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;+&#x27;</span>, <span class="string">&#x27;+&#x27;</span>, <span class="string">&#x27;\0&#x27;</span>&#125;;  <span class="comment">// list initialization, explicit null</span></span><br><span class="line"><span class="type">char</span> a3[] = <span class="string">&quot;C++&quot;</span>;      <span class="comment">// null terminator added automatically</span></span><br><span class="line"><span class="type">const</span> <span class="type">char</span> a4[<span class="number">6</span>] = <span class="string">&quot;Daniel&quot;</span>;    <span class="comment">// error: no space for the null!</span></span><br></pre></td></tr></table></figure>
+
+<p>不能用一个数组初始化或直接赋值给另一个数组。</p>
+<p>从数组的名字开始由内向外阅读有助于理解复杂数组声明的含义。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *ptrs[<span class="number">10</span>];              <span class="comment">// ptrs is an array of ten pointers to int</span></span><br><span class="line"><span class="type">int</span> &amp;refs[<span class="number">10</span>] = <span class="comment">/* ? */</span>;    <span class="comment">// error: no arrays of references</span></span><br><span class="line"><span class="built_in">int</span> (*Parray)[<span class="number">10</span>] = &amp;arr;   <span class="comment">// Parray points to an array of ten ints</span></span><br><span class="line"><span class="built_in">int</span> (&amp;arrRef)[<span class="number">10</span>] = arr;    <span class="comment">// arrRef refers to an array of ten ints</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="访问数组元素（Accessing-the-Elements-of-an-Array）"><a href="#访问数组元素（Accessing-the-Elements-of-an-Array）" class="headerlink" title="访问数组元素（Accessing the Elements of an Array）"></a>访问数组元素（Accessing the Elements of an Array）</h4><p>数组下标通常被定义成<code>size_t</code>类型，这是一种机器相关的无符号类型，可以表示内存中任意对象的大小。<code>size_t</code>定义在头文件<em>cstddef</em>中。</p>
+<p>大多数常见的安全问题都源于缓冲区溢出错误。当数组或其他类似数据结构的下标越界并试图访问非法内存区域时，就会产生此类错误。</p>
+<h4 id="指针和数组（Pointers-and-Arrays）"><a href="#指针和数组（Pointers-and-Arrays）" class="headerlink" title="指针和数组（Pointers and Arrays）"></a>指针和数组（Pointers and Arrays）</h4><p>在大多数表达式中，使用数组类型的对象其实是在使用一个指向该数组首元素的指针。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">string nums[] = &#123;<span class="string">&quot;one&quot;</span>, <span class="string">&quot;two&quot;</span>, <span class="string">&quot;three&quot;</span>&#125;;    <span class="comment">// array of strings</span></span><br><span class="line">string *p = &amp;nums[<span class="number">0</span>];   <span class="comment">// p points to the first element in nums</span></span><br><span class="line">string *p2 = nums;      <span class="comment">// equivalent to p2 = &amp;nums[0]</span></span><br></pre></td></tr></table></figure>
+
+<p><em><em>这里刚好可以说明一下指针和引用的区别，为什么要有引用这个东西。比如有一个长度为10的数组arr，要改变第五个元素，arr[4] = 0；就可以直接改，这里的arr[4]就是引用，表述起来比较方便，想一下如果要用指针表述的话，就是</em>(&amp;arr[4]) = 0;更复杂的情况会更繁琐，这可能是引用出现的一个因素吧</em>*</p>
+<p>当使用数组作为一个<code>auto</code>变量的初始值时，推断得到的类型是指针而非数组。但<code>decltype</code>关键字不会发生这种转换，直接返回数组类型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> ia[] = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>&#125;;   <span class="comment">// ia is an array of ten ints</span></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">ia2</span><span class="params">(ia)</span></span>;   <span class="comment">// ia2 is an int* that points to the first element in ia</span></span><br><span class="line">ia2 = <span class="number">42</span>;       <span class="comment">// error: ia2 is a pointer, and we can&#x27;t assign an int to a pointer</span></span><br><span class="line"><span class="function"><span class="keyword">auto</span> <span class="title">ia2</span><span class="params">(&amp;ia[<span class="number">0</span>])</span></span>;   <span class="comment">// now it&#x27;s clear that ia2 has type int*</span></span><br><span class="line"><span class="comment">// ia3 is an array of ten ints</span></span><br><span class="line"><span class="keyword">decltype</span>(ia) ia3 = &#123;<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>&#125;;</span><br><span class="line">ia3 = p;    <span class="comment">// error: can&#x27;t assign an int* to an array</span></span><br><span class="line">ia3[<span class="number">4</span>] = i;     <span class="comment">// ok: assigns the value of i to an element in ia3</span></span><br></pre></td></tr></table></figure>
+
+<p>C++11在头文件<em>iterator</em>中定义了两个名为<code>begin</code>和<code>end</code>的函数，功能与容器中的两个同名成员函数类似，参数是一个数组。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int ia[] = &#123;0,1,2,3,4,5,6,7,8,9&#125;;   // ia is an array of ten ints</span><br><span class="line">int *beg = begin(ia);   // pointer to the first element in ia</span><br><span class="line">int *last = end(ia);    // pointer one past the last element in ia</span><br></pre></td></tr></table></figure>
+
+<p>两个指针相减的结果类型是<code>ptrdiff_t</code>，这是一种定义在头文件<em>cstddef</em>中的带符号类型。</p>
+<p><strong>标准库类型限定使用的下标必须是无符号类型，而内置的下标运算无此要求。</strong></p>
+<hr>
+<h4 id="C风格字符串"><a href="#C风格字符串" class="headerlink" title="C风格字符串"></a>C风格字符串</h4><p>C风格字符串是将字符串存放在字符数组中，并以空字符结束（null terminated）。这不是一种类型，而是一种为了表达和使用字符串而形成的书写方法。</p>
+<p>C++标准支持C风格字符串，但是最好不要在C++程序中使用它们。对大多数程序来说，使用标准库<code>string</code>要比使用C风格字符串更加安全和高效。</p>
+<p>C风格字符串函数不负责验证其参数的正确性，<strong>传入此类函数的指针必须指向以空字符作为结尾的数组。</strong></p>
+<hr>
+<h4 id="与旧代码的接口（Interfacing-to-Older-Code）"><a href="#与旧代码的接口（Interfacing-to-Older-Code）" class="headerlink" title="与旧代码的接口（Interfacing to Older Code）"></a>与旧代码的接口（Interfacing to Older Code）</h4><p>任何出现字符串字面值的地方都可以用以空字符结束的字符数组来代替：</p>
+<ul>
+<li>允许使用以空字符结束的字符数组来初始化<code>string</code>对象或为<code>string</code>对象赋值。</li>
+<li>在<code>string</code>对象的加法运算中，允许使用以空字符结束的字符数组作为其中一个运算对象（不能两个运算对象都是）。</li>
+<li>在<code>string</code>对象的复合赋值运算中，允许使用以空字符结束的字符数组作为右侧运算对象。</li>
+</ul>
+<p>不能用<code>string</code>对象直接初始化指向字符的指针。为了实现该功能，<code>string</code>提供了一个名为<code>c_str</code>的成员函数，返回<code>const char*</code>类型的指针，指向一个以空字符结束的字符数组，数组的数据和<code>string</code>对象一样。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">string <span class="title">s</span><span class="params">(<span class="string">&quot;Hello World&quot;</span>)</span></span>;    <span class="comment">// s holds Hello World</span></span><br><span class="line"><span class="type">char</span> *str = s;  <span class="comment">// error: can&#x27;t initialize a char* from a string</span></span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *str = s.<span class="built_in">c_str</span>();    <span class="comment">// ok</span></span><br></pre></td></tr></table></figure>
+
+<p>针对<code>string</code>对象的后续操作有可能会让<code>c_str</code>函数之前返回的数组失去作用，如果程序想一直都能使用其返回的数组，最好将该数组重新拷贝一份。</p>
+<p>可以使用数组来初始化<code>vector</code>对象，但是需要指明要拷贝区域的首元素地址和尾后地址。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> int_arr[] = &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line"><span class="comment">// ivec has six elements; each is a copy of the corresponding element in int_arr</span></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">ivec</span><span class="params">(begin(int_arr), end(int_arr))</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>在新版本的C++程序中应该尽量使用<code>vector</code>、<code>string</code>和迭代器，避免使用内置数组、C风格字符串和指针。</p>
+<h3 id="多维数组（Multidimensional-Arrays）"><a href="#多维数组（Multidimensional-Arrays）" class="headerlink" title="多维数组（Multidimensional Arrays）"></a>多维数组（Multidimensional Arrays）</h3><p>C++中的多维数组其实就是数组的数组。当一个数组的元素仍然是数组时，通常需要用两个维度定义它：一个维度表示数组本身的大小，另一个维度表示其元素（也是数组）的大小。通常把二维数组的第一个维度称作行，第二个维度称作列。</p>
+<p>多维数组初始化的几种方式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> ia[<span class="number">3</span>][<span class="number">4</span>] =</span><br><span class="line">&#123;   <span class="comment">// three elements; each element is an array of size 4</span></span><br><span class="line">    &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;,   <span class="comment">// initializers for the row indexed by 0</span></span><br><span class="line">    &#123;<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>&#125;,   <span class="comment">// initializers for the row indexed by 1</span></span><br><span class="line">    &#123;<span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>&#125;  <span class="comment">// initializers for the row indexed by 2</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// equivalent initialization without the optional nested braces for each row</span></span><br><span class="line"><span class="type">int</span> ib[<span class="number">3</span>][<span class="number">4</span>] = &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>&#125;;</span><br><span class="line"><span class="comment">// explicitly initialize only element 0 in each row</span></span><br><span class="line"><span class="type">int</span> ic[<span class="number">3</span>][<span class="number">4</span>] = &#123;&#123; <span class="number">0</span> &#125;, &#123; <span class="number">4</span> &#125;, &#123; <span class="number">8</span> &#125;&#125;;</span><br><span class="line"><span class="comment">// explicitly initialize row 0; the remaining elements are value initialized</span></span><br><span class="line"><span class="type">int</span> id[<span class="number">3</span>][<span class="number">4</span>] = &#123;<span class="number">0</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">9</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>可以使用下标访问多维数组的元素，数组的每个维度对应一个下标运算符。如果表达式中下标运算符的数量和数组维度一样多，则表达式的结果是给定类型的元素。如果下标运算符数量比数组维度小，则表达式的结果是给定索引处的一个内层数组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// assigns the first element of arr to the last element in the last row of ia</span></span><br><span class="line">ia[<span class="number">2</span>][<span class="number">3</span>] = arr[<span class="number">0</span>][<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line"><span class="built_in">int</span> (&amp;row)[<span class="number">4</span>] = ia[<span class="number">1</span>];  <span class="comment">// binds row to the second four-element array in ia</span></span><br></pre></td></tr></table></figure>
+
+<p>使用范围<code>for</code>语句处理多维数组时，为了避免数组被自动转换成指针，语句中的外层循环控制变量必须声明成引用类型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;row : ia)  <span class="comment">// for every element in the outer array</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> col : row)    <span class="comment">// for every element in the inner array</span></span><br><span class="line">        cout &lt;&lt; col &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p>如果<em>row</em>不是引用类型，编译器初始化<em>row</em>时会自动将数组形式的元素转换成指向该数组内首元素的指针，这样得到的<em>row</em>就是<code>int*</code>类型，而之后的内层循环则试图在一个<code>int*</code>内遍历，程序将无法通过编译。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> row : ia)</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> col : row)</span><br></pre></td></tr></table></figure>
+
+<p>使用范围<code>for</code>语句处理多维数组时，除了最内层的循环，其他所有外层循环的控制变量都应该定义成引用类型。</p>
+<p>因为多维数组实际上是数组的数组，所以由多维数组名称转换得到的指针指向第一个内层数组。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> ia[<span class="number">3</span>][<span class="number">4</span>];       <span class="comment">// array of size 3; each element is an array of ints of size 4</span></span><br><span class="line"><span class="built_in">int</span> (*p)[<span class="number">4</span>] = ia;   <span class="comment">// p points to an array of four ints</span></span><br><span class="line">p = &amp;ia[<span class="number">2</span>];         <span class="comment">// p now points to the last element in ia</span></span><br></pre></td></tr></table></figure>
+
+<p>声明指向数组类型的指针时，必须带有圆括号。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> *ip[<span class="number">4</span>];     <span class="comment">// array of pointers to int</span></span><br><span class="line"><span class="built_in">int</span> (*ip)[<span class="number">4</span>];   <span class="comment">// pointer to an array of four ints</span></span><br></pre></td></tr></table></figure>
+
+<p>使用<code>auto</code>和<code>decltype</code>能省略复杂的指针定义。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// print the value of each element in ia, with each inner array on its own line</span></span><br><span class="line"><span class="comment">// p points to an array of four ints</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">auto</span> p = ia; p != ia + <span class="number">3</span>; ++p)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// q points to the first element of an array of four ints; that is, q points to an int</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> q = *p; q != *p + <span class="number">4</span>; ++q)</span><br><span class="line">        cout &lt;&lt; *q &lt;&lt; <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/02/20/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%89%E7%AB%A0-%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E5%90%91%E9%87%8F%E5%92%8C%E6%95%B0%E7%BB%84/" title="C++ Primer笔记|第三章-字符串，向量和数组" target="_blank" rel="external">http://icecorn.github.io/2022/02/20/C++ Primer/C++primer笔记-第三章-字符串，向量和数组/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/02/21/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%9B%9B%E7%AB%A0-%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="C++ Primer笔记|第四章-表达式"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/02/20/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%BA%8C%E7%AB%A0-%E5%8F%98%E9%87%8F%E5%92%8C%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B/" title="C++ Primer笔记|第二章-变量和基本类型"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

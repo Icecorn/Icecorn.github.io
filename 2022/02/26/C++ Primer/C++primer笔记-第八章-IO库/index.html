@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>C++ Primer笔记|第八章-IO库 | Blog of Icecorn</title>
+  <meta name="description" content="第8章 IO库部分IO库设施：  istream：输入流类型，提供输入操作。 ostream：输出流类型，提供输出操作。 cin：istream对象，从标准输入读取数据。 cout：ostream对象，向标准输出写入数据。 cerr：ostream对象，向标准错误写入数据。 &gt;&gt;运算符：从istream对象读取输入数据。 &lt;&lt;运算符：向ostream对象写入输出数据。 ge">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ Primer笔记|第八章-IO库">
+<meta property="og:url" content="http://icecorn.github.io/2022/02/26/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%85%AB%E7%AB%A0-IO%E5%BA%93/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第8章 IO库部分IO库设施：  istream：输入流类型，提供输入操作。 ostream：输出流类型，提供输出操作。 cin：istream对象，从标准输入读取数据。 cout：ostream对象，向标准输出写入数据。 cerr：ostream对象，向标准错误写入数据。 &gt;&gt;运算符：从istream对象读取输入数据。 &lt;&lt;运算符：向ostream对象写入输出数据。 ge">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629210314294.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8-2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629210334141.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8-4.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8-5.png">
+<meta property="article:published_time" content="2022-02-26T12:25:30.000Z">
+<meta property="article:modified_time" content="2022-06-29T13:04:00.943Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="C++ Primer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629210314294.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/02/26/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%85%AB%E7%AB%A0-IO%E5%BA%93/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.5px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E4%B8%93%E9%A2%98-%E5%9B%9B%E7%A7%8D%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|专题-四种类型转换的使用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/10/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/" class="title">C++ Primer笔记|第十五章-面向对象程序设计</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-10T12:25:30.000Z" itemprop="datePublished">2022-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E6%8B%B7%E8%B4%9D%E6%8E%A7%E5%88%B6/" class="title">C++ Primer笔记|第十三章-拷贝控制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/07/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E9%87%8D%E8%BD%BD%E8%BF%90%E7%AE%97%E4%B8%8E%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/" class="title">C++ Primer笔记|第十四章 重载运算与类型转换</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-07T12:25:30.000Z" itemprop="datePublished">2022-03-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/05/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0-%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98/" class="title">C++ Primer笔记|第十二章 动态内存</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-05T12:25:30.000Z" itemprop="datePublished">2022-03-05</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC8%E7%AB%A0-IO%E5%BA%93"><span class="toc-number">1.</span> <span class="toc-text">第8章 IO库</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#IO%E7%B1%BB%EF%BC%88The-IO-Classes%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">IO类（The IO Classes）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IO%E8%B1%A1%E6%97%A0%E6%8B%B7%E8%B4%9D%E6%88%96%E8%B5%8B%E5%80%BC%EF%BC%88No-Copy-or-Assign-for-IO-Objects%EF%BC%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">IO象无拷贝或赋值（No Copy or Assign for IO Objects）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%8A%B6%E6%80%81%EF%BC%88Condition-States%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">条件状态（Condition States）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%A1%E7%90%86%E8%BE%93%E5%87%BA%E7%BC%93%E5%86%B2%EF%BC%88Managing-the-Output-Buffer%EF%BC%89"><span class="toc-number">1.1.3.</span> <span class="toc-text">管理输出缓冲（Managing the Output Buffer）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%EF%BC%88File-Input-and-Output%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">文件输入输出（File Input and Output）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%87%E4%BB%B6%E6%B5%81%E5%AF%B9%E8%B1%A1%EF%BC%88Using-File-Stream-Objects%EF%BC%89"><span class="toc-number">1.2.1.</span> <span class="toc-text">使用文件流对象（Using File Stream Objects）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E6%A8%A1%E5%BC%8F%EF%BC%88File-Modes%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">文件模式（File Modes）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#string%E6%B5%81%EF%BC%88string-Streams%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">string流（string Streams）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8istringstream%EF%BC%88Using-an-istringstream%EF%BC%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">使用istringstream（Using an istringstream）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8ostringstream%EF%BC%88Using-ostringstreams%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">使用ostringstream（Using ostringstreams）</span></a></li></ol></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-C++ Primer/C++primer笔记-第八章-IO库" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++ Primer笔记|第八章-IO库
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/02/26/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%85%AB%E7%AB%A0-IO%E5%BA%93/" class="article-date">
+	  <time datetime="2022-02-26T12:25:30.000Z" itemprop="datePublished">2022-02-26</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/C/">C++</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/02/26/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%85%AB%E7%AB%A0-IO%E5%BA%93/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.5k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 10(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="第8章-IO库"><a href="#第8章-IO库" class="headerlink" title="第8章 IO库"></a>第8章 IO库</h1><p>部分IO库设施：</p>
+<ul>
+<li><code>istream</code>：输入流类型，提供输入操作。</li>
+<li><code>ostream</code>：输出流类型，提供输出操作。</li>
+<li><code>cin</code>：<code>istream</code>对象，从标准输入读取数据。</li>
+<li><code>cout</code>：<code>ostream</code>对象，向标准输出写入数据。</li>
+<li><code>cerr</code>：<code>ostream</code>对象，向标准错误写入数据。</li>
+<li><code>&gt;&gt;</code>运算符：从<code>istream</code>对象读取输入数据。</li>
+<li><code>&lt;&lt;</code>运算符：向<code>ostream</code>对象写入输出数据。</li>
+<li><code>getline</code>函数：从<code>istream</code>对象读取一行数据，写入<code>string</code>对象。</li>
+</ul>
+<h2 id="IO类（The-IO-Classes）"><a href="#IO类（The-IO-Classes）" class="headerlink" title="IO类（The IO Classes）"></a>IO类（The IO Classes）</h2><p>头文件<em>iostream</em>定义了用于读写流的基本类型，<em>fstream</em>定义了读写命名文件的类型，<em>sstream</em>定义了读写内存中<code>string</code>对象的类型。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629210314294.png" alt="image-20220629210314294"></p>
+<p>宽字符版本的IO类型和函数的名字以<code>w</code>开始，如<code>wcin</code>、<code>wcout</code>和<code>wcerr</code>分别对应<code>cin</code>、<code>cout</code>和<code>cerr</code>。它们与其对应的普通<code>char</code>版本都定义在同一个头文件中，如头文件<em>fstream</em>定义了<code>ifstream</code>和<code>wifstream</code>类型。</p>
+<p>可以将派生类的对象当作其基类的对象使用。</p>
+<h3 id="IO象无拷贝或赋值（No-Copy-or-Assign-for-IO-Objects）"><a href="#IO象无拷贝或赋值（No-Copy-or-Assign-for-IO-Objects）" class="headerlink" title="IO象无拷贝或赋值（No Copy or Assign for IO Objects）"></a>IO象无拷贝或赋值（No Copy or Assign for IO Objects）</h3><p>不能拷贝或对IO对象赋值。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ofstream out1, out2;</span><br><span class="line">out1 = out2;    <span class="comment">// error: cannot assign stream objects</span></span><br><span class="line"><span class="function">ofstream <span class="title">print</span><span class="params">(ofstream)</span></span>;   <span class="comment">// error: can&#x27;t initialize the ofstream parameter</span></span><br><span class="line">out2 = <span class="built_in">print</span>(out2);     <span class="comment">// error: cannot copy stream objects</span></span><br></pre></td></tr></table></figure>
+
+<p>由于IO对象不能拷贝，因此不能将函数形参或返回类型定义为流类型。进行IO操作的函数通常以引用方式传递和返回流。读写一个IO对象会改变其状态，因此传递和返回的引用不能是<code>const</code>的。</p>
+<h3 id="条件状态（Condition-States）"><a href="#条件状态（Condition-States）" class="headerlink" title="条件状态（Condition States）"></a>条件状态（Condition States）</h3><p>IO库条件状态：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8-2.png" alt="8-2"></p>
+<p><code>badbit</code>表示系统级错误，如不可恢复的读写错误。通常情况下，一旦<code>badbit</code>被置位，流就无法继续使用了。在发生可恢复错误后，<code>failbit</code>会被置位，如期望读取数值却读出一个字符。如果到达文件结束位置，<code>eofbit</code>和<code>failbit</code>都会被置位。如果流未发生错误，则<code>goodbit</code>的值为0。如果<code>badbit</code>、<code>failbit</code>和<code>eofbit</code>任何一个被置位，检测流状态的条件都会失败。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (cin &gt;&gt; word)</span><br><span class="line">    <span class="comment">// ok: read operation successful...</span></span><br></pre></td></tr></table></figure>
+
+<p><code>good</code>函数在所有错误均未置位时返回<code>true</code>。而<code>bad</code>、<code>fail</code>和<code>eof</code>函数在对应错误位被置位时返回<code>true</code>。此外，在<code>badbit</code>被置位时，<code>fail</code>函数也会返回<code>true</code>。因此应该使用<code>good</code>或<code>fail</code>函数确定流的总体状态，<code>eof</code>和<code>bad</code>只能检测特定错误。</p>
+<p>流对象的<code>rdstate</code>成员返回一个<code>iostate</code>值，表示流的当前状态。<code>setstate</code>成员用于将指定条件置位（叠加原始流状态）。<code>clear</code>成员的无参版本清除所有错误标志；含参版本接受一个<code>iostate</code>值，用于设置流的新状态（覆盖原始流状态）。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// remember the current state of cin</span></span><br><span class="line"><span class="keyword">auto</span> old_state = cin.<span class="built_in">rdstate</span>();     <span class="comment">// remember the current state of cin</span></span><br><span class="line">cin.<span class="built_in">clear</span>();    <span class="comment">// make cin valid</span></span><br><span class="line"><span class="built_in">process_input</span>(cin);     <span class="comment">// use cin</span></span><br><span class="line">cin.<span class="built_in">setstate</span>(old_state);    <span class="comment">// now reset cin to its old state</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="管理输出缓冲（Managing-the-Output-Buffer）"><a href="#管理输出缓冲（Managing-the-Output-Buffer）" class="headerlink" title="管理输出缓冲（Managing the Output Buffer）"></a>管理输出缓冲（Managing the Output Buffer）</h3><p>每个输出流都管理一个缓冲区，用于保存程序读写的数据。导致缓冲刷新（即数据真正写入输出设备或文件）的原因有很多：</p>
+<ul>
+<li>程序正常结束。</li>
+<li>缓冲区已满。</li>
+<li>使用操纵符（如<code>endl</code>）显式刷新缓冲区。</li>
+<li>在每个输出操作之后，可以用<code>unitbuf</code>操纵符设置流的内部状态，从而清空缓冲区。默认情况下，对<code>cerr</code>是设置<code>unitbuf</code>的，因此写到<code>cerr</code>的内容都是立即刷新的。</li>
+<li>一个输出流可以被关联到另一个流。这种情况下，当读写被关联的流时，关联到的流的缓冲区会被刷新。默认情况下，<code>cin</code>和<code>cerr</code>都关联到<code>cout</code>，因此，读<code>cin</code>或写<code>cerr</code>都会刷新<code>cout</code>的缓冲区。</li>
+</ul>
+<p><code>flush</code>操纵符刷新缓冲区，但不输出任何额外字符。<code>ends</code>向缓冲区插入一个空字符，然后刷新缓冲区。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cout &lt;&lt; <span class="string">&quot;hi!&quot;</span> &lt;&lt; endl;   <span class="comment">// writes hi and a newline, then flushes the buffer</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;hi!&quot;</span> &lt;&lt; flush;  <span class="comment">// writes hi, then flushes the buffer; adds no data</span></span><br><span class="line">cout &lt;&lt; <span class="string">&quot;hi!&quot;</span> &lt;&lt; ends;   <span class="comment">// writes hi and a null, then flushes the buffer</span></span><br></pre></td></tr></table></figure>
+
+<p>如果想在每次输出操作后都刷新缓冲区，可以使用<code>unitbuf</code>操纵符。它令流在接下来的每次写操作后都进行一次<code>flush</code>操作。而<code>nounitbuf</code>操纵符则使流恢复使用正常的缓冲区刷新机制。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cout &lt;&lt; unitbuf;    <span class="comment">// all writes will be flushed immediately</span></span><br><span class="line"><span class="comment">// any output is flushed immediately, no buffering</span></span><br><span class="line">cout &lt;&lt; nounitbuf;  <span class="comment">// returns to normal buffering</span></span><br></pre></td></tr></table></figure>
+
+<p>如果程序异常终止，输出缓冲区不会被刷新。</p>
+<p>当一个输入流被关联到一个输出流时，任何试图从输入流读取数据的操作都会先刷新关联的输出流。标准库将<code>cout</code>和<code>cin</code>关联在一起，因此下面的语句会导致<code>cout</code>的缓冲区被刷新：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cin &gt;&gt; ival;</span><br></pre></td></tr></table></figure>
+
+<p>交互式系统通常应该关联输入流和输出流。这意味着包括用户提示信息在内的所有输出，都会在读操作之前被打印出来。</p>
+<p>使用<code>tie</code>函数可以关联两个流。它有两个重载版本：无参版本返回指向输出流的指针。如果本对象已关联到一个输出流，则返回的就是指向这个流的指针，否则返回空指针。<code>tie</code>的第二个版本接受一个指向<code>ostream</code>的指针，将本对象关联到此<code>ostream</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cin.<span class="built_in">tie</span>(&amp;cout);     <span class="comment">// illustration only: the library ties cin and cout for us</span></span><br><span class="line"><span class="comment">// old_tie points to the stream (if any) currently tied to cin</span></span><br><span class="line">ostream *old_tie = cin.<span class="built_in">tie</span>(<span class="literal">nullptr</span>); <span class="comment">// cin is no longer tied</span></span><br><span class="line"><span class="comment">// ties cin and cerr; not a good idea because cin should be tied to cout</span></span><br><span class="line">cin.<span class="built_in">tie</span>(&amp;cerr);     <span class="comment">// reading cin flushes cerr, not cout</span></span><br><span class="line">cin.<span class="built_in">tie</span>(old_tie);   <span class="comment">// reestablish normal tie between cin and cout</span></span><br></pre></td></tr></table></figure>
+
+<p>每个流同时最多关联一个流，但多个流可以同时关联同一个<code>ostream</code>。向<code>tie</code>传递空指针可以解开流的关联。</p>
+<h2 id="文件输入输出（File-Input-and-Output）"><a href="#文件输入输出（File-Input-and-Output）" class="headerlink" title="文件输入输出（File Input and Output）"></a>文件输入输出（File Input and Output）</h2><p>头文件<em>fstream</em>定义了三个类型来支持文件IO：<code>ifstream</code>从给定文件读取数据，<code>ofstream</code>向指定文件写入数据，<code>fstream</code>可以同时读写指定文件。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629210334141.png" alt="image-20220629210334141"></p>
+<h3 id="使用文件流对象（Using-File-Stream-Objects）"><a href="#使用文件流对象（Using-File-Stream-Objects）" class="headerlink" title="使用文件流对象（Using File Stream Objects）"></a>使用文件流对象（Using File Stream Objects）</h3><p>每个文件流类型都定义了<code>open</code>函数，它完成一些系统操作，定位指定文件，并视情况打开为读或写模式。</p>
+<p>创建文件流对象时，如果提供了文件名（可选），<code>open</code>会被自动调用。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ifstream <span class="title">in</span><span class="params">(ifile)</span></span>;   <span class="comment">// construct an ifstream and open the given file</span></span><br><span class="line">ofstream out;   <span class="comment">// output file stream that is not associated with any file</span></span><br></pre></td></tr></table></figure>
+
+<p>在C++11中，文件流对象的文件名可以是<code>string</code>对象或C风格字符数组。旧版本的标准库只支持C风格字符数组。</p>
+<p>在要求使用基类对象的地方，可以用继承类型的对象代替。因此一个接受<code>iostream</code>类型引用或指针参数的函数，可以用对应的<code>fstream</code>类型来调用。</p>
+<p>可以先定义空文件流对象，再调用<code>open</code>函数将其与指定文件关联。如果<code>open</code>调用失败，<code>failbit</code>会被置位。</p>
+<p>对一个已经打开的文件流调用<code>open</code>会失败，并导致<code>failbit</code>被置位。随后试图使用文件流的操作都会失败。如果想将文件流关联到另一个文件，必须先调用<code>close</code>关闭当前文件，再调用<code>clear</code>重置流的条件状态（<code>close</code>不会重置流的条件状态）。</p>
+<p>当<code>fstream</code>对象被销毁时，<code>close</code>会自动被调用。</p>
+<h3 id="文件模式（File-Modes）"><a href="#文件模式（File-Modes）" class="headerlink" title="文件模式（File Modes）"></a>文件模式（File Modes）</h3><p>每个流都有一个关联的文件模式，用来指出如何使用文件。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8-4.png" alt="8-4"></p>
+<ul>
+<li>只能对<code>ofstream</code>或<code>fstream</code>对象设定<code>out</code>模式。</li>
+<li>只能对<code>ifstream</code>或<code>fstream</code>对象设定<code>in</code>模式。</li>
+<li>只有当<code>out</code>被设定时才能设定<code>trunc</code>模式。</li>
+<li>只要<code>trunc</code>没被设定，就能设定<code>app</code>模式。在<code>app</code>模式下，即使没有设定<code>out</code>模式，文件也是以输出方式打开。</li>
+<li>默认情况下，即使没有设定<code>trunc</code>，以<code>out</code>模式打开的文件也会被截断。如果想保留以<code>out</code>模式打开的文件内容，就必须同时设定<code>app</code>模式，这会将数据追加写到文件末尾；或者同时设定<code>in</code>模式，即同时进行读写操作。</li>
+<li><code>ate</code>和<code>binary</code>模式可用于任何类型的文件流对象，并可以和其他任何模式组合使用。</li>
+<li>与<code>ifstream</code>对象关联的文件默认以<code>in</code>模式打开，与<code>ofstream</code>对象关联的文件默认以<code>out</code>模式打开，与<code>fstream</code>对象关联的文件默认以<code>in</code>和<code>out</code>模式打开。</li>
+</ul>
+<p>默认情况下，打开<code>ofstream</code>对象时，文件内容会被丢弃，阻止文件清空的方法是同时指定<code>app</code>或<code>in</code>模式。</p>
+<p>流对象每次打开文件时都可以改变其文件模式。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ofstream out;   <span class="comment">// no file mode is set</span></span><br><span class="line">out.<span class="built_in">open</span>(<span class="string">&quot;scratchpad&quot;</span>);    <span class="comment">// mode implicitly out and trunc</span></span><br><span class="line">out.<span class="built_in">close</span>();    <span class="comment">// close out so we can use it for a different file</span></span><br><span class="line">out.<span class="built_in">open</span>(<span class="string">&quot;precious&quot;</span>, ofstream::app);   <span class="comment">// mode is out and app</span></span><br><span class="line">out.<span class="built_in">close</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="string流（string-Streams）"><a href="#string流（string-Streams）" class="headerlink" title="string流（string Streams）"></a>string流（string Streams）</h2><p>头文件<em>sstream</em>定义了三个类型来支持内存IO：<code>istringstream</code>从<code>string</code>读取数据，<code>ostringstream</code>向<code>string</code>写入数据，<code>stringstream</code>可以同时读写<code>string</code>的数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8-5.png" alt="8-5"></p>
+<h3 id="使用istringstream（Using-an-istringstream）"><a href="#使用istringstream（Using-an-istringstream）" class="headerlink" title="使用istringstream（Using an istringstream）"></a>使用istringstream（Using an istringstream）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// members are public by default</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">PersonInfo</span></span><br><span class="line">&#123;</span><br><span class="line">    string name;</span><br><span class="line">    vector&lt;string&gt; phones;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">string line, word;   <span class="comment">// will hold a line and word from input, respectively</span></span><br><span class="line">vector&lt;PersonInfo&gt; people;    <span class="comment">// will hold all the records from the input</span></span><br><span class="line"><span class="comment">// read the input a line at a time until cin hits end-of-file (or another error)</span></span><br><span class="line"><span class="keyword">while</span> (<span class="built_in">getline</span>(cin, line))</span><br><span class="line">&#123;</span><br><span class="line">    PersonInfo info;    <span class="comment">// create an object to hold this record&#x27;s data</span></span><br><span class="line">    <span class="function">istringstream <span class="title">record</span><span class="params">(line)</span></span>;    <span class="comment">// bind record to the line we just read</span></span><br><span class="line">    record &gt;&gt; info.name;    <span class="comment">// read the name</span></span><br><span class="line">    <span class="keyword">while</span> (record &gt;&gt; word)  <span class="comment">// read the phone numbers</span></span><br><span class="line">        info.phones.<span class="built_in">push_back</span>(word);   <span class="comment">// and store them</span></span><br><span class="line">    people.<span class="built_in">push_back</span>(info);    <span class="comment">// append this record to people</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用ostringstream（Using-ostringstreams）"><a href="#使用ostringstream（Using-ostringstreams）" class="headerlink" title="使用ostringstream（Using ostringstreams）"></a>使用ostringstream（Using ostringstreams）</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;entry : people)</span><br><span class="line">&#123; <span class="comment">// for each entry in people</span></span><br><span class="line">    ostringstream formatted, badNums;   <span class="comment">// objects created on each loop</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;nums : entry.phones)</span><br><span class="line">    &#123; <span class="comment">// for each number</span></span><br><span class="line">        <span class="keyword">if</span> (!<span class="built_in">valid</span>(nums))</span><br><span class="line">        &#123;</span><br><span class="line">            badNums &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; nums;  <span class="comment">// string in badNums</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="comment">// &#x27;&#x27;writes&#x27;&#x27; to formatted&#x27;s string</span></span><br><span class="line">            formatted &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; format(nums);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (badNums.<span class="built_in">str</span>().<span class="built_in">empty</span>())   <span class="comment">// there were no bad numbers</span></span><br><span class="line">        os &lt;&lt; entry.name &lt;&lt; <span class="string">&quot; &quot;</span>  <span class="comment">// print the name</span></span><br><span class="line">            &lt;&lt; formatted.<span class="built_in">str</span>() &lt;&lt; endl;   <span class="comment">// and reformatted numbers</span></span><br><span class="line">    <span class="keyword">else</span>  <span class="comment">// otherwise, print the name and bad numbers</span></span><br><span class="line">        cerr &lt;&lt; <span class="string">&quot;input error: &quot;</span> &lt;&lt; entry.name</span><br><span class="line">            &lt;&lt; <span class="string">&quot; invalid number(s) &quot;</span> &lt;&lt; badNums.<span class="built_in">str</span>() &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/02/26/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E5%85%AB%E7%AB%A0-IO%E5%BA%93/" title="C++ Primer笔记|第八章-IO库" target="_blank" rel="external">http://icecorn.github.io/2022/02/26/C++ Primer/C++primer笔记-第八章-IO库/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/02/28/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B9%9D%E7%AB%A0-%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8/" title="C++ Primer笔记|第九章-顺序容器"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/02/24/C++%20Primer/C++primer%E7%AC%94%E8%AE%B0-%E7%AC%AC%E4%B8%83%E7%AB%A0-%E7%B1%BB/" title="C++ Primer笔记|第七章-类"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
