@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Games-101|光栅化渲染部分 | Blog of Icecorn</title>
+  <meta name="description" content="Game-101二 向量与线性代数向量vector表示的向量，包括向量的长度，方向，单位向量等。 向量加法（平行四边形，三角形法则），用笛卡尔坐标系直接坐标相加 向量点乘： a*b &#x3D; |a||b|cosθ，得到的是一个数 作用：  算向量的夹角 算b向量在a向量上的投影 衡量两个方向是不是接近的 分解一个向量（到两个垂直方向上） 通过点成&gt;0或&lt;0判断方向性  向量叉乘： |axb|">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Games-101|光栅化渲染部分">
+<meta property="og:url" content="http://icecorn.github.io/2022/03/18/Games-101/Games101-%E5%85%89%E6%A0%85%E5%8C%96%E9%83%A8%E5%88%86/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="Game-101二 向量与线性代数向量vector表示的向量，包括向量的长度，方向，单位向量等。 向量加法（平行四边形，三角形法则），用笛卡尔坐标系直接坐标相加 向量点乘： a*b &#x3D; |a||b|cosθ，得到的是一个数 作用：  算向量的夹角 算b向量在a向量上的投影 衡量两个方向是不是接近的 分解一个向量（到两个垂直方向上） 通过点成&gt;0或&lt;0判断方向性  向量叉乘： |axb|">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224913916.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/3.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224946363.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/5.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224959521.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225022067.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225045408.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225058336.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/10.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/11.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/12.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/14.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225134866.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/17.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/18.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225151670.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/21.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/22.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225209123.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/24.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/25.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/26.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/27.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/28.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225230444.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/30.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/31.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/32.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/33.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/34.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/35.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225248914.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/37.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/38.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225303891.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225316434.png">
+<meta property="article:published_time" content="2022-03-18T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T14:59:15.932Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="Rasterizer">
+<meta property="article:tag" content="Games-101">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224913916.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/03/18/Games-101/Games101-%E5%85%89%E6%A0%85%E5%8C%96%E9%83%A8%E5%88%86/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.5px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.25px;">Games-101</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.25px;">Rasterizer</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.75px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/16/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E5%9B%9B%E8%AE%B2-%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9/" class="title">C++内存管理机制|第四讲-分配器/new&amp;delete</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-16T09:25:10.000Z" itemprop="datePublished">2022-04-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/" class="title">C++内存管理机制|第三讲-malloc/free</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-11T09:25:10.000Z" itemprop="datePublished">2022-04-11</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/08/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%BA%8C%E8%AE%B2std_allocator/" class="title">C++内存管理机制|第二讲-std_allocator-内存池</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-08T09:25:10.000Z" itemprop="datePublished">2022-04-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/" class="title">C++内存管理机制|第一讲-primitives</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-05T09:25:10.000Z" itemprop="datePublished">2022-04-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/25/Games-101/Games101-%E5%85%89%E8%BF%BD%E9%83%A8%E5%88%86/" class="title">Games-101|光线追踪部分</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-25T09:25:10.000Z" itemprop="datePublished">2022-03-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Game-101"><span class="toc-number">1.</span> <span class="toc-text">Game-101</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E5%90%91%E9%87%8F%E4%B8%8E%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0"><span class="toc-number">1.1.</span> <span class="toc-text">二 向量与线性代数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%91%E9%87%8F"><span class="toc-number">1.1.1.</span> <span class="toc-text">向量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9F%A9%E9%98%B5"><span class="toc-number">1.1.2.</span> <span class="toc-text">矩阵</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E5%8F%98%E6%8D%A2%EF%BC%88%E4%BA%8C%E7%BB%B4%E5%92%8C%E4%B8%89%E7%BB%B4%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">三 变换（二维和三维）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%A9%E6%94%BE%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.1.</span> <span class="toc-text">缩放变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E8%BD%AC%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.2.</span> <span class="toc-text">反转变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%87%E5%8F%98%E6%8D%A2%EF%BC%88Shear%EF%BC%89"><span class="toc-number">1.2.3.</span> <span class="toc-text">切变换（Shear）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%8B%E8%BD%AC%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.4.</span> <span class="toc-text">旋转变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E6%80%A7%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.5.</span> <span class="toc-text">线性变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B3%E7%A7%BB%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.6.</span> <span class="toc-text">平移变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BF%E5%B0%84%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.7.</span> <span class="toc-text">仿射变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%86%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.8.</span> <span class="toc-text">逆变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%98%E6%8D%A2%E7%9A%84%E5%90%88%E6%88%90%E4%B8%8E%E5%88%86%E8%A7%A3"><span class="toc-number">1.2.9.</span> <span class="toc-text">变换的合成与分解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E7%BB%B4%E5%8F%98%E6%8D%A2"><span class="toc-number">1.2.10.</span> <span class="toc-text">三维变换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E5%8F%98%E6%8D%A2%EF%BC%88MVP%E5%8F%98%E6%8D%A2%EF%BC%8C%E6%A8%A1%E5%9E%8B%EF%BC%8C%E8%A7%86%E5%9B%BE%EF%BC%8C%E6%8A%95%E5%BD%B1%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">四 变换（MVP变换，模型，视图，投影）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%86%E5%9B%BE%E5%8F%98%E6%8D%A2"><span class="toc-number">1.3.1.</span> <span class="toc-text">视图变换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%95%E5%BD%B1%E5%8F%98%E6%8D%A2"><span class="toc-number">1.3.2.</span> <span class="toc-text">投影变换</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A3%E4%BA%A4%E6%8A%95%E5%BD%B1"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">正交投影</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%8F%E8%A7%86%E6%8A%95%E5%BD%B1"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">透视投影</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9A%84%E7%A6%BB%E6%95%A3%E5%8C%96%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">五  光栅化（三角形的离散化）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E8%A7%92%E7%BD%91%E6%A0%BC%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="toc-number">1.4.1.</span> <span class="toc-text">三角网格的优势</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88Sampling%EF%BC%89"><span class="toc-number">1.4.2.</span> <span class="toc-text">采样光栅化（Sampling）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88%E6%B7%B1%E5%BA%A6%E6%B5%8B%E8%AF%95%E4%B8%8E%E6%8A%97%E9%94%AF%E9%BD%BF%EF%BC%89"><span class="toc-number">1.5.</span> <span class="toc-text">六 光栅化（深度测试与抗锯齿）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E8%B5%B0%E6%A0%B7-MSAA%EF%BC%88%E6%8A%97%E9%94%AF%E9%BD%BF%EF%BC%89"><span class="toc-number">1.5.1.</span> <span class="toc-text">反走样-MSAA（抗锯齿）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF"><span class="toc-number">1.5.2.</span> <span class="toc-text">卷积</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B6%85%E9%87%87%E6%A0%B7MSAA"><span class="toc-number">1.5.3.</span> <span class="toc-text">超采样MSAA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E8%BF%91%E4%BC%BC%E6%8A%97%E9%94%AF%E9%BD%BF-FXAA"><span class="toc-number">1.5.4.</span> <span class="toc-text">快速近似抗锯齿-FXAA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Temporal-AA-TAA"><span class="toc-number">1.5.5.</span> <span class="toc-text">Temporal AA-TAA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7%EF%BC%88%E9%81%AE%E6%8C%A1%EF%BC%89"><span class="toc-number">1.5.6.</span> <span class="toc-text">可见性（遮挡）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%BB%E5%AE%B6%E7%AE%97%E6%B3%95"><span class="toc-number">1.5.6.1.</span> <span class="toc-text">画家算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%AD%98%EF%BC%88Z-Buffer%EF%BC%89"><span class="toc-number">1.5.6.2.</span> <span class="toc-text">深度缓存（Z-Buffer）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E4%B9%9D-%E7%9D%80%E8%89%B2%EF%BC%88%E5%85%89%E7%85%A7%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%9D%80%E8%89%B2%E6%A8%A1%E5%9E%8B%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">七-九  着色（光照与基本着色模型）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%83%E6%9E%97-%E5%86%AF%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.6.1.</span> <span class="toc-text">布林-冯模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%AB%E5%8F%8D%E5%B0%84"><span class="toc-number">1.6.2.</span> <span class="toc-text">漫反射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E5%85%89"><span class="toc-number">1.6.3.</span> <span class="toc-text">高光</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%85%89"><span class="toc-number">1.6.4.</span> <span class="toc-text">环境光</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9D%80%E8%89%B2%E9%A2%91%E7%8E%87"><span class="toc-number">1.6.5.</span> <span class="toc-text">着色频率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E6%97%B6%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF"><span class="toc-number">1.6.6.</span> <span class="toc-text">实时渲染管线</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84"><span class="toc-number">1.6.7.</span> <span class="toc-text">纹理映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%E5%B1%9E%E6%80%A7%E6%8F%92%E5%80%BC"><span class="toc-number">1.6.8.</span> <span class="toc-text">三角形内属性插值</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E5%A4%AA%E5%B0%8F"><span class="toc-number">1.6.8.1.</span> <span class="toc-text">纹理太小</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E5%A4%AA%E5%A4%A7"><span class="toc-number">1.6.8.2.</span> <span class="toc-text">纹理太大</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%B9%E5%87%B8%E8%B4%B4%E5%9B%BE"><span class="toc-number">1.6.9.</span> <span class="toc-text">凹凸贴图</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81-%E5%87%A0%E4%BD%95%EF%BC%88%E5%9F%BA%E6%9C%AC%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%EF%BC%89"><span class="toc-number">1.7.</span> <span class="toc-text">十 几何（基本表示方法）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="toc-number">1.7.1.</span> <span class="toc-text">表示方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9B%B2%E7%BA%BF%E5%92%8C%E6%9B%B2%E9%9D%A2"><span class="toc-number">1.7.2.</span> <span class="toc-text">曲线和曲面</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E6%A0%BC%E5%A4%84%E7%90%86"><span class="toc-number">1.7.3.</span> <span class="toc-text">网格处理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Loop-%E7%BB%86%E5%88%86%EF%BC%88%E5%8A%A0%E5%AF%86%EF%BC%89"><span class="toc-number">1.7.3.1.</span> <span class="toc-text">Loop 细分（加密）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Catmull-Clark-%E7%BB%86%E5%88%86"><span class="toc-number">1.7.3.2.</span> <span class="toc-text">Catmull-Clark 细分</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shadow-Mapping"><span class="toc-number">1.7.4.</span> <span class="toc-text">Shadow Mapping</span></a></li></ol></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Games-101/Games101-光栅化部分" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Games-101|光栅化渲染部分
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/03/18/Games-101/Games101-%E5%85%89%E6%A0%85%E5%8C%96%E9%83%A8%E5%88%86/" class="article-date">
+	  <time datetime="2022-03-18T09:25:10.000Z" itemprop="datePublished">2022-03-18</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>►<a class="article-category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Games-101/" rel="tag">Games-101</a>, <a class="article-tag-link-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/03/18/Games-101/Games101-%E5%85%89%E6%A0%85%E5%8C%96%E9%83%A8%E5%88%86/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.6k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 9(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="Game-101"><a href="#Game-101" class="headerlink" title="Game-101"></a>Game-101</h1><h2 id="二-向量与线性代数"><a href="#二-向量与线性代数" class="headerlink" title="二 向量与线性代数"></a>二 向量与线性代数</h2><h3 id="向量"><a href="#向量" class="headerlink" title="向量"></a>向量</h3><p>vector表示的向量，包括向量的长度，方向，单位向量等。</p>
+<p>向量加法（平行四边形，三角形法则），用笛卡尔坐标系直接坐标相加</p>
+<p><strong>向量点乘：</strong></p>
+<p>a*b = |a||b|cosθ，得到的是一个数</p>
+<p>作用：</p>
+<ul>
+<li>算向量的夹角</li>
+<li>算b向量在a向量上的投影</li>
+<li>衡量两个方向是不是接近的</li>
+<li>分解一个向量（到两个垂直方向上）</li>
+<li>通过点成&gt;0或&lt;0判断方向性</li>
+</ul>
+<p><strong>向量叉乘：</strong></p>
+<p>|axb| = |a||b|sinθ</p>
+<p>axb = -bxa</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224913916.png" alt="image-20220629224913916"></p>
+<p>作用：</p>
+<ul>
+<li>算法向量的方向</li>
+<li>判断左右</li>
+<li>判断内外（经典问题，判断点在三角形内外）</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/2.png" alt="2"></p>
+<h3 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h3><p>矩阵乘法是没有<strong>交换律</strong>的，AB！=BA</p>
+<p>有<strong>结合律</strong>和<strong>分配律</strong></p>
+<p>矩阵求<strong>逆矩阵</strong>，求<strong>转置</strong></p>
+<p>向量的乘积写成矩阵形式：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/3.png" alt="3"></p>
+<h2 id="三-变换（二维和三维）"><a href="#三-变换（二维和三维）" class="headerlink" title="三 变换（二维和三维）"></a>三 变换（二维和三维）</h2><h3 id="缩放变换"><a href="#缩放变换" class="headerlink" title="缩放变换"></a>缩放变换</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224946363.png" alt="image-20220629224946363"></p>
+<h3 id="反转变换"><a href="#反转变换" class="headerlink" title="反转变换"></a>反转变换</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/5.png" alt="5"></p>
+<h3 id="切变换（Shear）"><a href="#切变换（Shear）" class="headerlink" title="切变换（Shear）"></a>切变换（Shear）</h3><p>找到对应关系，这里其实相当于在x方向上进行一个线性插值</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629224959521.png" alt="image-20220629224959521"></p>
+<h3 id="旋转变换"><a href="#旋转变换" class="headerlink" title="旋转变换"></a>旋转变换</h3><p>旋转方向默认逆时针</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225022067.png" alt="image-20220629225022067"></p>
+<p>旋转-sinθ</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225045408.png" alt="image-20220629225045408"></p>
+<h3 id="线性变换"><a href="#线性变换" class="headerlink" title="线性变换"></a>线性变换</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/8.png" alt="8"></p>
+<h3 id="平移变换"><a href="#平移变换" class="headerlink" title="平移变换"></a>平移变换</h3><p>需要线性变化+常数项</p>
+<p><strong>平移变换不属于线性变换</strong></p>
+<p><strong>将平移变换转变成矩阵乘法：</strong></p>
+<p>通过给二维点和向量增加一个维度从而实现（齐次坐标）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225058336.png" alt="image-20220629225058336"></p>
+<p>点+点表示的是这两个点的中点</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/10.png" alt="10"></p>
+<h3 id="仿射变换"><a href="#仿射变换" class="headerlink" title="仿射变换"></a>仿射变换</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/11.png" alt="11"></p>
+<p>总结：通过齐次坐标实现仿射变换，它们的任何变换操作都可以变成左乘一个变换矩阵来表示</p>
+<h3 id="逆变换"><a href="#逆变换" class="headerlink" title="逆变换"></a>逆变换</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/12.png" alt="12"></p>
+<p>实现上就是左乘M矩阵的逆矩阵</p>
+<h3 id="变换的合成与分解"><a href="#变换的合成与分解" class="headerlink" title="变换的合成与分解"></a>变换的合成与分解</h3><p>通过左乘很多矩阵实现变换的合成，同时也可以左乘逆矩阵实现变换的分解</p>
+<h3 id="三维变换"><a href="#三维变换" class="headerlink" title="三维变换"></a>三维变换</h3><p>类比二维的，多加一为，用4x4的矩阵表示各种变换矩阵</p>
+<p>对于三维的旋转有很多种方法：</p>
+<p>比如欧拉角和四元数</p>
+<hr>
+<h2 id="四-变换（MVP变换，模型，视图，投影）"><a href="#四-变换（MVP变换，模型，视图，投影）" class="headerlink" title="四 变换（MVP变换，模型，视图，投影）"></a>四 变换（MVP变换，模型，视图，投影）</h2><p>以拍照来类比：</p>
+<p>Model：人拍pose</p>
+<p>View：确定相机的位置，和镜头朝向等等</p>
+<p>Projection：按下快门，把三维场景投影到照片上</p>
+<h3 id="视图变换"><a href="#视图变换" class="headerlink" title="视图变换"></a>视图变换</h3><p>首先要固定相机在（0，0，0）的位置上，并且看下-Z方向，向上方向（想想摄像机上有一根草，相机歪着的话，草也是歪着的，这就是向上方向）为Y方向因为这样之后好处理。</p>
+<p>那么在移动过程中，就是先移动相机的位置，然后所有的物体都做同样的变换，保持相对变换就可以了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/14.png" alt="14"></p>
+<p>先平移，在旋转</p>
+<p>因为要把任意的（x,y,z）旋转到（1，0，0）不好写，所以可以先求逆变换，然后因为旋转矩阵是正交矩阵，它的转置就是它的逆，所以之后再转置就可以得到正常的旋转变化了。</p>
+<p>这样的操作（平移+旋转）就叫视图变换</p>
+<hr>
+<h3 id="投影变换"><a href="#投影变换" class="headerlink" title="投影变换"></a>投影变换</h3><p>3D to 2D的变化方式，分为正交投影和透视投影</p>
+<h4 id="正交投影"><a href="#正交投影" class="headerlink" title="正交投影"></a>正交投影</h4><p>并不会近大远小</p>
+<p>简单方法：</p>
+<ul>
+<li>设置相机（0，0，0），-Z，向上Y</li>
+<li>丢掉Z坐标</li>
+<li>变换到【-1，1】的平方这块矩形上</li>
+</ul>
+<p>常规方法（图形学上）：</p>
+<p>先把物体中心平移到【-1，1】的立方这个小正方体上，在进行缩放变换</p>
+<ul>
+<li>平移中心</li>
+<li>缩放到单位正方体</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225134866.png" alt="image-20220629225134866"></p>
+<p>写成数学形式：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/17.png" alt="17"></p>
+<h4 id="透视投影"><a href="#透视投影" class="headerlink" title="透视投影"></a>透视投影</h4><p>会有近大远小的特性，符合人眼，用途广泛</p>
+<p>实现方法：</p>
+<p>分成两步：</p>
+<ul>
+<li>将中间和远平面的所有点都“挤压”到单位平面上</li>
+<li>再做正交投影</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/18.png" alt="18"></p>
+<p>由相似三角形，可以得到被挤压后的位置应该在哪里</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225151670.png" alt="image-20220629225151670"></p>
+<p>由此可以反推出来变换矩阵</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20.png" alt="20"></p>
+<p>根据近平面点和远平面中点的不变性，用待定系数法，推出M矩阵的第三行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/21.png" alt="21"></p>
+<hr>
+<h2 id="五-光栅化（三角形的离散化）"><a href="#五-光栅化（三角形的离散化）" class="headerlink" title="五  光栅化（三角形的离散化）"></a>五  光栅化（三角形的离散化）</h2><p>将【-1，1】的单位立方体，呈现到屏幕上，屏幕是由像素组成的比如1980*1080</p>
+<p><strong>视口变换：</strong></p>
+<ul>
+<li>先把中心平移到屏幕的中心</li>
+<li>进行M变换</li>
+</ul>
+<p>整个过程我们先不考虑Z轴的问题</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/22.png" alt="22"></p>
+<h3 id="三角网格的优势"><a href="#三角网格的优势" class="headerlink" title="三角网格的优势"></a>三角网格的优势</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225209123.png" alt="image-20220629225209123"></p>
+<p><strong>怎样判断一个像素是在三角形内部还是外部？</strong></p>
+<p>三个向量叉乘同号</p>
+<h3 id="采样光栅化（Sampling）"><a href="#采样光栅化（Sampling）" class="headerlink" title="采样光栅化（Sampling）"></a>采样光栅化（Sampling）</h3><p>采样其实就是把函数离散化的过程</p>
+<p>例子：</p>
+<p>首先写一个函数 inside（tri，x，y）；表示点是否在三角形内，然后遍历像素把每个像素的值写入结果image【x】【y】中</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/24.png" alt="24"></p>
+<p>判断点是否在三角形内很重要，有时间写一下代码</p>
+<p><strong>优化：</strong></p>
+<p>为了避免每个三角形离散都要遍历所有像素，可以进行优化</p>
+<ul>
+<li>包围盒，找到min_x,min_y,max_x,max_y这样就可以确定包围盒</li>
+<li>一行一行遍历里边的像素（适合窄的三角形）</li>
+</ul>
+<h2 id="六-光栅化（深度测试与抗锯齿）"><a href="#六-光栅化（深度测试与抗锯齿）" class="headerlink" title="六 光栅化（深度测试与抗锯齿）"></a>六 光栅化（深度测试与抗锯齿）</h2><h3 id="反走样-MSAA（抗锯齿）"><a href="#反走样-MSAA（抗锯齿）" class="headerlink" title="反走样-MSAA（抗锯齿）"></a>反走样-MSAA（抗锯齿）</h3><p><strong>需要先做模糊（卷积）再采样</strong></p>
+<p>具体的原因是根据信号与系统中时域和频域的知识，简单理解去掉高频信息可以使得采样更接近（想象一下颜色都相近情况下，采样的间隔当然可以变小，换句话说同样的采样间隔，颜色相近，频率更低的函数采样起来肯定更准确）</p>
+<h3 id="卷积"><a href="#卷积" class="headerlink" title="卷积"></a>卷积</h3><p>通过一个卷积核对单位像素周围的一圈像素（一环领域）平均算值，从而实现模糊的效果</p>
+<h3 id="超采样MSAA"><a href="#超采样MSAA" class="headerlink" title="超采样MSAA"></a>超采样MSAA</h3><p>将每个像素点分割成4个或16个或更多个小单元，判断一个像素中有几个单元在三角形内，然后计算比例，通过这种方式实现模糊操作</p>
+<p><strong>注意这里的采样方式不是规规整整的4个格子，是其他有效的采样方式，比如斐波那契采样之类的，而且有一些相邻的采样点还会被相邻像素复用</strong></p>
+<h3 id="快速近似抗锯齿-FXAA"><a href="#快速近似抗锯齿-FXAA" class="headerlink" title="快速近似抗锯齿-FXAA"></a>快速近似抗锯齿-FXAA</h3><p>得到有锯齿的图，找到锯齿的边界，换成没有锯齿的图</p>
+<h3 id="Temporal-AA-TAA"><a href="#Temporal-AA-TAA" class="headerlink" title="Temporal AA-TAA"></a>Temporal AA-TAA</h3><p>复用上一帧的抗锯齿效果，这一帧再进行处理</p>
+<hr>
+<h3 id="可见性（遮挡）"><a href="#可见性（遮挡）" class="headerlink" title="可见性（遮挡）"></a>可见性（遮挡）</h3><p>要把很多物体放在屏幕上，如何呈现的问题</p>
+<h4 id="画家算法"><a href="#画家算法" class="headerlink" title="画家算法"></a>画家算法</h4><p>从远到近，一个一个画，后画的遮挡前边画的</p>
+<h4 id="深度缓存（Z-Buffer）"><a href="#深度缓存（Z-Buffer）" class="headerlink" title="深度缓存（Z-Buffer）"></a>深度缓存（Z-Buffer）</h4><p>从像素考虑，像素永远保存里屏幕最近的元素</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/25.png" alt="25"></p>
+<p>同时要维护两张图，一张是最后的结果图，一张是深度图</p>
+<p>对每一个三角形（物体），遍历它的采样（像素），如果它的深度比深度图中的小，那就要更新结果图和深度图，否则什么都不做</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/26.png" alt="26"></p>
+<hr>
+<h2 id="七-九-着色（光照与基本着色模型）"><a href="#七-九-着色（光照与基本着色模型）" class="headerlink" title="七-九  着色（光照与基本着色模型）"></a>七-九  着色（光照与基本着色模型）</h2><h3 id="布林-冯模型"><a href="#布林-冯模型" class="headerlink" title="布林-冯模型"></a>布林-冯模型</h3><p>就是在一种光源下，一个着色点如何着色的问题</p>
+<p>全反射（高光）</p>
+<p>漫反射</p>
+<p>环境光照（间接光照）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/27.png" alt="27"></p>
+<p>着色点，光源方向，观察方向等一些参数的设置</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/28.png" alt="28"></p>
+<h3 id="漫反射"><a href="#漫反射" class="headerlink" title="漫反射"></a>漫反射</h3><p>考虑光是离散的，根据光照射到着色点，着色点接收到光的能量来计算漫反射的实际光照</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225230444.png" alt="image-20220629225230444"></p>
+<p>n点乘l，计算夹角的cos值</p>
+<p><strong>漫反射和观测角度没关系</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/30.png" alt="30"></p>
+<hr>
+<h3 id="高光"><a href="#高光" class="headerlink" title="高光"></a>高光</h3><p>镜面反射，和观测方向有关</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/31.png" alt="31"></p>
+<h3 id="环境光"><a href="#环境光" class="headerlink" title="环境光"></a>环境光</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/32.png" alt="32"></p>
+<h3 id="着色频率"><a href="#着色频率" class="headerlink" title="着色频率"></a>着色频率</h3><p>按照粒度不同可分为，按照面着色（flat shading)，按照点着色(Gouraud shading)，按照像素着色(phong shading)</p>
+<p>Gouraud shading:渲染点，求出每个点法向，然后算出点的颜色，三角形内部点颜色插值得到</p>
+<p>phong shading:像素渲染，每个像素插值法向，然后逐像素着色</p>
+<p><strong>算点的法向量：是点周围的面的法向量加权平均</strong></p>
+<hr>
+<h3 id="实时渲染管线"><a href="#实时渲染管线" class="headerlink" title="实时渲染管线"></a>实时渲染管线</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/33.png" alt="33"></p>
+<ul>
+<li>顶点的投影 MVP变换</li>
+<li>光栅化，包括Z-buffer操作</li>
+<li>着色，可分为顶点着色，或者像素着色</li>
+</ul>
+<p><strong>Shader 程序</strong></p>
+<p>shader是在硬件中实现的，可以定义顶点着色或者像素着色</p>
+<p>不用写for循环，一个shader写好可以应用在所有像素或者顶点上</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/34.png" alt="34"></p>
+<h3 id="纹理映射"><a href="#纹理映射" class="headerlink" title="纹理映射"></a>纹理映射</h3><p>纹理贴图，uv映射</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/35.png" alt="35"></p>
+<h3 id="三角形内属性插值"><a href="#三角形内属性插值" class="headerlink" title="三角形内属性插值"></a>三角形内属性插值</h3><p>通过重心坐标实现插值</p>
+<p><strong>重点：重心坐标在投影下是会变的，也就是说，我们要插值三维属性（比如说深度，法向）就必须在世界空间（投影前的三维空间）下进行插值。</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225248914.png" alt="image-20220629225248914"></p>
+<p>点在三角形要保证三个参数非负</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/37.png" alt="37"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/38.png" alt="38"></p>
+<p>纹理就是漫反射系数</p>
+<h4 id="纹理太小"><a href="#纹理太小" class="headerlink" title="纹理太小"></a>纹理太小</h4><p>纹理太小，可以使用双线性插值，双三次插值等</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225303891.png" alt="image-20220629225303891"></p>
+<h4 id="纹理太大"><a href="#纹理太大" class="headerlink" title="纹理太大"></a>纹理太大</h4><p>纹理太大会引起摩尔纹等走样问题</p>
+<p>解决方法：</p>
+<p><strong>Mipmap</strong></p>
+<p><strong>三线性插值</strong></p>
+<p>mipmap做近似的正方形的范围查询</p>
+<p>其实就是一张图生成一系列分辨率不同的图</p>
+<p>这里有个问题是远处的点采样小分辨率的图，会覆盖很多像素，那么就会做模糊，可能会引起远处全糊的情况，可以使用<strong>各向异性过滤</strong>的方法解决</p>
+<h3 id="凹凸贴图"><a href="#凹凸贴图" class="headerlink" title="凹凸贴图"></a>凹凸贴图</h3><p>通过凹凸贴图在<strong>切线空间</strong>重新计算扰动后的法向量，能够达到视觉上的trick</p>
+<hr>
+<h2 id="十-几何（基本表示方法）"><a href="#十-几何（基本表示方法）" class="headerlink" title="十 几何（基本表示方法）"></a>十 几何（基本表示方法）</h2><h3 id="表示方法"><a href="#表示方法" class="headerlink" title="表示方法"></a>表示方法</h3><p>几何有很多表示方法，大体分为隐式表示和显示表示</p>
+<p>隐式表示就是通过一系列的函数来描述几何体，比如一个球</p>
+<p>水平集，分形等</p>
+<p><strong>优点：表示起来比较容易，一个公式描述一个形状，并且判断点在几何体内外很容易</strong></p>
+<p><strong>缺点：难以描述复杂模型</strong></p>
+<h3 id="曲线和曲面"><a href="#曲线和曲面" class="headerlink" title="曲线和曲面"></a>曲线和曲面</h3><p><strong>贝塞尔曲线</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629225316434.png" alt="image-20220629225316434"></p>
+<p>B样条，曲面表示等等</p>
+<h3 id="网格处理"><a href="#网格处理" class="headerlink" title="网格处理"></a>网格处理</h3><p><strong>网格简化，网格正规化，网格细分</strong></p>
+<h4 id="Loop-细分（加密）"><a href="#Loop-细分（加密）" class="headerlink" title="Loop 细分（加密）"></a>Loop 细分（加密）</h4><p>只能用在三角形网格</p>
+<ul>
+<li>先递归分解，每个面片分成几个小面片</li>
+<li>调整点的位置（光滑处理）</li>
+</ul>
+<h4 id="Catmull-Clark-细分"><a href="#Catmull-Clark-细分" class="headerlink" title="Catmull-Clark 细分"></a>Catmull-Clark 细分</h4><p>通过增加非四边形面的奇异点，来使网格都变成四边形面</p>
+<p>然后再光滑处理</p>
+<h3 id="Shadow-Mapping"><a href="#Shadow-Mapping" class="headerlink" title="Shadow Mapping"></a>Shadow Mapping</h3><p>只能处理点光源</p>
+<p>核心思想是一个点既能被相机看到也能被光源看到</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/03/18/Games-101/Games101-%E5%85%89%E6%A0%85%E5%8C%96%E9%83%A8%E5%88%86/" title="Games-101|光栅化渲染部分" target="_blank" rel="external">http://icecorn.github.io/2022/03/18/Games-101/Games101-光栅化部分/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/03/25/Games-101/Games101-%E5%85%89%E8%BF%BD%E9%83%A8%E5%88%86/" title="Games-101|光线追踪部分"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/03/16/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" title="操作系统思维导图"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

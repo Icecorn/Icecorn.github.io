@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>C++内存管理机制|第一讲-primitives | Blog of Icecorn</title>
+  <meta name="description" content="C++内存管理一、四种内存分配和释放方法 在编程时可以通过上图的几种方法直接或间接地操作内存。下面将介绍四种C++内存操作方法：  通常可以使用malloc和new来分配内存，当然也可以使用::operator new()和分配器allocator来操作内存，下面将具体介绍这些函数的使用方法。对于不同的编译器，其allocate函数的接口也有所不同：  对于GNU C，不同版本又有所不同：  这张">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++内存管理机制|第一讲-primitives">
+<meta property="og:url" content="http://icecorn.github.io/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="C++内存管理一、四种内存分配和释放方法 在编程时可以通过上图的几种方法直接或间接地操作内存。下面将介绍四种C++内存操作方法：  通常可以使用malloc和new来分配内存，当然也可以使用::operator new()和分配器allocator来操作内存，下面将具体介绍这些函数的使用方法。对于不同的编译器，其allocate函数的接口也有所不同：  对于GNU C，不同版本又有所不同：  这张">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.imgur.com/AREog97.png">
+<meta property="og:image" content="https://i.imgur.com/8F62Mf8.png">
+<meta property="og:image" content="https://i.imgur.com/lljUGp1.png">
+<meta property="og:image" content="https://i.imgur.com/xkUvBlJ.png">
+<meta property="og:image" content="https://i.imgur.com/wFWZoad.png">
+<meta property="og:image" content="https://i.imgur.com/SU7545t.png">
+<meta property="og:image" content="https://i.imgur.com/FS9k7Lw.png">
+<meta property="og:image" content="https://i.imgur.com/pFUmLy0.png">
+<meta property="og:image" content="https://i.imgur.com/aWEq4Ve.png">
+<meta property="og:image" content="https://i.imgur.com/7FwNSzm.png">
+<meta property="og:image" content="https://i.imgur.com/kcoXFR6.png">
+<meta property="og:image" content="https://i.imgur.com/mQAjijM.png">
+<meta property="og:image" content="https://i.imgur.com/RCX6Hfm.png">
+<meta property="og:image" content="https://i.imgur.com/aWyButl.png">
+<meta property="og:image" content="https://i.imgur.com/xAguah0.png">
+<meta property="og:image" content="https://i.imgur.com/XkgjnI1.png">
+<meta property="og:image" content="https://i.imgur.com/2o83TNy.png">
+<meta property="og:image" content="https://i.imgur.com/KMrjz7s.png">
+<meta property="og:image" content="https://i.imgur.com/sZrLSr8.png">
+<meta property="og:image" content="https://i.imgur.com/S2yG6Um.png">
+<meta property="og:image" content="https://i.imgur.com/6D7odtt.png">
+<meta property="og:image" content="https://i.imgur.com/KjGXpFs.png">
+<meta property="og:image" content="https://i.imgur.com/GPW5wRa.png">
+<meta property="og:image" content="https://i.imgur.com/0ZoNJdM.png">
+<meta property="og:image" content="https://i.imgur.com/VgcPaVf.png">
+<meta property="og:image" content="https://i.imgur.com/PcPsPWd.png">
+<meta property="og:image" content="https://i.imgur.com/c6l7tRe.png">
+<meta property="og:image" content="https://i.imgur.com/J7nEVmm.png">
+<meta property="og:image" content="https://i.imgur.com/o1landO.png">
+<meta property="og:image" content="https://i.imgur.com/XeVjepx.png">
+<meta property="og:image" content="https://i.imgur.com/AAD8dur.png">
+<meta property="og:image" content="https://i.imgur.com/Va92P0d.png">
+<meta property="og:image" content="https://i.imgur.com/DEjg6FL.png">
+<meta property="og:image" content="https://i.imgur.com/fM1lMiv.png">
+<meta property="og:image" content="https://i.imgur.com/9dojXlJ.png">
+<meta property="og:image" content="https://i.imgur.com/OrZw2Ik.png">
+<meta property="og:image" content="https://i.imgur.com/akWdqgr.png">
+<meta property="og:image" content="https://i.imgur.com/czxP8JH.png">
+<meta property="og:image" content="https://i.imgur.com/baXE2RO.png">
+<meta property="og:image" content="https://i.imgur.com/nog6qAD.png">
+<meta property="og:image" content="https://i.imgur.com/0M5X6lY.png">
+<meta property="og:image" content="https://i.imgur.com/TJ9GqFz.png">
+<meta property="og:image" content="https://i.imgur.com/JfazkE0.png">
+<meta property="og:image" content="https://i.imgur.com/WUtaH2m.png">
+<meta property="og:image" content="https://i.imgur.com/2lxEgBI.png">
+<meta property="article:published_time" content="2022-04-05T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:06:13.152Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="C++内存管理机制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/AREog97.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.5px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.25px;">Games-101</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.25px;">Rasterizer</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.75px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/16/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E5%9B%9B%E8%AE%B2-%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9/" class="title">C++内存管理机制|第四讲-分配器/new&amp;delete</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-16T09:25:10.000Z" itemprop="datePublished">2022-04-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/" class="title">C++内存管理机制|第三讲-malloc/free</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-11T09:25:10.000Z" itemprop="datePublished">2022-04-11</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/08/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%BA%8C%E8%AE%B2std_allocator/" class="title">C++内存管理机制|第二讲-std_allocator-内存池</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-08T09:25:10.000Z" itemprop="datePublished">2022-04-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/" class="title">C++内存管理机制|第一讲-primitives</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-05T09:25:10.000Z" itemprop="datePublished">2022-04-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/25/Games-101/Games101-%E5%85%89%E8%BF%BD%E9%83%A8%E5%88%86/" class="title">Games-101|光线追踪部分</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-25T09:25:10.000Z" itemprop="datePublished">2022-03-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">C++内存管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%9B%9B%E7%A7%8D%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%92%8C%E9%87%8A%E6%94%BE%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">一、四种内存分配和释放方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%9F%BA%E6%9C%AC%E6%9E%84%E4%BB%B6%E4%B9%8B-new-delete-expression"><span class="toc-number">1.2.</span> <span class="toc-text">二、基本构件之 new&#x2F;delete expression</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81%E5%86%85%E5%AD%98%E7%94%B3%E8%AF%B7"><span class="toc-number">1.2.1.</span> <span class="toc-text">1、内存申请</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E5%86%85%E5%AD%98%E9%87%8A%E6%94%BE"><span class="toc-number">1.2.2.</span> <span class="toc-text">2、内存释放</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%A8%A1%E6%8B%9F%E7%BC%96%E8%AF%91%E5%99%A8%E7%9B%B4%E6%8E%A5%E8%B0%83%E7%94%A8%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.3.</span> <span class="toc-text">3、模拟编译器直接调用构造和析构函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81Array-new"><span class="toc-number">1.3.</span> <span class="toc-text">三、Array new</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81placement-new"><span class="toc-number">1.4.</span> <span class="toc-text">四、placement new</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E9%87%8D%E8%BD%BD"><span class="toc-number">1.5.</span> <span class="toc-text">五、重载</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81C-%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%9A%84%E9%80%94%E5%BE%84"><span class="toc-number">1.5.1.</span> <span class="toc-text">1、C++内存分配的途径</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E9%87%8D%E8%BD%BDnew-%E5%92%8C-delete"><span class="toc-number">1.5.2.</span> <span class="toc-text">2、重载new 和 delete</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%B5%8B%E8%AF%95%E6%A1%88%E4%BE%8B"><span class="toc-number">1.5.3.</span> <span class="toc-text">3、测试案例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81pre-class-allocator"><span class="toc-number">1.6.</span> <span class="toc-text">五、pre-class allocator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%E3%80%81static-allocator"><span class="toc-number">1.7.</span> <span class="toc-text">六、static allocator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%83%E3%80%81global-allocator"><span class="toc-number">1.8.</span> <span class="toc-text">七、global allocator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AB%E3%80%81new-handler"><span class="toc-number">1.9.</span> <span class="toc-text">八、new handler</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B9%9D%E3%80%81-default%E5%92%8C-delete"><span class="toc-number">1.10.</span> <span class="toc-text">九、&#x3D;default和&#x3D;delete</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-C++ 内存管理机制/第一讲primitives" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++内存管理机制|第一讲-primitives
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/" class="article-date">
+	  <time datetime="2022-04-05T09:25:10.000Z" itemprop="datePublished">2022-04-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/c/">c++</a>►<a class="article-category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 6.1k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 29(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="C-内存管理"><a href="#C-内存管理" class="headerlink" title="C++内存管理"></a>C++内存管理</h2><h3 id="一、四种内存分配和释放方法"><a href="#一、四种内存分配和释放方法" class="headerlink" title="一、四种内存分配和释放方法"></a>一、四种内存分配和释放方法</h3><p><img src="https://i.imgur.com/AREog97.png"></p>
+<p>在编程时可以通过上图的几种方法直接或间接地操作内存。下面将介绍四种C++内存操作方法：</p>
+<p><img src="https://i.imgur.com/8F62Mf8.png"></p>
+<p>通常可以使用malloc和new来分配内存，当然也可以使用::operator new()和分配器allocator来操作内存，下面将具体介绍这些函数的使用方法。对于不同的编译器，其allocate函数的接口也有所不同：</p>
+<p><img src="https://i.imgur.com/lljUGp1.png"></p>
+<p>对于GNU C，不同版本又有所不同：</p>
+<p><img src="https://i.imgur.com/xkUvBlJ.png"></p>
+<p>这张图中的__gnu_cxx::__pool_alloc<T>().allocate()对应于上张图中的allocator<T>().allocate()。</p>
+<p>通过malloc和new分配内存、通过free和delete释放内存是十分常用的，通过::operator new操作内存比较少见，allocator分配器操作内存在STL源码中使用较多，对于不同的编译环境使用也有所不同。下面这个例子是基与VS2013环境做测试的:</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;complex&gt;
+#include &lt;memory&gt;                 //std::allocator  
+//#include &lt;ext\pool_allocator.h&gt;     //GCC使用，欲使用 std::allocator 以外的 allocator, 就得自行 #include &lt;ext/...&gt; 
+using namespace std;
+namespace jj01
+&#123;
+    void test_primitives()
+    &#123;
+        cout &lt;&lt; &quot;\ntest_primitives().......... \n&quot;;
+
+        void* p1 = malloc(512);    //512 bytes
+        free(p1);
+
+        complex&lt;int&gt;* p2 = new complex&lt;int&gt;; //one object
+        delete p2;
+
+        void* p3 = ::operator new(512); //512 bytes
+        ::operator delete(p3);
+
+        //以下使用 C++ 標準庫提供的 allocators。
+        //其接口雖有標準規格，但實現廠商並未完全遵守；下面三者形式略異。
+#ifdef _MSC_VER
+        //以下兩函數都是 non-static，定要通過 object 調用。以下分配 3 個 ints.
+        int* p4 = allocator&lt;int&gt;().allocate(3, (int*)0);
+        p4[0] = 666;
+        p4[1] = 999;
+        p4[2] = 888;
+        cout &lt;&lt; &quot;p4[0] = &quot; &lt;&lt; p4[0] &lt;&lt; endl;
+        cout &lt;&lt; &quot;p4[1] = &quot; &lt;&lt; p4[1] &lt;&lt; endl;
+        cout &lt;&lt; &quot;p4[2] = &quot; &lt;&lt; p4[2] &lt;&lt; endl;
+        allocator&lt;int&gt;().deallocate(p4, 3);
+#endif
+#ifdef __BORLANDC__
+        //以下兩函數都是 non-static，定要通過 object 調用。以下分配 5 個 ints.
+        int* p4 = allocator&lt;int&gt;().allocate(5);
+        allocator&lt;int&gt;().deallocate(p4, 5);
+#endif
+#ifdef __GNUC__
+        //以下兩函數都是 static，可通過全名調用之。以下分配 512 bytes.
+        //void* p4 = alloc::allocate(512); 
+        //alloc::deallocate(p4,512);   
+
+        //以下兩函數都是 non-static，定要通過 object 調用。以下分配 7 個 ints.    
+        void* p4 = allocator&lt;int&gt;().allocate(7);
+        allocator&lt;int&gt;().deallocate((int*)p4, 7);
+
+        //以下兩函數都是 non-static，定要通過 object 調用。以下分配 9 個 ints.    
+        void* p5 = __gnu_cxx::__pool_alloc&lt;int&gt;().allocate(9);
+        __gnu_cxx::__pool_alloc&lt;int&gt;().deallocate((int*)p5, 9);
+#endif
+    &#125;
+&#125; //namespace
+
+int main(void)
+&#123;
+    jj01::test_primitives();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/wFWZoad.png"></p>
+<p>可见 int* p4 = allocator<int>().allocate(3, (int*)0) 操作成功申请了三个int的空间。</p>
+<h3 id="二、基本构件之-new-delete-expression"><a href="#二、基本构件之-new-delete-expression" class="headerlink" title="二、基本构件之 new/delete expression"></a>二、基本构件之 new/delete expression</h3><h4 id="1、内存申请"><a href="#1、内存申请" class="headerlink" title="1、内存申请"></a>1、内存申请</h4><p><img src="https://i.imgur.com/SU7545t.png"></p>
+<p>上面这张图揭示了new操作背后编译器做的事：</p>
+<ul>
+<li>1、第一步通过operator new()操作分配一个目标类型的内存大小，这里是Complex的大小；</li>
+<li>2、第二步通过static_cast将得到的内存块强制转换为目标类型指针，这里是Complex*</li>
+<li>3、第三版调用目标类型的构造方法，但是需要注意的是，直接通过pc-&gt;Complex::Complex(1, 2)这样的方法调用构造函数只有编译器可以做，用户这样做将产生错误。</li>
+</ul>
+<p>值得注意的是，operator new()操作的内部是调用了malloc()函数。</p>
+<h4 id="2、内存释放"><a href="#2、内存释放" class="headerlink" title="2、内存释放"></a>2、内存释放</h4><p><img src="https://i.imgur.com/FS9k7Lw.png"></p>
+<p>同样地，delete操作第一步也是调用了对象的析构函数，然后再通过operator delete()函数释放内存，本质上也是调用了free函数。</p>
+<h4 id="3、模拟编译器直接调用构造和析构函数"><a href="#3、模拟编译器直接调用构造和析构函数" class="headerlink" title="3、模拟编译器直接调用构造和析构函数"></a>3、模拟编译器直接调用构造和析构函数</h4><p>下面的代码测试环节为VS2013：</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;string&gt;
+//#include &lt;memory&gt;                 //std::allocator  
+using namespace std;
+
+namespace jj02
+&#123;
+
+    class A
+    &#123;
+    public:
+        int id;
+
+        A() : id(0)      &#123; cout &lt;&lt; &quot;default ctor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; id &lt;&lt; endl; &#125;
+        A(int i) : id(i) &#123; cout &lt;&lt; &quot;ctor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; id &lt;&lt; endl; &#125;
+        ~A()             &#123; cout &lt;&lt; &quot;dtor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; id &lt;&lt; endl; &#125;
+    &#125;;
+
+    void test_call_ctor_directly()
+    &#123;
+        cout &lt;&lt; &quot;\ntest_call_ctor_directly().......... \n&quot;;
+
+        string* pstr = new string;
+        cout &lt;&lt; &quot;str= &quot; &lt;&lt; *pstr &lt;&lt; endl;
+        //! pstr-&gt;string::string(&quot;jjhou&quot;);  
+        //[Error] &#39;class std::basic_string&lt;char&gt;&#39; has no member named &#39;string&#39;
+        //! pstr-&gt;~string();    //crash -- 其語法語意都是正確的, crash 只因為上一行被 remark 起來嘛.  
+        cout &lt;&lt; &quot;str= &quot; &lt;&lt; *pstr &lt;&lt; endl;
+</code></pre>
+<p>​<br>​            //————<br>​<br>            A* pA = new A(1);             //ctor. this=000307A8 id=1<br>            cout &lt;&lt; pA-&gt;id &lt;&lt; endl;       //1<br>            pA-&gt;A::A(3);<br>            cout &lt;&lt; pA-&gt;id &lt;&lt; endl;<br>            //!    pA-&gt;A::A(3);                //in VC6 : ctor. this=000307A8 id=3<br>            //in GCC : [Error] cannot call constructor ‘jj02::A::A’ directly</p>
+<pre><code>        A::A(5);
+        //!    A::A(5);                      //in VC6 : ctor. this=0013FF60 id=5
+        //         dtor. this=0013FF60      
+        //in GCC : [Error] cannot call constructor &#39;jj02::A::A&#39; directly
+        //         [Note] for a function-style cast, remove the redundant &#39;::A&#39;
+
+        cout &lt;&lt; pA-&gt;id &lt;&lt; endl;       //in VC6 : 3
+        //in GCC : 1      
+
+        delete pA;                    //dtor. this=000307A8 
+
+        //simulate new
+        void* p = ::operator new(sizeof(A));
+        cout &lt;&lt; &quot;p=&quot; &lt;&lt; p &lt;&lt; endl;     //p=000307A8
+        pA = static_cast&lt;A*&gt;(p);
+        pA-&gt;A::A(2);
+        //!    pA-&gt;A::A(2);                //in VC6 : ctor. this=000307A8 id=2
+        //in GCC : [Error] cannot call constructor &#39;jj02::A::A&#39; directly      
+
+        cout &lt;&lt; pA-&gt;id &lt;&lt; endl;     //in VC6 : 2
+        //in GCC : 0      
+
+        //simulate delete
+        pA-&gt;~A();                    //dtor. this=000307A8 
+        ::operator delete(pA);        //free()
+    &#125;
+&#125; //namespace
+
+int main(void)
+&#123;
+    jj02::test_call_ctor_directly();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/pFUmLy0.png"></p>
+<p>VS下可以直接通过内存空间调用构造函数，但侯杰测试在GNU C下无法通过，具体的内容可见代码注解和打印效果。</p>
+<h3 id="三、Array-new"><a href="#三、Array-new" class="headerlink" title="三、Array new"></a>三、Array new</h3><p><img src="https://i.imgur.com/aWEq4Ve.png"></p>
+<p><strong>上图主要展示的是关于new array内存分配的大致情况。当new一个数组对象时（例如 new Complex[3]），编译器将分配一块内存，这块内存首部是关于对象内存分配的一些标记，然后下面会分配三个连续的对象内存，在使用delete释放内存时需要使用delete[]。如果不使用delete[]，只是使用delete只会将分配的三块内存空间释放，但不会调用对象的析构函数，如果对象内部还使用了new指向其他空间，如果指向的该空间里的对象的析构函数没有意义，那么不会造成问题，如果有意义，那么由于该部分对象析构函数不会调用，那么将会导致内存泄漏。图中new string[3]便是一个例子，虽然str[0]、str[1]、str[2]被析构了，但只是调用了str[0]的析构函数，其他对象的析构函数不被调用，这里就会出问题。</strong></p>
+<p>下面将演示数组对象创建与析构过程：</p>
+<p><img src="https://i.imgur.com/7FwNSzm.png"></p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;new&gt;        //placement new
+using namespace std;
+
+namespace jj03
+&#123;
+
+    class A
+    &#123;
+    public:
+        int id;
+
+        A() : id(0)      &#123; cout &lt;&lt; &quot;default ctor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; id &lt;&lt; endl; &#125;
+        A(int i) : id(i) &#123; cout &lt;&lt; &quot;ctor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; id &lt;&lt; endl; &#125;
+        ~A()             &#123; cout &lt;&lt; &quot;dtor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; id &lt;&lt; endl; &#125;
+    &#125;;
+
+    void test_array_new_and_placement_new()
+    &#123;
+        cout &lt;&lt; &quot;\ntest_placement_new().......... \n&quot;;
+
+        size_t size = 3;
+
+        &#123;
+            //case 1
+            //模擬 memory pool 的作法, array new + placement new. 崩潰 
+
+            A* buf = (A*)(new char[sizeof(A)*size]);
+            A* tmp = buf;
+
+            cout &lt;&lt; &quot;buf=&quot; &lt;&lt; buf &lt;&lt; &quot;  tmp=&quot; &lt;&lt; tmp &lt;&lt; endl;
+
+            for (int i = 0; i &lt; size; ++i)
+                new (tmp++) A(i);              //3次 调用ctor 
+
+            cout &lt;&lt; &quot;buf=&quot; &lt;&lt; buf &lt;&lt; &quot;  tmp=&quot; &lt;&lt; tmp &lt;&lt; endl;
+
+            //!    delete [] buf;        //crash. why?
+            //因為這其實是個 char array，看到 delete [] buf; 編譯器會企圖喚起多次 A::~A. 
+            // 但 array memory layout 中找不到與 array 元素個數 (本例 3) 相關的信息, 
+            // -- 整個格局都錯亂 (從我對 VC 的認識而言)，於是崩潰。 
+            delete buf;         //dtor just one time, ~[0]    
+
+            cout &lt;&lt; &quot;\n\n&quot;;
+        &#125;
+
+        &#123;
+            //case 2
+            //回頭測試單純的 array new
+
+            A* buf = new A[size];  //default ctor 3 次. [0]先於[1]先於[2])
+            //A必須有 default ctor, 否則 [Error] no matching function for call to &#39;jj02::A::A()&#39;
+            A* tmp = buf;
+
+            cout &lt;&lt; &quot;buf=&quot; &lt;&lt; buf &lt;&lt; &quot;  tmp=&quot; &lt;&lt; tmp &lt;&lt; endl;
+
+            for (int i = 0; i &lt; size; ++i)
+                new (tmp++) A(i);          //3次 ctor 
+
+            cout &lt;&lt; &quot;buf=&quot; &lt;&lt; buf &lt;&lt; &quot;  tmp=&quot; &lt;&lt; tmp &lt;&lt; endl;
+
+            delete[] buf;    //dtor three times (次序逆反, [2]先於[1]先於[0])    
+        &#125;
+
+        &#123;
+            //case 3    
+            //掌握崩潰原因, 再次模擬 memory pool作法, array new + placement new.     
+            //不, 不做了, 因為 memory pool 只是供應 memory, 它並不管 construction, 
+            //也不管 destruction. 它只負責回收 memory. 
+            //所以它是以 void* 或 char* 取得 memory, 釋放 (刪除)的也是 void* or char*.  
+            //不像本例 case 1 釋放 (刪除) 的是 A*. 
+            //
+            //事實上 memory pool 形式如 jj04::test 
+        &#125;
+
+    &#125;
+&#125; //namespace
+
+int main(void)
+&#123;
+    jj03::test_array_new_and_placement_new();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/kcoXFR6.png"></p>
+<p>构造函数调用顺序是按照构建对象顺序来执行的，但是析构函数执行却相反。值得注意的是，在调用了delete的大括号代码段中，数组有三个元素，但最后只调用了第一个对象的析构函数。</p>
+<p>接下来将更具体地展示new array对象的内存分配情况：</p>
+<p><img src="https://i.imgur.com/mQAjijM.png"></p>
+<p>如果使用new分配十个内存的int，内存空间如上图所示，首先内存块会有一个头和尾，黄色部分为debug信息，灰色部分才是真正使用到的内存，蓝色部分的12bytes是为了让该内存块以16字节对齐。在这个例子中delete pi和delete[] pi效果是一样的，因为int没有析构函数。但是下面的例子就不一样了：</p>
+<p><img src="https://i.imgur.com/RCX6Hfm.png"></p>
+<p>上图通过new申请三个Demo空间大小，内存块使用了96byte，这里是这样计算得到的:黄色部分调试信息32 + 4 = 36byte；黄色部分下面的“3”用于标记实际分配给对象内存个数，这里是三个所以里面内容为3，消耗4byte；Demo内有三个int类型成员变量，一个Demo消耗内存3 * 4 = 12byte，由于有三个Demo，所以消耗了12 * 3 = 36byte空间；到目前为止消耗36 + 4 + 36 = 76byte，加上头尾cookie一共8byte一共消耗84byte，由于需要16位对齐，所以填充蓝色部分为12byte，一共消耗了84 + 12 = 96byte。这里释放内存时需要加上delete[]，上面分配内存中有个标记“3”，所以编译器将释放三个Demo对象空间，如果不加就会报错。</p>
+<h3 id="四、placement-new"><a href="#四、placement-new" class="headerlink" title="四、placement new"></a>四、placement new</h3><p><img src="https://i.imgur.com/aWyButl.png"></p>
+<h3 id="五、重载"><a href="#五、重载" class="headerlink" title="五、重载"></a>五、重载</h3><h4 id="1、C-内存分配的途径"><a href="#1、C-内存分配的途径" class="headerlink" title="1、C++内存分配的途径"></a>1、C++内存分配的途径</h4><p><img src="https://i.imgur.com/xAguah0.png"></p>
+<p>如果是正常情况下，调用new之后走的是第二条路线，如果在类中重载了operator new()，那么走的是第一条路线，但最后还是要调用到系统的::operator new()函数，这在后续的例子中会体现。</p>
+<p><img src="https://i.imgur.com/XkgjnI1.png"></p>
+<p>对于GNU C，背后使用的allocate()函数最后也是调用了系统的::operator new()函数。</p>
+<h4 id="2、重载new-和-delete"><a href="#2、重载new-和-delete" class="headerlink" title="2、重载new 和 delete"></a>2、重载new 和 delete</h4><p><img src="https://i.imgur.com/2o83TNy.png"></p>
+<p>上面这张图演示了如何重载系统的::operator new()函数，该方法最后也是模拟了系统的做法，效果和系统的方法一样，但一般不推荐重载::operator new()函数，因为它对全局有影响，如果使用不当将造成很大的问题。</p>
+<p><img src="https://i.imgur.com/KMrjz7s.png"></p>
+<p>如果是在类中重载operator new()方法，那么该方法有N多种形式，但必须保证函数参数列表第一个参数是size_t类型变量；对于operator delete()，第一个参数必须是void* 类型，第二个size_t是可选项，可以去掉。</p>
+<p><img src="https://i.imgur.com/sZrLSr8.png"></p>
+<p>对于operator new[]和operator delete[]函数的重载，和前面类似。</p>
+<p><img src="https://i.imgur.com/S2yG6Um.png"></p>
+<p><img src="https://i.imgur.com/6D7odtt.png"></p>
+<p><img src="https://i.imgur.com/KjGXpFs.png"></p>
+<p><img src="https://i.imgur.com/GPW5wRa.png"></p>
+<p><img src="https://i.imgur.com/0ZoNJdM.png"></p>
+<p><img src="https://i.imgur.com/VgcPaVf.png"></p>
+<p><img src="https://i.imgur.com/PcPsPWd.png"></p>
+<h4 id="3、测试案例"><a href="#3、测试案例" class="headerlink" title="3、测试案例"></a>3、测试案例</h4><p>测试一：</p>
+<pre><code>#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+namespace jj06
+&#123;
+
+    class Foo
+    &#123;
+    public:
+        int _id;
+        long _data;
+        string _str;
+
+    public:
+        static void* operator new(size_t size);
+        static void  operator delete(void* deadObject, size_t size);
+        static void* operator new[](size_t size);
+        static void  operator delete[](void* deadObject, size_t size);
+
+        Foo() : _id(0)      &#123; cout &lt;&lt; &quot;default ctor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; _id &lt;&lt; endl; &#125;
+        Foo(int i) : _id(i) &#123; cout &lt;&lt; &quot;ctor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; _id &lt;&lt; endl; &#125;
+        //virtual 
+        ~Foo()              &#123; cout &lt;&lt; &quot;dtor. this=&quot; &lt;&lt; this &lt;&lt; &quot; id=&quot; &lt;&lt; _id &lt;&lt; endl; &#125;
+
+        //不加 virtual dtor, sizeof = 12, new Foo[5] =&gt; operator new[]() 的 size 參數是 64, 
+        //加了 virtual dtor, sizeof = 16, new Foo[5] =&gt; operator new[]() 的 size 參數是 84, 
+        //上述二例，多出來的 4 可能就是個 size_t 欄位用來放置 array size. 
+    &#125;;
+
+    void* Foo::operator new(size_t size)
+    &#123;
+        Foo* p = (Foo*)malloc(size);
+        cout &lt;&lt; &quot;Foo::operator new(), size=&quot; &lt;&lt; size &lt;&lt; &quot;\t  return: &quot; &lt;&lt; p &lt;&lt; endl;
+
+        return p;
+    &#125;
+
+    void Foo::operator delete(void* pdead, size_t size)
+    &#123;
+        cout &lt;&lt; &quot;Foo::operator delete(), pdead= &quot; &lt;&lt; pdead &lt;&lt; &quot;  size= &quot; &lt;&lt; size &lt;&lt; endl;
+        free(pdead);
+    &#125;
+
+    void* Foo::operator new[](size_t size)
+    &#123;
+        Foo* p = (Foo*)malloc(size);  //crash, 問題可能出在這兒 
+        cout &lt;&lt; &quot;Foo::operator new[](), size=&quot; &lt;&lt; size &lt;&lt; &quot;\t  return: &quot; &lt;&lt; p &lt;&lt; endl;
+
+        return p;
+    &#125;
+
+    void Foo::operator delete[](void* pdead, size_t size)
+    &#123;
+        cout &lt;&lt; &quot;Foo::operator delete[](), pdead= &quot; &lt;&lt; pdead &lt;&lt; &quot;  size= &quot; &lt;&lt; size &lt;&lt; endl;
+
+        free(pdead);
+    &#125;
+
+    //-------------    
+    void test_overload_operator_new_and_array_new()
+    &#123;
+        cout &lt;&lt; &quot;\ntest_overload_operator_new_and_array_new().......... \n&quot;;
+
+        cout &lt;&lt; &quot;sizeof(Foo)= &quot; &lt;&lt; sizeof(Foo) &lt;&lt; endl;
+
+        &#123;
+            Foo* p = new Foo(7);
+            delete p;
+
+            Foo* pArray = new Foo[5];    //無法給 array elements 以 initializer 
+            delete[] pArray;
+        &#125;
+
+        &#123;
+            cout &lt;&lt; &quot;testing global expression ::new and ::new[] \n&quot;;
+            // 這會繞過 overloaded new(), delete(), new[](), delete[]() 
+            // 但當然 ctor, dtor 都會被正常呼叫.  
+
+            Foo* p = ::new Foo(7);
+            ::delete p;
+
+            Foo* pArray = ::new Foo[5];
+            ::delete[] pArray;
+        &#125;
+    &#125;
+&#125; //namespace
+
+int main(void)
+&#123;
+    jj06::test_overload_operator_new_and_array_new();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/c6l7tRe.png"></p>
+<p>测试二：</p>
+<pre><code>#include &lt;vector&gt;  //for test
+#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+namespace jj07
+&#123;
+
+    class Bad &#123; &#125;;
+    class Foo
+    &#123;
+    public:
+        Foo() &#123; cout &lt;&lt; &quot;Foo::Foo()&quot; &lt;&lt; endl; &#125;
+        Foo(int) &#123;
+            cout &lt;&lt; &quot;Foo::Foo(int)&quot; &lt;&lt; endl;
+            // throw Bad();  
+        &#125;
+
+        //(1) 這個就是一般的 operator new() 的重載 
+        void* operator new(size_t size)&#123;
+            cout &lt;&lt; &quot;operator new(size_t size), size= &quot; &lt;&lt; size &lt;&lt; endl;
+            return malloc(size);
+        &#125;
+
+        //(2) 這個就是標準庫已經提供的 placement new() 的重載 (形式)
+        //    (所以我也模擬 standard placement new 的動作, just return ptr) 
+        void* operator new(size_t size, void* start)&#123;
+            cout &lt;&lt; &quot;operator new(size_t size, void* start), size= &quot; &lt;&lt; size &lt;&lt; &quot;  start= &quot; &lt;&lt; start &lt;&lt; endl;
+            return start;
+        &#125;
+
+        //(3) 這個才是嶄新的 placement new 
+        void* operator new(size_t size, long extra)&#123;
+            cout &lt;&lt; &quot;operator new(size_t size, long extra)  &quot; &lt;&lt; size &lt;&lt; &#39; &#39; &lt;&lt; extra &lt;&lt; endl;
+            return malloc(size + extra);
+        &#125;
+
+        //(4) 這又是一個 placement new 
+        void* operator new(size_t size, long extra, char init)&#123;
+            cout &lt;&lt; &quot;operator new(size_t size, long extra, char init)  &quot; &lt;&lt; size &lt;&lt; &#39; &#39; &lt;&lt; extra &lt;&lt; &#39; &#39; &lt;&lt; init &lt;&lt; endl;
+            return malloc(size + extra);
+        &#125;
+
+        //(5) 這又是一個 placement new, 但故意寫錯第一參數的 type (它必須是 size_t 以滿足正常的 operator new) 
+        //!      void* operator new(long extra, char init) &#123; //[Error] &#39;operator new&#39; takes type &#39;size_t&#39; (&#39;unsigned int&#39;) as first parameter [-fpermissive]
+        //!          cout &lt;&lt; &quot;op-new(long,char)&quot; &lt;&lt; endl;
+        //!        return malloc(extra);
+        //!      &#125;     
+
+        //以下是搭配上述 placement new 的各個 called placement delete. 
+        //當 ctor 發出異常，這兒對應的 operator (placement) delete 就會被喚起. 
+        //應該是要負責釋放其搭檔兄弟 (placement new) 分配所得的 memory.  
+        //(1) 這個就是一般的 operator delete() 的重載 
+        void operator delete(void*, size_t)
+        &#123;
+            cout &lt;&lt; &quot;operator delete(void*,size_t)  &quot; &lt;&lt; endl;
+        &#125;
+
+        //(2) 這是對應上述的 (2)  
+        void operator delete(void*, void*)
+        &#123;
+            cout &lt;&lt; &quot;operator delete(void*,void*)  &quot; &lt;&lt; endl;
+        &#125;
+
+        //(3) 這是對應上述的 (3)  
+        void operator delete(void*, long)
+        &#123;
+            cout &lt;&lt; &quot;operator delete(void*,long)  &quot; &lt;&lt; endl;
+        &#125;
+
+        //(4) 這是對應上述的 (4)  
+        //如果沒有一一對應, 也不會有任何編譯報錯 
+        void operator delete(void*, long, char)
+        &#123;
+            cout &lt;&lt; &quot;operator delete(void*,long,char)  &quot; &lt;&lt; endl;
+        &#125;
+
+    private:
+        int m_i;
+    &#125;;
+</code></pre>
+<p>​<br>​        //————-<br>​        void test_overload_placement_new()<br>​        {<br>​            cout &lt;&lt; “\n\n\ntest_overload_placement_new()………. \n”;<br>​<br>            Foo start;  //Foo::Foo</p>
+<pre><code>        Foo* p1 = new Foo;           //op-new(size_t)
+        Foo* p2 = new (&amp;start) Foo;  //op-new(size_t,void*)
+        Foo* p3 = new (100) Foo;     //op-new(size_t,long)
+        Foo* p4 = new (100, &#39;a&#39;) Foo; //op-new(size_t,long,char)
+
+        Foo* p5 = new (100) Foo(1);     //op-new(size_t,long)  op-del(void*,long)
+        Foo* p6 = new (100, &#39;a&#39;) Foo(1); //
+        Foo* p7 = new (&amp;start) Foo(1);  //
+        Foo* p8 = new Foo(1);           //
+        //VC6 warning C4291: &#39;void *__cdecl Foo::operator new(unsigned int)&#39;
+        //no matching operator delete found; memory will not be freed if
+        //initialization throws an exception
+    &#125;
+&#125; //namespace    
+
+int main(void)
+&#123;
+    jj07::test_overload_placement_new();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/J7nEVmm.png"></p>
+<h3 id="五、pre-class-allocator"><a href="#五、pre-class-allocator" class="headerlink" title="五、pre-class allocator"></a>五、pre-class allocator</h3><p><img src="https://i.imgur.com/o1landO.png"></p>
+<p><img src="https://i.imgur.com/XeVjepx.png"></p>
+<p>案例如下：</p>
+<pre><code>#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+namespace jj04
+&#123;
+    //ref. C++Primer 3/e, p.765
+    //per-class allocator 
+
+    class Screen &#123;
+    public:
+        Screen(int x) : i(x) &#123; &#125;;
+        int get() &#123; return i; &#125;
+
+        void* operator new(size_t);
+        void  operator delete(void*, size_t);    //(2)
+        //! void  operator delete(void*);            //(1) 二擇一. 若(1)(2)並存,會有很奇怪的報錯 (摸不著頭緒) 
+
+    private:
+        Screen* next;
+        static Screen* freeStore;
+        static const int screenChunk;
+    private:
+        int i;
+    &#125;;
+    Screen* Screen::freeStore = 0;
+    const int Screen::screenChunk = 24;
+
+    void* Screen::operator new(size_t size)
+    &#123;
+        Screen *p;
+        if (!freeStore) &#123;
+            //linked list 是空的，所以攫取一大塊 memory
+            //以下呼叫的是 global operator new
+            size_t chunk = screenChunk * size;
+            freeStore = p =
+                reinterpret_cast&lt;Screen*&gt;(new char[chunk]);
+            //將分配得來的一大塊 memory 當做 linked list 般小塊小塊串接起來
+            for (; p != &amp;freeStore[screenChunk - 1]; ++p)
+                p-&gt;next = p + 1;
+            p-&gt;next = 0;
+        &#125;
+        p = freeStore;
+        freeStore = freeStore-&gt;next;
+        return p;
+    &#125;
+</code></pre>
+<p>​<br>​        //! void Screen::operator delete(void *p)        //(1)<br>​        void Screen::operator delete(void *p, size_t)    //(2)二擇一<br>​        {<br>​            //將 deleted object 收回插入 free list 前端<br>​            (static_cast&lt;Screen*&gt;(p))-&gt;next = freeStore;<br>​            freeStore = static_cast&lt;Screen*&gt;(p);<br>​        }<br>​<br>        //————-<br>        void test_per_class_allocator_1()<br>        {<br>            cout &lt;&lt; “\ntest_per_class_allocator_1()………. \n”;</p>
+<pre><code>        cout &lt;&lt; sizeof(Screen) &lt;&lt; endl;        //8    
+
+        size_t const N = 100;
+        Screen* p[N];
+
+        for (int i = 0; i&lt; N; ++i)
+            p[i] = new Screen(i);
+
+        //輸出前 10 個 pointers, 用以比較其間隔 
+        for (int i = 0; i&lt; 10; ++i)
+            cout &lt;&lt; p[i] &lt;&lt; endl;
+
+        for (int i = 0; i&lt; N; ++i)
+            delete p[i];
+    &#125;
+&#125; //namespace
+
+int main(void)
+&#123;
+    jj04::test_per_class_allocator_1();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/AAD8dur.png"></p>
+<p>每个对象以8byte对齐。内存池本质上是分配了一大块内存，然后将该内存分割为多个小块通过链表拼接起来，所以物理上不一定连续但是逻辑上是连续的。</p>
+<p><img src="https://i.imgur.com/Va92P0d.png"></p>
+<p><img src="https://i.imgur.com/DEjg6FL.png"></p>
+<p>案例如下：</p>
+<pre><code>#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+namespace jj05
+&#123;
+    //ref. Effective C++ 2e, item10
+    //per-class allocator 
+
+    class Airplane &#123;   //支援 customized memory management
+    private:
+        struct AirplaneRep &#123;
+            unsigned long miles;
+            char type;
+        &#125;;
+    private:
+        union &#123;
+            AirplaneRep rep;  //此針對 used object
+            Airplane* next;   //此針對 free list
+        &#125;;
+    public:
+        unsigned long getMiles() &#123; return rep.miles; &#125;
+        char getType() &#123; return rep.type; &#125;
+        void set(unsigned long m, char t)
+        &#123;
+            rep.miles = m;
+            rep.type = t;
+        &#125;
+    public:
+        static void* operator new(size_t size);
+        static void  operator delete(void* deadObject, size_t size);
+    private:
+        static const int BLOCK_SIZE;
+        static Airplane* headOfFreeList;
+    &#125;;
+
+    Airplane* Airplane::headOfFreeList;
+    const int Airplane::BLOCK_SIZE = 512;
+
+    void* Airplane::operator new(size_t size)
+    &#123;
+        //如果大小錯誤，轉交給 ::operator new()
+        if (size != sizeof(Airplane))
+        return ::operator new(size);
+
+        Airplane* p = headOfFreeList;
+
+        //如果 p 有效，就把list頭部移往下一個元素
+        if (p)
+            headOfFreeList = p-&gt;next;
+        else &#123;
+            //free list 已空。配置一塊夠大記憶體，
+            //令足夠容納 BLOCK_SIZE 個 Airplanes
+            Airplane* newBlock = static_cast&lt;Airplane*&gt;
+                (::operator new(BLOCK_SIZE * sizeof(Airplane)));
+            //組成一個新的 free list：將小區塊串在一起，但跳過 
+            //#0 元素，因為要將它傳回給呼叫者。
+            for (int i = 1; i &lt; BLOCK_SIZE - 1; ++i)
+                newBlock[i].next = &amp;newBlock[i + 1];
+            newBlock[BLOCK_SIZE - 1].next = 0; //以null結束
+
+            // 將 p 設至頭部，將 headOfFreeList 設至
+            // 下一個可被運用的小區塊。
+            p = newBlock;
+            headOfFreeList = &amp;newBlock[1];
+        &#125;
+        return p;
+    &#125;
+
+    // operator delete 接獲一塊記憶體。
+    // 如果它的大小正確，就把它加到 free list 的前端
+    void Airplane::operator delete(void* deadObject,
+        size_t size)
+    &#123;
+        if (deadObject == 0) return;
+        if (size != sizeof(Airplane)) &#123;
+            ::operator delete(deadObject);
+            return;
+        &#125;
+
+        Airplane *carcass =
+            static_cast&lt;Airplane*&gt;(deadObject);
+
+        carcass-&gt;next = headOfFreeList;
+        headOfFreeList = carcass;
+    &#125;
+
+    //-------------
+    void test_per_class_allocator_2()
+    &#123;
+        cout &lt;&lt; &quot;\ntest_per_class_allocator_2().......... \n&quot;;
+
+        cout &lt;&lt; sizeof(Airplane) &lt;&lt; endl;    //8
+
+        size_t const N = 100;
+        Airplane* p[N];
+
+        for (int i = 0; i&lt; N; ++i)
+            p[i] = new Airplane;
+</code></pre>
+<p>​<br>​            //隨機測試 object 正常否<br>​            p[1]-&gt;set(1000, ‘A’);<br>​            p[5]-&gt;set(2000, ‘B’);<br>​            p[9]-&gt;set(500000, ‘C’);<br>​            cout &lt;&lt; p[1] &lt;&lt; ‘ ‘ &lt;&lt; p[1]-&gt;getType() &lt;&lt; ‘ ‘ &lt;&lt; p[1]-&gt;getMiles() &lt;&lt; endl;<br>​            cout &lt;&lt; p[5] &lt;&lt; ‘ ‘ &lt;&lt; p[5]-&gt;getType() &lt;&lt; ‘ ‘ &lt;&lt; p[5]-&gt;getMiles() &lt;&lt; endl;<br>​            cout &lt;&lt; p[9] &lt;&lt; ‘ ‘ &lt;&lt; p[9]-&gt;getType() &lt;&lt; ‘ ‘ &lt;&lt; p[9]-&gt;getMiles() &lt;&lt; endl;<br>​<br>            //輸出前 10 個 pointers, 用以比較其間隔<br>            for (int i = 0; i&lt; 10; ++i)<br>                cout &lt;&lt; p[i] &lt;&lt; endl;</p>
+<pre><code>        for (int i = 0; i&lt; N; ++i)
+            delete p[i];
+    &#125;
+&#125; //namespace
+
+int main(void)
+&#123;
+    jj05::test_per_class_allocator_2();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/fM1lMiv.png"></p>
+<p>这种做法有几点比较有意思，首先是使用了union保存链表元素的next指针，这样整体上可以节省空间；其次是delete函数，它并没有直接将目标元素删除，而是将它当作下一个可分配的内存空间，也就是说如果delete某元素，那么该元素占有的内存空间不会被free掉，而是在下一次调用new时分配给新的对象。</p>
+<h3 id="六、static-allocator"><a href="#六、static-allocator" class="headerlink" title="六、static allocator"></a>六、static allocator</h3><p><img src="https://i.imgur.com/9dojXlJ.png"></p>
+<p><img src="https://i.imgur.com/OrZw2Ik.png"></p>
+<p><img src="https://i.imgur.com/akWdqgr.png"></p>
+<p>代码如下：</p>
+<pre><code>#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+#include &lt;complex&gt;
+using namespace std;
+
+namespace jj09
+&#123;
+
+    class allocator
+    &#123;
+    private:
+        struct obj &#123;
+            struct obj* next;  //embedded pointer
+        &#125;;
+    public:
+        void* allocate(size_t);
+        void  deallocate(void*, size_t);
+        void  check();
+
+    private:
+        obj* freeStore = nullptr;
+        const int CHUNK = 5; //小一點方便觀察 
+    &#125;;
+
+    void* allocator::allocate(size_t size)
+    &#123;
+        obj* p;
+
+        if (!freeStore) &#123;
+            //linked list 是空的，所以攫取一大塊 memory
+            size_t chunk = CHUNK * size;
+            freeStore = p = (obj*)malloc(chunk);
+
+            //cout &lt;&lt; &quot;empty. malloc: &quot; &lt;&lt; chunk &lt;&lt; &quot;  &quot; &lt;&lt; p &lt;&lt; endl;
+
+            //將分配得來的一大塊當做 linked list 般小塊小塊串接起來
+            for (int i = 0; i &lt; (CHUNK - 1); ++i)    &#123;  //沒寫很漂亮, 不是重點無所謂.  
+                p-&gt;next = (obj*)((char*)p + size);
+                p = p-&gt;next;
+            &#125;
+            p-&gt;next = nullptr;  //last       
+        &#125;
+        p = freeStore;
+        freeStore = freeStore-&gt;next;
+
+        //cout &lt;&lt; &quot;p= &quot; &lt;&lt; p &lt;&lt; &quot;  freeStore= &quot; &lt;&lt; freeStore &lt;&lt; endl;
+
+        return p;
+    &#125;
+    void allocator::deallocate(void* p, size_t)
+    &#123;
+        //將 deleted object 收回插入 free list 前端
+        ((obj*)p)-&gt;next = freeStore;
+        freeStore = (obj*)p;
+    &#125;
+    void allocator::check()
+    &#123;
+        obj* p = freeStore;
+        int count = 0;
+
+        while (p) &#123;
+            cout &lt;&lt; p &lt;&lt; endl;
+            p = p-&gt;next;
+            count++;
+        &#125;
+        cout &lt;&lt; count &lt;&lt; endl;
+    &#125;
+    //--------------
+
+    class Foo &#123;
+    public:
+        long L;
+        string str;
+        static allocator myAlloc;
+    public:
+        Foo(long l) : L(l) &#123;  &#125;
+        static void* operator new(size_t size)
+        &#123; return myAlloc.allocate(size); &#125;
+        static void  operator delete(void* pdead, size_t size)
+        &#123;
+            return myAlloc.deallocate(pdead, size);
+        &#125;
+    &#125;;
+    allocator Foo::myAlloc;
+</code></pre>
+<p>​<br>​        class Goo {<br>​        public:<br>​            complex<double> c;<br>​            string str;<br>​            static allocator myAlloc;<br>​        public:<br>​            Goo(const complex<double>&amp; x) : c(x) {  }<br>​            static void* operator new(size_t size)<br>​            { return myAlloc.allocate(size); }<br>​            static void  operator delete(void* pdead, size_t size)<br>​            {<br>​                return myAlloc.deallocate(pdead, size);<br>​            }<br>​        };<br>​        allocator Goo::myAlloc;<br>​<br>        //————-<br>        void test_static_allocator_3()<br>        {<br>            cout &lt;&lt; “\n\n\ntest_static_allocator()………. \n”;</p>
+<pre><code>        &#123;
+            Foo* p[100];
+
+            cout &lt;&lt; &quot;sizeof(Foo)= &quot; &lt;&lt; sizeof(Foo) &lt;&lt; endl;
+            for (int i = 0; i&lt;23; ++i) &#123;    //23,任意數, 隨意看看結果 
+                p[i] = new Foo(i);
+                cout &lt;&lt; p[i] &lt;&lt; &#39; &#39; &lt;&lt; p[i]-&gt;L &lt;&lt; endl;
+            &#125;
+            //Foo::myAlloc.check();
+
+            for (int i = 0; i&lt;23; ++i) &#123;
+                delete p[i];
+            &#125;
+            //Foo::myAlloc.check();
+        &#125;
+
+        &#123;
+            Goo* p[100];
+
+            cout &lt;&lt; &quot;sizeof(Goo)= &quot; &lt;&lt; sizeof(Goo) &lt;&lt; endl;
+            for (int i = 0; i&lt;17; ++i) &#123;    //17,任意數, 隨意看看結果 
+                p[i] = new Goo(complex&lt;double&gt;(i, i));
+                cout &lt;&lt; p[i] &lt;&lt; &#39; &#39; &lt;&lt; p[i]-&gt;c &lt;&lt; endl;
+            &#125;
+            //Goo::myAlloc.check();
+
+            for (int i = 0; i&lt;17; ++i) &#123;
+                delete p[i];
+            &#125;
+            //Goo::myAlloc.check();    
+        &#125;
+    &#125;
+&#125; //namespace    
+
+int main(void)
+&#123;
+    jj09::test_static_allocator_3();
+    return 0;
+&#125;
+</code></pre>
+<p>编译运行结果如下：</p>
+<p><img src="https://i.imgur.com/czxP8JH.png"></p>
+<p>之前的几个版本都是在类的内部重载了operator new()和operator delete()函数，这些版本都将分配内存的工作放在这些函数中，但现在的这个版本将这些分配内存的操作放在了allocator类中，这就渐渐接近了标准库的方法。从上面的代码中可以看到，两个类Foo和Goo中operator new()和operator delete()函数等很多部分代码类似，于是可以使用宏来将这些高度相似的代码提取出来，简化类的内部结构，但最后达到的结果是一样的：</p>
+<p><img src="https://i.imgur.com/baXE2RO.png"></p>
+<p><img src="https://i.imgur.com/nog6qAD.png"></p>
+<h3 id="七、global-allocator"><a href="#七、global-allocator" class="headerlink" title="七、global allocator"></a>七、global allocator</h3><p>上面我们自己定义的分配器使用了一条链表来管理内存的，但标准库却用了多条链表来管理，这在后续会详细介绍：</p>
+<p><img src="https://i.imgur.com/0M5X6lY.png"></p>
+<h3 id="八、new-handler"><a href="#八、new-handler" class="headerlink" title="八、new handler"></a>八、new handler</h3><p><img src="https://i.imgur.com/TJ9GqFz.png"></p>
+<p>如果用户调用new申请一块内存，如果由于系统原因或者申请内存过大导致申请失败，这时将抛出异常，在一些老的编译器中可能会直接返回0，可以参考上图右边代码，当无法分配内存时，operator new()函数内部将调用_calnewh()函数，这个函数通过左边的typedef传入，看程序员是否能自己写一个handler处理函数来处理该问题。一般有两个选择，让更多的Memory可用或者直接abort()或exit()。下面是测试的一个结果：</p>
+<p><img src="https://i.imgur.com/JfazkE0.png"></p>
+<p>该部分中自定义了处理函数noMoreMemory()并通过set_new_handler来注册该处理函数，在BCB4编译器中会调用到自定义的noMoreMemory()函数，但在右边的dev c++中却没有调用，这个还要看平台。</p>
+<h3 id="九、-default和-delete"><a href="#九、-default和-delete" class="headerlink" title="九、=default和=delete"></a>九、=default和=delete</h3><p><img src="https://i.imgur.com/WUtaH2m.png"></p>
+<p><img src="https://i.imgur.com/2lxEgBI.png"></p>
+<p>更加详细的内容可以参考下面这篇文章:</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012333003/article/details/25299939">https://blog.csdn.net/u012333003/article/details/25299939</a></p>
+</blockquote>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/" title="C++内存管理机制|第一讲-primitives" target="_blank" rel="external">http://icecorn.github.io/2022/04/05/C++ 内存管理机制/第一讲primitives/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/04/08/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%BA%8C%E8%AE%B2std_allocator/" title="C++内存管理机制|第二讲-std_allocator-内存池"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/03/25/Games-101/Games101-%E5%85%89%E8%BF%BD%E9%83%A8%E5%88%86/" title="Games-101|光线追踪部分"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

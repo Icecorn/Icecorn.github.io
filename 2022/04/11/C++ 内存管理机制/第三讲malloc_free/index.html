@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>C++内存管理机制|第三讲-malloc/free | Blog of Icecorn</title>
+  <meta name="description" content="C++内存管理malloc&#x2F;free一、VC6内存分配下图左边是函数调用栈，最下方是操作系统  SBH：VC6 malloc对小区块（1016）的分配有特殊处理。在后续的版本VC10 取消了SBH的实现，全部交给操作系统来做（HeapAlloc()函数，OS对小区快内存的分配也和VC6类似） 下图是VC10的call stack，红×是相对VC6去掉的，最大区别就是取消了SBH，全部移交OS分配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++内存管理机制|第三讲-malloc&#x2F;free">
+<meta property="og:url" content="http://icecorn.github.io/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="C++内存管理malloc&#x2F;free一、VC6内存分配下图左边是函数调用栈，最下方是操作系统  SBH：VC6 malloc对小区块（1016）的分配有特殊处理。在后续的版本VC10 取消了SBH的实现，全部交给操作系统来做（HeapAlloc()函数，OS对小区快内存的分配也和VC6类似） 下图是VC10的call stack，红×是相对VC6去掉的，最大区别就是取消了SBH，全部移交OS分配">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.imgur.com/GSff1Jp.png">
+<meta property="og:image" content="https://i.imgur.com/EZG35WQ.png">
+<meta property="og:image" content="https://s2.loli.net/2022/05/13/4kxruOeRVKcI3GM.png">
+<meta property="og:image" content="https://s2.loli.net/2022/05/13/Cu87lfJpyGnMLFz.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513215753.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513223103.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513230245.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513230944.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513231905.png">
+<meta property="og:image" content="c:/Users/Jun/AppData/Roaming/Typora/typora-user-images/image-20220513233203018.png">
+<meta property="og:image" content="c:/Users/Jun/AppData/Roaming/Typora/typora-user-images/image-20220513234229182.png">
+<meta property="og:image" content="c:/Users/Jun/AppData/Roaming/Typora/typora-user-images/image-20220514002537699.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514102213.png">
+<meta property="og:image" content="c:/Users/Jun/AppData/Roaming/Typora/typora-user-images/image-20220514103905946.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514155941.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514160556.png">
+<meta property="og:image" content="c:/Users/Jun/AppData/Roaming/Typora/typora-user-images/image-20220514162140680.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514163554.png">
+<meta property="article:published_time" content="2022-04-11T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:08:22.864Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="C++内存管理机制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/GSff1Jp.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">13</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.5px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.25px;">Games-101</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.25px;">Rasterizer</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.75px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/16/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E5%9B%9B%E8%AE%B2-%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9/" class="title">C++内存管理机制|第四讲-分配器/new&amp;delete</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-16T09:25:10.000Z" itemprop="datePublished">2022-04-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/" class="title">C++内存管理机制|第三讲-malloc/free</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-11T09:25:10.000Z" itemprop="datePublished">2022-04-11</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/08/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%BA%8C%E8%AE%B2std_allocator/" class="title">C++内存管理机制|第二讲-std_allocator-内存池</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-08T09:25:10.000Z" itemprop="datePublished">2022-04-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/c/">c++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/05/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%80%E8%AE%B2primitives/" class="title">C++内存管理机制|第一讲-primitives</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-05T09:25:10.000Z" itemprop="datePublished">2022-04-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/25/Games-101/Games101-%E5%85%89%E8%BF%BD%E9%83%A8%E5%88%86/" class="title">Games-101|光线追踪部分</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-25T09:25:10.000Z" itemprop="datePublished">2022-03-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">C++内存管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#malloc-free"><span class="toc-number">2.</span> <span class="toc-text">malloc&#x2F;free</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81VC6%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D"><span class="toc-number">2.1.</span> <span class="toc-text">一、VC6内存分配</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SBH%E4%B9%8B%E5%A7%8B"><span class="toc-number">2.1.1.</span> <span class="toc-text">SBH之始</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-C++ 内存管理机制/第三讲malloc_free" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C++内存管理机制|第三讲-malloc/free
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/" class="article-date">
+	  <time datetime="2022-04-11T09:25:10.000Z" itemprop="datePublished">2022-04-11</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/c/">c++</a>►<a class="article-category-link" href="/categories/c/ReadingNotes/">ReadingNotes</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 1.9k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 6(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="C-内存管理"><a href="#C-内存管理" class="headerlink" title="C++内存管理"></a>C++内存管理</h2><h2 id="malloc-free"><a href="#malloc-free" class="headerlink" title="malloc/free"></a>malloc/free</h2><h3 id="一、VC6内存分配"><a href="#一、VC6内存分配" class="headerlink" title="一、VC6内存分配"></a>一、VC6内存分配</h3><p>下图左边是函数调用栈，最下方是操作系统</p>
+<p><img src="https://i.imgur.com/GSff1Jp.png"></p>
+<p>SBH：VC6 malloc对小区块（1016）的分配有特殊处理。在后续的版本VC10 取消了SBH的实现，全部交给操作系统来做（HeapAlloc()函数，OS对小区快内存的分配也和VC6类似）</p>
+<p>下图是VC10的call stack，红×是相对VC6去掉的，最大区别就是取消了SBH，全部移交OS分配</p>
+<p><img src="https://i.imgur.com/EZG35WQ.png"></p>
+<h4 id="SBH之始"><a href="#SBH之始" class="headerlink" title="SBH之始"></a>SBH之始</h4><p><strong>以下内容核心的目的，就是通过组织一些数据结构和算法来管理1MB的内存的灵活分配和释放（因为超过1MB就不用SBH，直接交给OS管理）</strong></p>
+<p>首先call OS的系统函数HeapCreate（），申请一块4096bits的内存(_crtheap)供后续使用，</p>
+<p>即__cdecl_heap_init()，创建了16个Header</p>
+<p><img src="https://s2.loli.net/2022/05/13/4kxruOeRVKcI3GM.png"></p>
+<p>CRT：C Run Time</p>
+<p>Header里边包括下边这些东西，具体干什么用的下文再说</p>
+<p><img src="https://s2.loli.net/2022/05/13/Cu87lfJpyGnMLFz.png"></p>
+<p>debug模式会多增加一些内存用于跟踪我们使用的内存，这就是VS debug模式能显示堆栈中变量及地址的原因</p>
+<p><strong>ioinit（）</strong>函数是首次分配内存的函数，而且必定是256个字节（16进制为100）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513215753.png"></p>
+<p>接着往下调用到**_heap_alloc_dbg()<strong>,这个函数的参数是下图中的blocksize= debug模式需要的内存（下图上方灰色部分）+ 上下两个“无人区”（下图深绿部分，一个4字节）+ 实际内存大小（下图浅绿部分，256字节）</strong>补充一点：上下无人区实际也属于debug模式的信息，release模式就没有了**</p>
+<p><strong>无人区</strong>起到一个栏杆的作用，从而调试器可以检测出内存越界行为</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513223103.png"></p>
+<p>pBlockHeaderNext;pBlockHeaderPrev这两个指针的作用就是将SBH分配的所有的内存区块全部串联起来，从而来管理</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513230245.png"></p>
+<p>接下来调用**_heap_alloc_base()**这个函数就是在加完debug这些内存之后，判断有没有超过1016个字节，没超过就SBH，超过了就OS分配</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513230944.png"></p>
+<p>接下来调用**__sbh_alloc_block()**,这个函数作用：</p>
+<p>下图add 8 bytes就是加入了上下cookies，然后进行对齐操作，将这个带着上下cookies的内存块上调为16 bytes对齐</p>
+<p>这些整个的大小是0X130，但是cookies里却存的是00000131，这里是用了个trick，因为内存块是16位对齐的，那么最后一位必然是0，所以这里cookies那里就用结尾存0或1来表示这个内存块的状态（使用，释放）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220513231905.png"></p>
+<p><strong>以上这些内容都是在计算所需内存大小，还没有实际分配内存，自然更谈不上初始化内容</strong></p>
+<p>下面将进入实际分配内存的环节：</p>
+<p>之前讲过有16个Header，它们每个控制1MB的内存（通过win API申请的Virtual melloc（））</p>
+<p>下图就是将它们控制的region是怎么玩的，细节是一个header的一个group维护了64个指针（双向链表）来控制这1MB，这些指针消耗大概16K</p>
+<p><img src="C:\Users\Jun\AppData\Roaming\Typora\typora-user-images\image-20220513233203018.png" alt="image-20220513233203018"></p>
+<p>32个group分1MB，一个32K，再分成8分，一份4K称为一个page，看到这里恍然大悟，和OS连上了，这个就是OS里的分页，目的就是最大程度的里用零散的小内存</p>
+<p>所以这里实际上就看出来SBH就是类似上一讲的内存池那样挖出一块大内存1MB然后手动画好格子32group * 8page，并且搞一堆指针形成链表让他们能找到，然后就可以分配管理了</p>
+<p><strong>另外，这个header控制的1MB实际上只是逻辑上的地址空间，因为win系统的虚拟内存机制，前边也说了它是用Virtual malloc申请的，这里联想以下OS里的虚内存机制就可以了。所以这里不是直接再物理空间上挖1MB，而是最小只用分配1page 4k就可以了，为什么呢？这里联想下虚内存和硬盘的交互，恰恰就是按page的粒度来进行换入换出的！</strong></p>
+<p><img src="C:\Users\Jun\AppData\Roaming\Typora\typora-user-images\image-20220513234229182.png" alt="image-20220513234229182"></p>
+<p>上图中一个group的64根指针实际上就像第二讲的allocator内存池一样，第一个用来挂在8字节，第二个16字节，这样一直到最后一个指针是挂载1KB及1KB以上的</p>
+<p> 下面是实际切的情况：</p>
+<p><img src="C:\Users\Jun\AppData\Roaming\Typora\typora-user-images\image-20220514002537699.png" alt="image-20220514002537699"></p>
+<p>VC6的内存管理分配情况：</p>
+<p>其实就和内存池的分配差不多，把一个group用64个指针管理，按照所需分配的内存大小选择挂载在哪个指针下边，每一次分配从下往上长</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514102213.png"></p>
+<p>收回内存，就是把这块内存挂载到对应的链表上（例下图是35号链表），然后把group的标志数组对应的35号位子置为1，表示这个底下有闲置的内存可以分配</p>
+<p><img src="C:\Users\Jun\AppData\Roaming\Typora\typora-user-images\image-20220514103905946.png" alt="image-20220514103905946"></p>
+<p>下一次再分配内存，算出要挂载在25号指针，但是它的group标志位是0，那么就往后找比它大的最近的指针标志位为1的，这里是35号链表，所以这次分配的内存实际上就是在上一次回收的35号内存上切一刀再分配给当前申请内存的程序。这里相比第二讲allocate简陋的内存池，就有了一个很大的好处，可以将这一个group32K的内存的压榨的很满。</p>
+<p><strong>区块合并</strong></p>
+<p>一个区块要被free的情况，在直接挂载到group对应的指针下之前，可以先看这个区块的上下区块是不是也是free的状态，如果是，那么可以将它们合并成一个大区块（上下cookies的最后一位是0表示是free状态的区块，可以合并，<strong>这也是上下cookies的作用之一</strong>）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514155941.png"></p>
+<p><strong>Free（p）挂载内存到指针上</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514160556.png"></p>
+<p>确定哪一个Header-&gt;确定哪一个group-&gt;最后确定是64个指针中的哪一个</p>
+<p>至于怎么找，就用指针的地址减去头的地址就行</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>SBH实际上就是将内存分成不同的粒度大小，16个Header每个管理1MB，1MB又分成了32个group每个32K，32K用分成8个page每个4K，<strong>这实际上就是OS内存的段页式管理，目的就是为了最大化合理利用内存碎片，从最大的内存一层一层找到最后内存所在的page就是句柄？</strong></p>
+<p><strong>全回收判断</strong></p>
+<p>因为是链表的结构，所以不容易判断内存是否全部回收完毕，所以设置了一个cntEntires参数每次melloc就+1，free就-1，如果为0就表示全回收啦（就是最后8个page全部挂在最后一个链表上，因为最后一个链表指针控制1KB以上的字节）</p>
+<p>另外这里有个buffer机制，就是有个defer指针，当有第一个全回收的group时先不回收（还给OS），出现第二个全回收的group再把第一个回收掉，这样就减少了像OS申请虚拟内存的次数（当没有第二个group时，又有进程申请内存，这时直接分配defer指针下全回收的group就行）</p>
+<p><img src="C:\Users\Jun\AppData\Roaming\Typora\typora-user-images\image-20220514162140680.png" alt="image-20220514162140680"></p>
+<p>allocator内存池的设计其实只是为了减少cookies内存的占用，而不是减少malloc的调用次数，因为malloc其实很快</p>
+<p>在下图中各层级的调用栈中，确实存在一些冗余，但因为过于庞大且不是一拨开发人员所以没办法，但VC因为是微软自家的，所以在VC10就取消了SBH的设计，将小区块内存也一并交给下层OS来管理了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220514163554.png"></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/04/11/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%B8%89%E8%AE%B2malloc_free/" title="C++内存管理机制|第三讲-malloc/free" target="_blank" rel="external">http://icecorn.github.io/2022/04/11/C++ 内存管理机制/第三讲malloc_free/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/04/16/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E5%9B%9B%E8%AE%B2-%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9/" title="C++内存管理机制|第四讲-分配器/new&amp;delete"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/04/08/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E4%BA%8C%E8%AE%B2std_allocator/" title="C++内存管理机制|第二讲-std_allocator-内存池"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
