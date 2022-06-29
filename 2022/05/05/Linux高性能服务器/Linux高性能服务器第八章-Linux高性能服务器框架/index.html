@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Linux高性能服务器|第八章-Linux高性能服务器框架 | Blog of Icecorn</title>
+  <meta name="description" content="第八章高性能服务器程序框架服务器模型-CS模型 优点  实现起来简单缺点 服务器是通信的中心, 访问过大的时候会导致响应过慢  模式图 编写的demo 没有用到fork函数. 后续待完善 服务器框架 IO模型  这个模型大概能够理解, 自己也算是学了半年的Javaweb. socket在创建的时候默认是阻塞的, 不过可以通过传SOCK_NONBLOCK参解决非阻塞调用都会立即返回 但可能事件没有发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux高性能服务器|第八章-Linux高性能服务器框架">
+<meta property="og:url" content="http://icecorn.github.io/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第八章高性能服务器程序框架服务器模型-CS模型 优点  实现起来简单缺点 服务器是通信的中心, 访问过大的时候会导致响应过慢  模式图 编写的demo 没有用到fork函数. 后续待完善 服务器框架 IO模型  这个模型大概能够理解, 自己也算是学了半年的Javaweb. socket在创建的时候默认是阻塞的, 不过可以通过传SOCK_NONBLOCK参解决非阻塞调用都会立即返回 但可能事件没有发">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233248719.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E6%9C%AC%E6%A1%86%E6%9E%B6.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/Reactor%E6%A8%A1%E5%BC%8F.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233354924.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233409090.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233423078.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%8D%8A%E5%8F%8D%E5%BA%94%E5%A0%86%E6%A8%A1%E5%BC%8F.png">
+<meta property="article:published_time" content="2022-05-05T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:34:50.041Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="Linux高性能服务器">
+<meta property="article:tag" content="socket编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233248719.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">20</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">7</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.4px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.2px;">Games-101</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.8px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.2px;">Rasterizer</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.4px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.6px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十四章-多线程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十三章-多进程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" class="title">Linux高性能服务器|第九章-IO复用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-09T09:25:10.000Z" itemprop="datePublished">2022-05-09</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="title">Linux高性能服务器|第八章-Linux高性能服务器框架</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-05T09:25:10.000Z" itemprop="datePublished">2022-05-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" class="title">Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-03T09:25:10.000Z" itemprop="datePublished">2022-05-03</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AB%E7%AB%A0%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6"><span class="toc-number">1.</span> <span class="toc-text">第八章高性能服务器程序框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E9%AB%98%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%80%A7%E8%83%BD%E7%9A%84%E5%85%B6%E4%BB%96%E5%BB%BA%E8%AE%AE-%E6%B1%A0-%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6-%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%E5%92%8C%E9%94%81"><span class="toc-number">1.1.</span> <span class="toc-text">提高服务器性能的其他建议 池 数据复制 上下文切换和锁</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Linux高性能服务器/Linux高性能服务器第八章-Linux高性能服务器框架" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux高性能服务器|第八章-Linux高性能服务器框架
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="article-date">
+	  <time datetime="2022-05-05T09:25:10.000Z" itemprop="datePublished">2022-05-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a>, <a class="article-tag-link-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 884(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 3(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="第八章高性能服务器程序框架"><a href="#第八章高性能服务器程序框架" class="headerlink" title="第八章高性能服务器程序框架"></a>第八章高性能服务器程序框架</h2><p><strong>服务器模型-CS模型</strong></p>
+<p><strong>优点</strong></p>
+<ul>
+<li>实现起来简单<br><strong>缺点</strong></li>
+<li>服务器是通信的中心, 访问过大的时候会导致响应过慢</li>
+</ul>
+<p>模式图<br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233248719.png" alt="image-20220629233248719"></p>
+<p>编写的demo 没有用到fork函数. 后续待完善</p>
+<p><strong>服务器框架 IO模型</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E6%9C%AC%E6%A1%86%E6%9E%B6.png"></p>
+<p>这个模型大概能够理解, 自己也算是学了半年的Javaweb.</p>
+<p>socket在创建的时候默认是阻塞的, 不过可以通过传<code>SOCK_NONBLOCK</code>参解决<br>非阻塞调用都会立即返回 但可能事件没有发生(recv没有接收到信息), 没有发生和出错都会<code>返回-1</code> 所以需要通过<code>errno</code>来区分这些错误.<br><strong>事件未发生</strong><br>accept, send,recv errno被设置为 <code>EAGAIN(再来一次)</code>或<code>EWOULDBLOCK(期望阻塞)</code><br>connect 被设置为 <code>EINPROGRESS(正在处理中)</code></p>
+<p>需要在事件已经发生的情况下 去调用非阻塞IO, 才能提高性能</p>
+<p>常用IO复用函数 <code>select</code> <code>poll</code> <code>epoll_wait</code> 将在第九章后面说明<br>信号将在第十章说明</p>
+<p><strong>两种高效的事件处理模式和并发模式</strong><br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/Reactor%E6%A8%A1%E5%BC%8F.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233354924.png" alt="image-20220629233354924"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233409090.png" alt="image-20220629233409090"></p>
+<p>程序分为计算密集型(CPU使用很多, IO资源使用很少)和IO密集型(反过来).<br>前者使用并发编程反而会降低效率, 后者则会提升效率<br>并发编程有多进程和多线程两种方式</p>
+<p>并发模式 - IO单元和多个逻辑单元之间协调完成任务的方法.<br>服务器主要有两种并发模式</p>
+<ul>
+<li>半同步/半异步模式</li>
+<li>领导者/追随者模式</li>
+</ul>
+<p><strong>半同步/半异步模式</strong><br>在IO模型中, 异步和同步的区分是内核向应用程序通知的是何种IO事件(就绪事件还是完成事件), 以及由谁来完成IO读写(应用程序还是内核)</p>
+<p>而在这里(并发模式)<br>同步指的是完全按照代码序列的顺序执行 - 按照同步方式运行的线程称为同步线程<br>异步需要系统事件(中断, 信号)来驱动 - 按照异步方式运行的线程称为异步线程<br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233423078.png" alt="image-20220629233423078"></p>
+<p>服务器(需要较好的实时性且能同时处理多个客户请求) - 一般使用同步线程和异步线程来实现,即为半同步/半异步模式<br>同步线程 - 处理客户逻辑, 处理请求队列中的对象<br>异步线程 - 处理IO事件, 接收到客户请求后将其封装成请求对象并插入请求队列</p>
+<p>半同步/半异步模式 存在变体 <code>半同步/半反应堆模式</code><br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%8D%8A%E5%8F%8D%E5%BA%94%E5%A0%86%E6%A8%A1%E5%BC%8F.png"></p>
+<p>异步线程 - 主线程 - 负责监听所有socket上的事件</p>
+<p><strong>领导者/追随者模式</strong><br>略</p>
+<p><strong>高效编程方法 - 有限状态机</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态独立的有限状态机</span></span><br><span class="line">STATE_MACHINE(Package _pack) &#123;</span><br><span class="line">	</span><br><span class="line">	PackageType _type = _pack.GetType();</span><br><span class="line">	<span class="keyword">switch</span>(_type) &#123;</span><br><span class="line">		<span class="keyword">case</span> type_A:</span><br><span class="line">			xxxx;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> type_B:</span><br><span class="line">			xxxx;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 带状态转移的有限状态机</span></span><br><span class="line">STATE_MACHINE() &#123;</span><br><span class="line">	State cur_State = type_A;</span><br><span class="line">	<span class="keyword">while</span>(cur_State != type_C) &#123;</span><br><span class="line">	</span><br><span class="line">		Package _pack = getNewPackage();</span><br><span class="line">		<span class="keyword">switch</span>(cur_State) &#123;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">case</span> type_A:</span><br><span class="line">				process_package_state_A(_pack);</span><br><span class="line">				cur_State = type_B;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> type_B:</span><br><span class="line">				xxxx;</span><br><span class="line">				cur_State = type_C;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="提高服务器性能的其他建议-池-数据复制-上下文切换和锁"><a href="#提高服务器性能的其他建议-池-数据复制-上下文切换和锁" class="headerlink" title="提高服务器性能的其他建议 池 数据复制 上下文切换和锁"></a>提高服务器性能的其他建议 池 数据复制 上下文切换和锁</h3><p><strong>池</strong> - 用空间换取时间<br>进程池和线程池</p>
+<p><strong>数据复制</strong> - 高性能的服务器应该尽量避免不必要的复制</p>
+<p><strong>上下文切换和锁</strong><br>减少<code>锁</code>的作用区域. 不应该创建太多的工作进程, 而是使用专门的业务逻辑线程.</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" title="Linux高性能服务器|第八章-Linux高性能服务器框架" target="_blank" rel="external">http://icecorn.github.io/2022/05/05/Linux高性能服务器/Linux高性能服务器第八章-Linux高性能服务器框架/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" title="Linux高性能服务器|第九章-IO复用"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" title="Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

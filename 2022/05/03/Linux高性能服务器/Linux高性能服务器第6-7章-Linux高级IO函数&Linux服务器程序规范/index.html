@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范 | Blog of Icecorn</title>
+  <meta name="description" content="第六章高级IO函数Linux提供的高级IO函数, 自然是特定条件下能力更强, 不然要他干啥, 特定条件自然限制了他的使用频率文件描述符文件描述符在是一个非负整数。是一个索引值,指向内核为每一个进程所维护的该进程打开文件的记录表。STDOUT_FILENO(值为1)- 值为1的文件描述符为标准输出, 关闭STDOUT_FILENO后用dup即可返回最小可用值(目前为, 1) 这样输出就重定向到了调用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范">
+<meta property="og:url" content="http://icecorn.github.io/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第六章高级IO函数Linux提供的高级IO函数, 自然是特定条件下能力更强, 不然要他干啥, 特定条件自然限制了他的使用频率文件描述符文件描述符在是一个非负整数。是一个索引值,指向内核为每一个进程所维护的该进程打开文件的记录表。STDOUT_FILENO(值为1)- 值为1的文件描述符为标准输出, 关闭STDOUT_FILENO后用dup即可返回最小可用值(目前为, 1) 这样输出就重定向到了调用">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-05-03T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:30:17.308Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="Linux高性能服务器">
+<meta property="article:tag" content="socket编程">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">20</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">7</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.4px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.2px;">Games-101</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.8px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.2px;">Rasterizer</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.4px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.6px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十四章-多线程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十三章-多进程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" class="title">Linux高性能服务器|第九章-IO复用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-09T09:25:10.000Z" itemprop="datePublished">2022-05-09</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="title">Linux高性能服务器|第八章-Linux高性能服务器框架</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-05T09:25:10.000Z" itemprop="datePublished">2022-05-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" class="title">Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-03T09:25:10.000Z" itemprop="datePublished">2022-05-03</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AD%E7%AB%A0%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text">第六章高级IO函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6-pipe-dup-dup2-splice-select"><span class="toc-number">1.1.</span> <span class="toc-text">创建文件描述符 - pipe dup dup2 splice select</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E5%86%99%E6%95%B0%E6%8D%AE-readv-writev-mmap-munmap"><span class="toc-number">1.2.</span> <span class="toc-text">读写数据 - readv writev mmap munmap</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%83%E7%AB%A0Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83"><span class="toc-number">2.</span> <span class="toc-text">第七章Linux服务器程序规范</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A5%E5%BF%97"><span class="toc-number">2.1.</span> <span class="toc-text">日志</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF-%E5%88%87%E6%8D%A2%E7%94%A8%E6%88%B7"><span class="toc-number">2.2.</span> <span class="toc-text">用户信息, 切换用户</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E9%97%B4%E5%85%B3%E7%B3%BB"><span class="toc-number">2.3.</span> <span class="toc-text">进程间关系</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Linux高性能服务器/Linux高性能服务器第6-7章-Linux高级IO函数&amp;Linux服务器程序规范" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" class="article-date">
+	  <time datetime="2022-05-03T09:25:10.000Z" itemprop="datePublished">2022-05-03</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a>, <a class="article-tag-link-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 3k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 12(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="第六章高级IO函数"><a href="#第六章高级IO函数" class="headerlink" title="第六章高级IO函数"></a>第六章高级IO函数</h2><p>Linux提供的高级IO函数, 自然是特定条件下能力更强, 不然要他干啥, 特定条件自然限制了他的使用频率<br><em>文件描述符</em><br>文件描述符在是一个非负整数。是一个索引值,指向内核为每一个进程所维护的该进程打开文件的记录表。<br>STDOUT_FILENO(值为1)- 值为1的文件描述符为标准输出, 关闭STDOUT_FILENO后用dup即可返回最小可用值(目前为, 1) 这样输出就重定向到了调用dup的参数指向的文件</p>
+<h3 id="创建文件描述符-pipe-dup-dup2-splice-select"><a href="#创建文件描述符-pipe-dup-dup2-splice-select" class="headerlink" title="创建文件描述符 - pipe dup dup2 splice select"></a>创建文件描述符 - pipe dup dup2 splice select</h3><p><strong>pipe函数</strong><br>这个函数可用于创建一个管道, 实现进程间的通信. </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 函数定义</span></span><br><span class="line"><span class="comment">// 参数文件描述符数组 fd[0] 读出 fd[1]写入 单向管道</span></span><br><span class="line"><span class="comment">// 成功返回0, 并将一对打开的文件描述符填入其参数指向的数组</span></span><br><span class="line"><span class="comment">// 失败返回-1 errno</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pipe</span><span class="params">(<span class="type">int</span> fd[<span class="number">2</span>])</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 双向管道</span></span><br><span class="line"><span class="comment">// 第一个参数为 协议PF_UNIX(书上是AF_UNIX)感觉这里指明协议使用PF更好一些</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">socketpair</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol, <span class="type">int</span> fd[<span class="number">2</span>])</span>;</span><br></pre></td></tr></table></figure>
+
+<p>学习了后面的内容了解到了进程间通信, 回来补上一个例子</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> fds[<span class="number">2</span>];</span><br><span class="line">    socketpair(PF_UNIX, SOCK_STREAM, <span class="number">0</span>, fds);</span><br><span class="line">    <span class="type">int</span> pid = fork();</span><br><span class="line">    <span class="keyword">if</span> (pid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        close(fds[<span class="number">0</span>]);</span><br><span class="line">        <span class="type">char</span> a[] = <span class="string">&quot;123&quot;</span>;</span><br><span class="line">        send(fds[<span class="number">1</span>], a, <span class="built_in">strlen</span>(a), <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        close(fds[<span class="number">1</span>]);</span><br><span class="line">        <span class="type">char</span> b[<span class="number">20</span>] &#123;&#125;;</span><br><span class="line">        recv(fds[<span class="number">0</span>], b, <span class="number">20</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s&quot;</span>, b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>dup和dup2函数</strong><br>复制一个现有的文件描述符</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="comment">// 返回的文件描述符总是取系统当前可用的最小整数值</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dup</span><span class="params">(<span class="type">int</span> oldfd)</span>;</span><br><span class="line"><span class="comment">// 可以用newfd来制定新的文件描述符, 如果newfd已经被打开则先关闭</span></span><br><span class="line"><span class="comment">// 如果newfd==oldfd 则不关闭newfd直接返回</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dup2</span><span class="params">(<span class="type">int</span> oldfd, <span class="type">int</span> newfd)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>dup函数创建一个新的文件描述符, 新的文件描述符和原有的file_descriptor共同指向相同的目标.<br>回来补上例子, 这个例子由于关掉了<code>STDOUT_FILENO</code>dup最小的即为<code>STDOUT_FILENO</code>所以<br>标准输出都到了这个文件之中</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> filefd = open(<span class="string">&quot;/home/lsmg/1.txt&quot;</span>, O_WRONLY);</span><br><span class="line">    close(STDOUT_FILENO);</span><br><span class="line">    dup(filefd);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;123\n&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="读写数据-readv-writev-mmap-munmap"><a href="#读写数据-readv-writev-mmap-munmap" class="headerlink" title="读写数据 - readv writev mmap munmap"></a>读写数据 - readv writev mmap munmap</h3><p><strong>readv/writev</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/uio.h&gt;</span></span></span><br><span class="line"><span class="comment">// count 为 vector的长度, 即为有多少块内存</span></span><br><span class="line"><span class="comment">// 成功时返回写入\读取的长度 失败返回-1</span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">readv</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="keyword">struct</span> iovec* <span class="built_in">vector</span>, <span class="type">int</span> count)</span>;</span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">writev</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="keyword">struct</span> iovec* <span class="built_in">vector</span>, <span class="type">int</span> count)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">iovec</span> &#123;</span></span><br><span class="line">	<span class="type">void</span>* iov_base <span class="comment">/* 内存起始地址*/</span></span><br><span class="line">	<span class="type">size_t</span> iov_len <span class="comment">/* 这块内存长度*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>回来补上一个使用例子, 这个例子将一个int的内存表示写入到了文件之中<br>使用hexdump查看这个文件<code>0000000 86a0 0001</code>可以看到<code>186a0</code>即为100000</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2020年1月7日16:52:11</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> file = open(<span class="string">&quot;/home/lsmg/1.txt&quot;</span>, O_WRONLY);</span><br><span class="line">    <span class="type">int</span> temp = <span class="number">100000</span>;</span><br><span class="line">    iovec temp_iovec&#123;&#125;;</span><br><span class="line">    temp_iovec.iov_base = &amp;temp;</span><br><span class="line">    temp_iovec.iov_len = <span class="keyword">sizeof</span>(temp);</span><br><span class="line">    writev(file, &amp;temp_iovec, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>sendfile函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/sendfile.h&gt;</span></span></span><br><span class="line"><span class="comment">// offset为指定输入流从哪里开始读, 如果为NULL 则从开头读取</span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendfile</span><span class="params">(<span class="type">int</span> out_fd, <span class="type">int</span> in_fd, <span class="type">off_t</span>* offset, <span class="type">size_t</span> count)</span>;</span><br><span class="line"></span><br><span class="line">O_RDONLY只读模式</span><br><span class="line">O_WRONLY只写模式</span><br><span class="line">O_RDWR读写模式</span><br><span class="line"><span class="type">int</span> <span class="title function_">open</span><span class="params">(file_name, flag)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>stat结构体, 可用fstat生成, <strong>简直就是文件的身份证</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">dev_t</span>       st_dev;     <span class="comment">/* ID of device containing file -文件所在设备的ID*/</span></span><br><span class="line">    <span class="type">ino_t</span>       st_ino;     <span class="comment">/* inode number -inode节点号*/</span></span><br><span class="line">    <span class="type">mode_t</span>      st_mode;    <span class="comment">/* protection -保护模式?*/</span></span><br><span class="line">    <span class="type">nlink_t</span>     st_nlink;   <span class="comment">/* number of hard links -链向此文件的连接数(硬连接)*/</span></span><br><span class="line">    <span class="type">uid_t</span>       st_uid;     <span class="comment">/* user ID of owner -user id*/</span></span><br><span class="line">    <span class="type">gid_t</span>       st_gid;     <span class="comment">/* group ID of owner - group id*/</span></span><br><span class="line">    <span class="type">dev_t</span>       st_rdev;    <span class="comment">/* device ID (if special file) -设备号，针对设备文件*/</span></span><br><span class="line">    <span class="type">off_t</span>       st_size;    <span class="comment">/* total size, in bytes -文件大小，字节为单位*/</span></span><br><span class="line">    <span class="type">blksize_t</span>   st_blksize; <span class="comment">/* blocksize for filesystem I/O -系统块的大小*/</span></span><br><span class="line">    <span class="type">blkcnt_t</span>    st_blocks;  <span class="comment">/* number of blocks allocated -文件所占块数*/</span></span><br><span class="line">    <span class="type">time_t</span>      st_atime;   <span class="comment">/* time of last access -最近存取时间*/</span></span><br><span class="line">    <span class="type">time_t</span>      st_mtime;   <span class="comment">/* time of last modification -最近修改时间*/</span></span><br><span class="line">    <span class="type">time_t</span>      st_ctime;   <span class="comment">/* time of last status change - */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><strong>身份证</strong>生成函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第一个参数需要调用open生成文件描述符</span></span><br><span class="line"><span class="comment">// 下面其他两个为文件全路径</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fstat</span><span class="params">(<span class="type">int</span> filedes, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 当路径指向为符号链接的时候, lstat为符号链接的信息. stat为符号链接指向文件信息</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="keyword">struct</span> stat *buf)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* ln -s source dist  建立软连接, 类似快捷方式, 也叫符号链接</span></span><br><span class="line"><span class="comment">* ln source dist  建立硬链接, 同一个文件使用多个不同的别名, 指向同一个文件数据块, 只要硬链接不被完全</span></span><br><span class="line"><span class="comment">* 删除就可以正常访问</span></span><br><span class="line"><span class="comment">* 文件数据块 - 文件的真正数据是一个文件数据块, 打开的`文件`指向这个数据块, 就是说</span></span><br><span class="line"><span class="comment">* `文件`本身就类似快捷方式, 指向文件存在的区域.</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p> <strong>mmap和munmap函数</strong></p>
+<p><code>mmap</code>创建一块进程通讯共享的内存(可以将文件映射入其中), <code>munmap</code>释放这块内存</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// start 内存起始位置, 如果为NULL则系统分配一个地址 length为长度</span></span><br><span class="line"><span class="comment">// port参数 PROT_READ(可读) PROT_WRITE(可写) PROT_EXEC(可执行), PROT_NONE(不可访问)</span></span><br><span class="line"><span class="comment">// flag参数 内存被修改后的行为</span></span><br><span class="line"><span class="comment">// - MAP_SHARED 进程间共享内存, 对内存的修改反映到映射文件中</span></span><br><span class="line"><span class="comment">// - MAP_PRIVATE 为调用进程私有, 对该内存段的修改不会反映到文件中</span></span><br><span class="line"><span class="comment">// - MAP_ANONUMOUS 不是从文件映射而来, 内容被初始化为0, 最后两个参数被忽略</span></span><br><span class="line"><span class="comment">// 成功返回区域指针, 失败返回 -1</span></span><br><span class="line"><span class="type">void</span>* <span class="title function_">mmap</span><span class="params">(<span class="type">void</span>* start, <span class="type">size_t</span> length, <span class="type">int</span> port, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="comment">// 成功返回0 失败返回-1</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span>* start, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>splice函数</strong><br>用于在两个文件名描述符之间移动数据, 0拷贝操作</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="comment">// fd_in 为文件描述符, 如果为管道文件描述符则 off_in必须为NULL, 否则为读取开始偏移位置</span></span><br><span class="line"><span class="comment">// len为指定移动的数据长度, flags参数控制数据如何移动.</span></span><br><span class="line"><span class="comment">// - SPLICE_F_NONBLOCK 非阻塞splice操作, 但会受文件描述符自身的阻塞</span></span><br><span class="line"><span class="comment">// - SPLICE_F_MORE 给内核一个提示, 后续的splice调用将读取更多的数据???????</span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">splice</span><span class="params">(<span class="type">int</span> fd_in, <span class="type">loff_t</span>* off_in, <span class="type">int</span> fd_out, <span class="type">loff_t</span>* off_out, <span class="type">size_t</span> len, <span class="type">unsigned</span> <span class="type">int</span> flags)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用splice函数  实现echo服务器</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (argc &lt;= <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;the parmerters is wrong\n&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(errno);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">char</span> *ip = argv[<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> port = atoi(argv[<span class="number">2</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;the port is %d the ip is %s\n&quot;</span>, port, ip);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> sockfd = socket(PF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    assert(sockfd &gt;= <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">address</span>&#123;</span>&#125;;</span><br><span class="line">    address.sin_family = AF_INET;</span><br><span class="line">    address.sin_port = htons(port);</span><br><span class="line">    inet_pton(AF_INET, ip, &amp;address.sin_addr);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> ret = bind(sockfd, (sockaddr*)&amp;address, <span class="keyword">sizeof</span>(address));</span><br><span class="line">    assert(ret != <span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">    ret = listen(sockfd, <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> clientfd&#123;&#125;;</span><br><span class="line">    sockaddr_in client_address&#123;&#125;;</span><br><span class="line">    <span class="type">socklen_t</span> client_addrlen = <span class="keyword">sizeof</span>(client_address);</span><br><span class="line"></span><br><span class="line">    clientfd = accept(sockfd, (sockaddr*)&amp;client_address, &amp;client_addrlen);</span><br><span class="line">    <span class="keyword">if</span> (clientfd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;accept error\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;a new connection from %s:%d success\n&quot;</span>, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));</span><br><span class="line">        <span class="type">int</span> fds[<span class="number">2</span>];</span><br><span class="line">        pipe(fds);</span><br><span class="line">        ret = splice(clientfd, nullptr, fds[<span class="number">1</span>], nullptr, <span class="number">32768</span>, SPLICE_F_MORE);</span><br><span class="line">        assert(ret != <span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">        ret = splice(fds[<span class="number">0</span>], nullptr, clientfd, nullptr, <span class="number">32768</span>, SPLICE_F_MORE);</span><br><span class="line">        assert(ret != <span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">        close(clientfd);</span><br><span class="line">    &#125;</span><br><span class="line">    close(sockfd);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>select 函数</strong><br>select函数在第二个参数列表 可读的时候返回<br>或者是等到了规定的时间返回</p>
+<p>返回之后 第二个参数指向fdset的集合 被修改为可读的fd列表<br>这就需要每次返回后都更新 fdset集合</p>
+<p>返回后 此函数的返回值为可读的fd数量, 遍历fdset集合 同时使用FD_ISSET判断fdset[i] 是否在其中<br>然后判断此fd是否为listenfd 如果是则接受新的连接 如果不是说明是已经接受的其他fd 判断是有数据可读<br>还是此连接断开</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span> </span></span><br><span class="line"><span class="comment">// maxfdp 最大数 FD_SETSIZE</span></span><br><span class="line"><span class="comment">// struct fd_set 一个集合,可以存储多个文件描述符</span></span><br><span class="line"><span class="comment">// - FD_ZERO(&amp;fd_set) 清空 -FD_SET(fd, &amp;fd_set) 放入fd FD_CLR(fd, &amp;fd_set)从其中清除fd</span></span><br><span class="line"><span class="comment">// - FD_ISSET(fd, &amp;fd_set) 判断是否在其中</span></span><br><span class="line"><span class="comment">// readfds  需要监视的文件描述符读变化, 其中的文件描述符可读的时候返回</span></span><br><span class="line"><span class="comment">// writefds 需要监视的文件描述符写变化, 其中的文件描述符可写的时候返回</span></span><br><span class="line"><span class="comment">// errorfds 错误</span></span><br><span class="line"><span class="comment">// timeout 传入NULL为阻塞, 设置为0秒0微秒则变为非阻塞函数</span></span><br><span class="line"><span class="comment">// 返回值 负值为错误 等待超时说明文件无变化返回0 有变化返回正值</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">select</span><span class="params">(<span class="type">int</span> maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,<span class="keyword">struct</span> timeval*timeout)</span>; </span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> exit_if(r, ...) \</span></span><br><span class="line"><span class="meta">&#123;   \</span></span><br><span class="line"><span class="meta">    <span class="keyword">if</span> (r)  \</span></span><br><span class="line"><span class="meta">    &#123;   \</span></span><br><span class="line"><span class="meta">        printf(__VA_ARGS__);    \</span></span><br><span class="line"><span class="meta">        printf(<span class="string">&quot;errno no: %d, error msg is %s&quot;</span>, errno, strerror(errno));    \</span></span><br><span class="line"><span class="meta">        exit(1);    \</span></span><br><span class="line"><span class="meta">    &#125;   \</span></span><br><span class="line"><span class="meta">&#125;   \</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> keyboard_fd = open(<span class="string">&quot;/dev/tty&quot;</span>, O_RDONLY | O_NONBLOCK);</span><br><span class="line">    exit_if(keyboard_fd &lt; <span class="number">0</span>, <span class="string">&quot;open keyboard fd error\n&quot;</span>);</span><br><span class="line">    fd_set readfd;</span><br><span class="line">    <span class="type">char</span> recv_buffer = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        FD_ZERO(&amp;readfd);</span><br><span class="line">        FD_SET(<span class="number">0</span>, &amp;readfd);</span><br><span class="line"></span><br><span class="line">        timeval timeout &#123;<span class="number">5</span>, <span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> ret = select(keyboard_fd + <span class="number">1</span>, &amp;readfd, nullptr, nullptr, &amp;timeout);</span><br><span class="line">        exit_if(ret == <span class="number">-1</span>, <span class="string">&quot;select error\n&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (ret &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (FD_ISSET(keyboard_fd, &amp;readfd))</span><br><span class="line">            &#123;</span><br><span class="line">                recv_buffer = <span class="number">0</span>;</span><br><span class="line">                read(keyboard_fd, &amp;recv_buffer, <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">if</span> (<span class="string">&#x27;\n&#x27;</span> == recv_buffer)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (<span class="string">&#x27;q&#x27;</span> == recv_buffer)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;the input is %c\n&quot;</span>, recv_buffer);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (ret == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;timeout\n&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="第七章Linux服务器程序规范"><a href="#第七章Linux服务器程序规范" class="headerlink" title="第七章Linux服务器程序规范"></a>第七章Linux服务器程序规范</h2><ul>
+<li>Linux程序服务器 一般以后台进程形式运行.  后台进程又称为守护进程(daemon). 他没有控制终端, 因而不会意外的接收到用户输入. 守护进程的父进程通常都是init进程(PID为1的进程)</li>
+<li>Linux服务器程序有一套日志系统, 他至少能输出日志到文件. 日志这东西太重要了,排错对比全靠它.</li>
+<li>Linux服务器程序一般以某个专门的非root身份运行. 比如mysqld有自己的账户mysql.</li>
+<li>Linux服务器程序一般都有自己的配置文件, 而不是把所有配置都写死在代码里面, 方便后续的更改.</li>
+<li>Linux服务器程序通常在启动的时候生成一个PID文件并存入/var/run 目录中, 以记录改后台进程的PID.</li>
+<li>Linux服务器程序通常需要考虑系统资源和限制, 预测自己的承受能力</li>
+</ul>
+<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service rsyslog restart // 启动守护进程</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;syslog.h&gt;</span></span></span><br><span class="line"><span class="comment">// priority参数是所谓的设施值(记录日志信息来源, 默认为LOG_USER)与日志级别的按位或</span></span><br><span class="line"><span class="comment">// - 0 LOG_EMERG  /* 系统不可用*/</span></span><br><span class="line"><span class="comment">// - 1 LOG_ALERT   /* 报警需要立即采取行动*/</span></span><br><span class="line"><span class="comment">// - 2 LOG_CRIT /* 非常严重的情况*/</span></span><br><span class="line"><span class="comment">// - 3 LOG_ERR  /* 错误*/</span></span><br><span class="line"><span class="comment">// - 4 LOG_WARNING /* 警告*/</span></span><br><span class="line"><span class="comment">// - 5 LOG_NOTICE /* 通知*/</span></span><br><span class="line"><span class="comment">// - 6 LOG_INFO /* 信息*/</span></span><br><span class="line"><span class="comment">//  -7 LOG_DEBUG /* 调试*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">syslog</span><span class="params">(<span class="type">int</span> priority, <span class="type">const</span> <span class="type">char</span>* message, .....)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ident 位于日志的时间后 通常为名字</span></span><br><span class="line"><span class="comment">// logopt 对后续 syslog调用的行为进行配置</span></span><br><span class="line"><span class="comment">// -  0x01 LOG_PID  /* 在日志信息中包含程序PID*/</span></span><br><span class="line"><span class="comment">// -  0x02 LOG_CONS /* 如果信息不能记录到日志文件, 则打印到终端*/</span></span><br><span class="line"><span class="comment">// -  0x04 LOG_ODELAY /* 延迟打开日志功能直到第一次调用syslog*/</span></span><br><span class="line"><span class="comment">// -  0x08 LOG_NDELAY /* 不延迟打开日志功能*/</span></span><br><span class="line"><span class="comment">// facility参数可以修改syslog函数中的默认设施值</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">openlog</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* ident, <span class="type">int</span> logopt, <span class="type">int</span> facility)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// maskpri 一共八位 0000-0000</span></span><br><span class="line"><span class="comment">// 如果将最后一个0置为1 表示 记录0级别的日志</span></span><br><span class="line"><span class="comment">// 如果将最后两个0都置为1 表示记录0和1级别的日志</span></span><br><span class="line"><span class="comment">// 可以通过LOG_MASK() 宏设定 比如LOG_MASK(LOG_CRIT) 表示将倒数第三个0置为1, 表示只记录LOG_CRIT</span></span><br><span class="line"><span class="comment">// 如果直接设置setlogmask(3); 3的二进制最后两个数均为1 则记录 0和1级别的日志</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">setlogmask</span><span class="params">(<span class="type">int</span> maskpri)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关闭日志功能</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">closelog</span><span class="params">()</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户信息-切换用户"><a href="#用户信息-切换用户" class="headerlink" title="用户信息, 切换用户"></a>用户信息, 切换用户</h3><p>UID - 真实用户ID<br>EUID - 有效用户ID - 方便资源访问<br>GID - 真实组ID<br>EGID - 有效组ID</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">uid_t</span> <span class="title function_">getuid</span><span class="params">()</span>;</span><br><span class="line"><span class="type">uid_t</span> <span class="title function_">geteuid</span><span class="params">()</span>;</span><br><span class="line"><span class="type">gid_t</span> <span class="title function_">getgid</span><span class="params">()</span>;</span><br><span class="line"><span class="type">gid_t</span> <span class="title function_">getegid</span><span class="params">()</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setuid</span><span class="params">(<span class="type">uid_t</span> uid)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">seteuid</span><span class="params">(<span class="type">uid_t</span> euid)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setgid</span><span class="params">(<span class="type">gid_t</span> gid)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">setegid</span><span class="params">(<span class="type">gid_t</span> gid)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>setuid</code>和<code>setgid</code>切换用户 <strong>root用户uid和gid均为0</strong></p>
+<h3 id="进程间关系"><a href="#进程间关系" class="headerlink" title="进程间关系"></a>进程间关系</h3><p>PGID - 进程组ID(Linux下每个进程隶属于一个进程组)</p>
+<p>#include &lt;unistd.h&gt;<br>pid_t getpgid(pid_t pid); 成功时返回pid所属的pgid 失败返回-1<br>int setpgid(pid_t pid, pid_t pgid);</p>
+<p><strong>会话</strong><br>一些有关联的进程组将形成一个会话</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" title="Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范" target="_blank" rel="external">http://icecorn.github.io/2022/05/03/Linux高性能服务器/Linux高性能服务器第6-7章-Linux高级IO函数&Linux服务器程序规范/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" title="Linux高性能服务器|第八章-Linux高性能服务器框架"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/04/30/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%BA%94%E7%AB%A0-Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80API/" title="Linux高性能服务器|第五章-Linux网络编程基础API"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

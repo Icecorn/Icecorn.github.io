@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Linux高性能服务器|第九章-IO复用 | Blog of Icecorn</title>
+  <meta name="description" content="第九章 I&#x2F;O复用I&#x2F;O复用使得程序能同时监听多个文件描述符.  客户端程序需要同时处理多个socket 非阻塞connect技术 客户端程序同时处理用户输入和网络连接 聊天室程序 TCP服务器要同时处理监听socket和连接socket 同时处理TCP和UDP请求 - 回射服务器 同时监听多个端口, 或者处理多种服务 - xinetd服务器  常用手段select, poll, epoll se">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux高性能服务器|第九章-IO复用">
+<meta property="og:url" content="http://icecorn.github.io/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第九章 I&#x2F;O复用I&#x2F;O复用使得程序能同时监听多个文件描述符.  客户端程序需要同时处理多个socket 非阻塞connect技术 客户端程序同时处理用户输入和网络连接 聊天室程序 TCP服务器要同时处理监听socket和连接socket 同时处理TCP和UDP请求 - 回射服务器 同时监听多个端口, 或者处理多种服务 - xinetd服务器  常用手段select, poll, epoll se">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/poll%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B1.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/poll%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E4%B8%89%E7%A7%8DIO%E5%A4%8D%E7%94%A8%E6%AF%94%E8%BE%83.png">
+<meta property="article:published_time" content="2022-05-09T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:36:48.246Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="Linux高性能服务器">
+<meta property="article:tag" content="socket编程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/poll%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">20</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">7</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.4px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.2px;">Games-101</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.8px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.2px;">Rasterizer</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.4px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.6px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十四章-多线程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十三章-多进程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" class="title">Linux高性能服务器|第九章-IO复用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-09T09:25:10.000Z" itemprop="datePublished">2022-05-09</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="title">Linux高性能服务器|第八章-Linux高性能服务器框架</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-05T09:25:10.000Z" itemprop="datePublished">2022-05-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" class="title">Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-03T09:25:10.000Z" itemprop="datePublished">2022-05-03</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B9%9D%E7%AB%A0-I-O%E5%A4%8D%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">第九章 I&#x2F;O复用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#select"><span class="toc-number">1.1.</span> <span class="toc-text">select</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#poll"><span class="toc-number">1.2.</span> <span class="toc-text">poll</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#epoll"><span class="toc-number">1.3.</span> <span class="toc-text">epoll</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E7%A7%8DIO%E5%A4%8D%E7%94%A8%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-number">1.4.</span> <span class="toc-text">三种IO复用的比较</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#I-O-%E5%A4%8D%E7%94%A8%E7%9A%84%E9%AB%98%E7%BA%A7%E5%BA%94%E7%94%A8-%E9%9D%9E%E9%98%BB%E5%A1%9Econnect"><span class="toc-number">1.5.</span> <span class="toc-text">I&#x2F;O 复用的高级应用, 非阻塞connect</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Linux高性能服务器/Linux高性能服务器第九章-IO复用" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux高性能服务器|第九章-IO复用
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" class="article-date">
+	  <time datetime="2022-05-09T09:25:10.000Z" itemprop="datePublished">2022-05-09</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a>, <a class="article-tag-link-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 1.9k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 8(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="第九章-I-O复用"><a href="#第九章-I-O复用" class="headerlink" title="第九章 I/O复用"></a>第九章 I/O复用</h1><p>I/O复用使得程序能同时监听多个文件描述符.</p>
+<ul>
+<li>客户端程序需要同时处理多个socket 非阻塞connect技术</li>
+<li>客户端程序同时处理用户输入和网络连接 聊天室程序</li>
+<li>TCP服务器要同时处理监听socket和连接socket</li>
+<li>同时处理TCP和UDP请求 - 回射服务器</li>
+<li>同时监听多个端口, 或者处理多种服务 - xinetd服务器</li>
+</ul>
+<p>常用手段<code>select</code>, <code>poll</code>, <code>epoll</code></p>
+<h2 id="select"><a href="#select" class="headerlink" title="select"></a>select</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/select.h&gt;</span></span></span><br><span class="line"><span class="comment">// nfds - 被监听的文件描述符总数</span></span><br><span class="line"><span class="comment">// 后面三个分别指向 可读, 可写, 异常等事件对应的文件描述符集合</span></span><br><span class="line"><span class="comment">// timeval select超时时间 如果传递0 则为非阻塞, 设置为NULL则为阻塞</span></span><br><span class="line"><span class="comment">// 成功返回就绪(可读, 可写, 异常)文件描述符的总数, 没有则返回0 失败返回-1</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">select</span> <span class="params">(<span class="type">int</span> nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, <span class="keyword">struct</span> timeval* timeout)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//操作fd_set的宏</span></span><br><span class="line"><span class="built_in">FD_ZERO</span>(fd_set* fdset);</span><br><span class="line"><span class="built_in">FD_SET</span>(<span class="type">int</span> fd, fd_set* fdset);</span><br><span class="line"><span class="built_in">FD_CLR</span>(<span class="type">int</span> fd, fd_set* fdset);</span><br><span class="line"><span class="built_in">FD_ISSET</span>(<span class="type">int</span> fd, fd_set* fdset);</span><br><span class="line"><span class="comment">// 设置 timeval 超时时间</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">timeval</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">long</span> tv_sec; <span class="comment">// 秒</span></span><br><span class="line">	<span class="type">long</span> tv_usec; <span class="comment">// 微秒</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>select</strong></p>
+<p>文件描述符就绪条件</p>
+<ul>
+<li>socket内核接收缓存区中的字节数大于或等于 其低水位标记</li>
+<li>socket通信的对方关闭连接, 对socket的读操作返回0</li>
+<li>监听socket上有新的连接请求</li>
+<li>socket上有未处理的错误, 可以使用getsockopt来读取和清除错误</li>
+<li>socket内核的发送缓冲区的可用字节数大于或等于 其低水位标记</li>
+<li>socket的写操作被关闭, 对被关闭的socket执行写操作将会触发一个SIGPIPE信号</li>
+<li>socket使用非阻塞connect 连接成功或失败后</li>
+</ul>
+<h2 id="poll"><a href="#poll" class="headerlink" title="poll"></a>poll</h2><p><strong>poll</strong><br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/poll%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B1.png"><br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/poll%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B2.png"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="comment">// fds 结构体类型数组 指定我们感兴趣的文件描述符上发生的可读可写和异常事件\</span></span><br><span class="line"><span class="comment">// nfds 遍历结合大小 左闭右开</span></span><br><span class="line"><span class="comment">// timeout 单位为毫秒 -1 为阻塞 0 为立即返回</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">poll</span><span class="params">(<span class="keyword">struct</span> pollfd* fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">pollfd</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> fd;</span><br><span class="line">	<span class="type">short</span> events;  <span class="comment">//注册的事件, 告知poll监听fd上的哪些事件</span></span><br><span class="line">	<span class="type">short</span> revents; <span class="comment">// 实际发生的事件</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> exit_if(r, ...) \</span></span><br><span class="line"><span class="meta">&#123;   \</span></span><br><span class="line"><span class="meta">    <span class="keyword">if</span> (r)  \</span></span><br><span class="line"><span class="meta">    &#123;   \</span></span><br><span class="line"><span class="meta">        printf(__VA_ARGS__);    \</span></span><br><span class="line"><span class="meta">        printf(<span class="string">&quot;errno no: %d, error msg is %s&quot;</span>, errno, strerror(errno));    \</span></span><br><span class="line"><span class="meta">        exit(1);    \</span></span><br><span class="line"><span class="meta">    &#125;   \</span></span><br><span class="line"><span class="meta">&#125;   \</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">client_info</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *ip_;</span><br><span class="line">    <span class="type">int</span> port_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> port = <span class="number">8001</span>;</span><br><span class="line">    <span class="type">char</span> ip[] = <span class="string">&quot;127.0.0.1&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> address;</span><br><span class="line">    address.sin_port = <span class="built_in">htons</span>(port);</span><br><span class="line">    address.sin_family = AF_INET;</span><br><span class="line">    address.sin_addr.s_addr = <span class="built_in">htons</span>(INADDR_ANY);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> listenfd = <span class="built_in">socket</span>(PF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">exit_if</span>(listenfd &lt; <span class="number">0</span>, <span class="string">&quot;socket error\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> ret = <span class="built_in">bind</span>(listenfd, (<span class="keyword">struct</span> sockaddr*)&amp;address, <span class="built_in">sizeof</span>(address));</span><br><span class="line">    <span class="built_in">exit_if</span>(ret == <span class="number">-1</span>, <span class="string">&quot;bind error\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    ret = <span class="built_in">listen</span>(listenfd, <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">exit_if</span>(ret == <span class="number">-1</span>, <span class="string">&quot;listen error\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constexpr</span> <span class="type">int</span> MAX_CLIENTS = <span class="number">1024</span>;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">pollfd</span> polls[MAX_CLIENTS] = &#123;&#125;;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">client_info</span> clientsinfo[MAX_CLIENTS] = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    polls[<span class="number">3</span>].fd = listenfd;</span><br><span class="line">    polls[<span class="number">3</span>].events = POLLIN | POLLRDHUP;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ret = <span class="built_in">poll</span>(polls, MAX_CLIENTS + <span class="number">1</span>, <span class="number">-1</span>);</span><br><span class="line">        <span class="built_in">exit_if</span>(ret == <span class="number">-1</span>, <span class="string">&quot;poll error\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">3</span>; i &lt;= MAX_CLIENTS; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">int</span> fd = polls[i].fd;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (polls[i].revents &amp; POLLRDHUP)</span><br><span class="line">            &#123;</span><br><span class="line">                polls[i].events = <span class="number">0</span>;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;close fd-%d from %s:%d\n&quot;</span>, fd, clientsinfo[fd].ip_, clientsinfo[fd].port_);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (polls[i].revents &amp; POLLIN)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (fd == listenfd)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> client_address;</span><br><span class="line">                    <span class="type">socklen_t</span> client_addresslen = <span class="built_in">sizeof</span>(client_address);</span><br><span class="line"></span><br><span class="line">                    <span class="type">int</span> clientfd = <span class="built_in">accept</span>(listenfd, (<span class="keyword">struct</span> sockaddr*)&amp;client_address,</span><br><span class="line">                            &amp;client_addresslen);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">struct</span> <span class="title class_">client_info</span> *clientinfo = &amp;clientsinfo[clientfd];</span><br><span class="line"></span><br><span class="line">                    clientinfo-&gt;ip_ = <span class="built_in">inet_ntoa</span>(client_address.sin_addr);</span><br><span class="line">                    clientinfo-&gt;port_ = <span class="built_in">ntohs</span>(client_address.sin_port);</span><br><span class="line"></span><br><span class="line">                    <span class="built_in">exit_if</span>(clientfd &lt; <span class="number">0</span>, <span class="string">&quot;accpet error, from %s:%d\n&quot;</span>, clientinfo-&gt;ip_,</span><br><span class="line">                            clientinfo-&gt;port_);</span><br><span class="line">                    <span class="built_in">printf</span>(<span class="string">&quot;accept from %s:%d\n&quot;</span>, clientinfo-&gt;ip_, clientinfo-&gt;port_);</span><br><span class="line"></span><br><span class="line">                    polls[clientfd].fd = clientfd;</span><br><span class="line">                    polls[clientfd].events = POLLIN | POLLRDHUP;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="type">char</span> buffer[<span class="number">1024</span>];</span><br><span class="line">                    <span class="built_in">memset</span>(buffer, <span class="string">&#x27;\0&#x27;</span>, <span class="built_in">sizeof</span>(buffer));</span><br><span class="line"></span><br><span class="line">                    ret = <span class="built_in">read</span>(fd, buffer, <span class="number">1024</span>);</span><br><span class="line">                    <span class="keyword">if</span>(ret == <span class="number">0</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="built_in">close</span>(fd);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="built_in">printf</span>(<span class="string">&quot;recv from %s:%d:\n%s\n&quot;</span>, clientsinfo[fd].ip_,</span><br><span class="line">                               clientsinfo[fd].port_, buffer);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="epoll"><a href="#epoll" class="headerlink" title="epoll"></a>epoll</h2><p><strong>epoll</strong></p>
+<p>epoll是Linux特有的I/O复用函数, 实现上与select,poll有很大的差异</p>
+<ul>
+<li>epoll使用一组函数完成任务</li>
+<li>epoll把用户关心的文件描述符上的事件放在内核里的一个事件表中</li>
+<li>epoll无需每次调用都传入文件描述符集或事件集.</li>
+</ul>
+<p>有特定的文件描述符创建函数, 来标识这个事件表<code>epoll_create()</code><br><code>epoll_ctl()</code> 用来操作这个内核事件表<br><code>epoll_wait()</code> 为主要函数 成功返回就绪的文件描述符个数 失败返回-1<br>如果<code>epoll_wait()</code>函数检测到事件,就将所有就绪的事件从内核事件表(由第一个参数, epoll_create返回的结果) 中复制到第二个参数event指向的数组中, 这个数组只用于输出<code>epoll_wait</code>检测到的就绪事件.</p>
+<p><em>event不同于select和poll的数组参数 既用于传入用户注册的事件, 又用于输出内核检测到的就绪事件, 提高了效率</em></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 索引poll返回的就绪文件描述符</span></span><br><span class="line"><span class="type">int</span> ret = <span class="built_in">poll</span>(fds, MAX_EVENT_NUMBER - <span class="number">1</span>);</span><br><span class="line"><span class="comment">// 遍历</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; MAX_EVENT_NUMBER; ++i) &#123;</span><br><span class="line">	<span class="keyword">if</span>(fds[i].revents &amp; POLLIN) &#123;</span><br><span class="line">		<span class="type">int</span> sockfd = fds[i].fd;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 索引epoll返回的就绪文件描述符</span></span><br><span class="line"><span class="type">int</span> ret = <span class="built_in">epoll_wait</span>(epoll_fd, events, MAX_EVENT_NUMBER,  <span class="number">-1</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; ret; i++) &#123;</span><br><span class="line">	<span class="type">int</span> sockfd = events[i].data.fd;</span><br><span class="line">	<span class="comment">// sockfd 一定就绪 ?????</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>LT和ET模式</strong><br>LT(电平触发, 默认的工作模式)<br>LT模式下的epoll相当于一个效率较高的poll<br>epoll_wait将会一只通知一个事件知道这个事件被处理</p>
+<p>ET(边沿触发, epoll的高效工作模式)模式<br>当向epoll内核事件表中注册一个文件描述符上的EPOLLET事件的时候, epoll将用ET模式来操作这个<br>文件描述符<br>epoll_wait只会通知一次, 不论这个事件有没有完成</p>
+<p>ET模式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-&gt; 123456789-123456789-123456789</span><br><span class="line">event trigger once</span><br><span class="line">get 9bytes of content: 123456789</span><br><span class="line">get 9bytes of content: -12345678</span><br><span class="line">get 9bytes of content: 9-1234567</span><br><span class="line">get 4bytes of content: 89</span><br><span class="line">read later</span><br></pre></td></tr></table></figure>
+
+<p>LT模式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-&gt; 123456789-123456789-123456789</span><br><span class="line">event trigger once</span><br><span class="line">get 9bytes of contents: 123456789</span><br><span class="line">event trigger once</span><br><span class="line">get 9bytes of contents: -12345678</span><br><span class="line">event trigger once</span><br><span class="line">get 9bytes of contents: 9-1234567</span><br><span class="line">event trigger once</span><br><span class="line">get 4bytes of contents: 89</span><br></pre></td></tr></table></figure>
+
+<p>ET模式有任务到来就必须做完, 因为后续将不会继续通知这个事件, 所以ET是epoll的高效工作模式<br>LT模式只要事件没被处理就会一直通知</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;epoll.h&gt;</span></span></span><br><span class="line"><span class="comment">// size 参数只是给内核一个提示, 事件表需要多大</span></span><br><span class="line"><span class="comment">// 函数返回其他所有epoll系统调用的第一个参数, 来指定要访问的内核事件表</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">epoll_create</span><span class="params">(<span class="type">int</span> size)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// epfd 为 epoll_create的返回值</span></span><br><span class="line"><span class="comment">// op为操作类型</span></span><br><span class="line"><span class="comment">// - EPOLL_CTL_ADD 向事件表中注册fd上的事件</span></span><br><span class="line"><span class="comment">// - EPOLL_CTL_MOD 修改fd上的注册事件</span></span><br><span class="line"><span class="comment">// - EPOLL_CTL_DEL 删除fd上的注册事件</span></span><br><span class="line"><span class="comment">// fd 为要操作的文件描述符</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">epoll_ctl</span><span class="params">(<span class="type">int</span> epfd, <span class="type">int</span> op, <span class="type">int</span> fd, <span class="keyword">struct</span> epoll_event* event)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">epoll_event</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">_uint32_t</span> events; <span class="comment">// epoll事件</span></span><br><span class="line">	<span class="type">epoll_data_t</span> data; <span class="comment">// 用户数据 是一个联合体</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span> <span class="title class_">epoll_data</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">void</span>* ptr; <span class="comment">// ptr fd 不能同时使用</span></span><br><span class="line">	<span class="type">int</span> fd;</span><br><span class="line">	<span class="type">uint32_t</span> u32;</span><br><span class="line">	<span class="type">uint64_t</span> u64;</span><br><span class="line">&#125;<span class="type">epoll_data_t</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// maxevents监听事件数 必须大于0</span></span><br><span class="line"><span class="comment">// timeout 为-1 表示阻塞</span></span><br><span class="line"><span class="comment">// 成功返回就绪的文件描述符个数 失败返回-1</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">epoll_wait</span><span class="params">(<span class="type">int</span> epfd, <span class="keyword">struct</span> epoll_event* events, <span class="type">int</span> maxevents, <span class="type">int</span> timeout)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三种IO复用的比较"><a href="#三种IO复用的比较" class="headerlink" title="三种IO复用的比较"></a>三种IO复用的比较</h2><p><code>select</code>以及<code>poll</code>和<code>epoll</code><br>相同</p>
+<ul>
+<li>都能同时监听多个文件描述符, 都将等待timeout参数指定的超时时间, 直到一个或多个文件描述符上有事件发生.</li>
+<li>返回值为就绪的文件描述符数量, 返回0则表示没有事件发生</li>
+<li><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E4%B8%89%E7%A7%8DIO%E5%A4%8D%E7%94%A8%E6%AF%94%E8%BE%83.png"></li>
+</ul>
+<h2 id="I-O-复用的高级应用-非阻塞connect"><a href="#I-O-复用的高级应用-非阻塞connect" class="headerlink" title="I/O 复用的高级应用, 非阻塞connect"></a>I/O 复用的高级应用, 非阻塞connect</h2><p>connect出错的时候会返回一个errno值 EINPROGRESS - 表示对非阻塞socket调用connect, 连接又没有立即建立的时候, 这时可以调用select和poll函数来监听这个连接失败的socket上的可写事件.</p>
+<p>当函数返回的时候, 可以用getsockopt来读取错误码, 并清楚该socket上的错误. 错误码为0表示成功</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" title="Linux高性能服务器|第九章-IO复用" target="_blank" rel="external">http://icecorn.github.io/2022/05/09/Linux高性能服务器/Linux高性能服务器第九章-IO复用/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%BC%96%E7%A8%8B/" title="Linux高性能服务器|第十三章-多进程编程"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" title="Linux高性能服务器|第八章-Linux高性能服务器框架"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

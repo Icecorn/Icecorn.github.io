@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Linux高性能服务器|第1-3章-计算机网络部分 | Blog of Icecorn</title>
+  <meta name="description" content="第一章 TCP&#x2F;IP协议族TCP&#x2F;IP协议族体系结构和主要协议协议族中协议众多, 这本书只选取了IP和TCP协议 - 对网络编程影响最直接  同样七层是osi参考模型, 简化后得到四层不同层次之间, 通过接口互相交流, 这样方便了各层次的修改 应用层负责处理应用程序的逻辑 表示层定义了数据的格式及加密 会话层它定义了如何开始、控制和结束一个会话，包括对多个双向消息的控制和管理，以便在只完成连续消息">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux高性能服务器|第1-3章-计算机网络部分">
+<meta property="og:url" content="http://icecorn.github.io/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="第一章 TCP&#x2F;IP协议族TCP&#x2F;IP协议族体系结构和主要协议协议族中协议众多, 这本书只选取了IP和TCP协议 - 对网络编程影响最直接  同样七层是osi参考模型, 简化后得到四层不同层次之间, 通过接口互相交流, 这样方便了各层次的修改 应用层负责处理应用程序的逻辑 表示层定义了数据的格式及加密 会话层它定义了如何开始、控制和结束一个会话，包括对多个双向消息的控制和管理，以便在只完成连续消息">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%9B%9B%E5%B1%82%E7%BB%93%E6%9E%84.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%90%BA%E5%B8%A6ICMP%E6%8A%A5%E6%96%87%E7%9A%84IP%E6%95%B0%E6%8D%AE%E6%8A%A5%E8%A2%AB%E5%88%86%E7%89%87.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E8%B7%AF%E7%94%B1%E6%9C%BA%E5%88%B6.png">
+<meta property="article:published_time" content="2022-04-27T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T15:22:52.187Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="计算机网络">
+<meta property="article:tag" content="Linux高性能服务器">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%9B%9B%E5%B1%82%E7%BB%93%E6%9E%84.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">20</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">7</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/c/">c++</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/c/ReadingNotes/">ReadingNotes</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.4px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.2px;">Games-101</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.8px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.2px;">Rasterizer</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.4px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.6px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十四章-多线程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/15/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%A4%9A%E8%BF%9B%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="title">Linux高性能服务器|第十三章-多进程编程</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-15T09:25:10.000Z" itemprop="datePublished">2022-05-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" class="title">Linux高性能服务器|第九章-IO复用</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-09T09:25:10.000Z" itemprop="datePublished">2022-05-09</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="title">Linux高性能服务器|第八章-Linux高性能服务器框架</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-05T09:25:10.000Z" itemprop="datePublished">2022-05-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/ReadingNotes/">ReadingNotes</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" class="title">Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-03T09:25:10.000Z" itemprop="datePublished">2022-05-03</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F"><span class="toc-number">1.</span> <span class="toc-text">第一章 TCP&#x2F;IP协议族</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%92%8C%E4%B8%BB%E8%A6%81%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.1.</span> <span class="toc-text">TCP&#x2F;IP协议族体系结构和主要协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-IP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-number">2.</span> <span class="toc-text">第二章 IP协议详解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-TCP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-number">3.</span> <span class="toc-text">第三章 TCP协议详解</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Linux高性能服务器/Linux高性能服务器-计网部分-1-3章" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Linux高性能服务器|第1-3章-计算机网络部分
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/" class="article-date">
+	  <time datetime="2022-04-27T09:25:10.000Z" itemprop="datePublished">2022-04-27</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a>, <a class="article-tag-link-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 1.8k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 6(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="第一章-TCP-IP协议族"><a href="#第一章-TCP-IP协议族" class="headerlink" title="第一章 TCP/IP协议族"></a>第一章 TCP/IP协议族</h2><h3 id="TCP-IP协议族体系结构和主要协议"><a href="#TCP-IP协议族体系结构和主要协议" class="headerlink" title="TCP/IP协议族体系结构和主要协议"></a>TCP/IP协议族体系结构和主要协议</h3><p>协议族中协议众多, 这本书只选取了IP和TCP协议 - 对网络编程影响最直接</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%9B%9B%E5%B1%82%E7%BB%93%E6%9E%84.jpg"></p>
+<p>同样七层是osi参考模型, 简化后得到四层<br>不同层次之间, 通过接口互相交流, 这样方便了各层次的修改</p>
+<p><strong>应用层</strong><br>负责处理应用程序的逻辑</p>
+<p><strong>表示层</strong><br>定义了数据的格式及加密</p>
+<p><strong>会话层</strong><br>它定义了如何开始、控制和结束一个会话，包括对多个双向消息的控制和管理，以便在只完成连续消息的一部分时可以通知应用，从而使表示层看到的数据是连续的</p>
+<p><strong>传输层</strong><br>为两台主机的应用提供端到端(end to end)的通信. 与网络层使用的下一跳不同, 他只关心起始和终止, 中转过程交给下层处理.<br>此层存在两大协议TCP协议和UDP协议<br>TCP协议(Transmission Control Protocol 传输控制协议)</p>
+<ul>
+<li>为应用层提供<code>可靠的, 面向连接, 基于流的服务</code></li>
+<li>通过<code>超时重传</code>和<code>数据确认</code>等确保数据正常送达.</li>
+<li>TCP需要存储一些必要的状态, 连接的状态, 读写缓冲区, 诸多定时器<br>UPD协议(User Datagram Protocol 用户数据报协议)</li>
+<li>为应用层提供<code>不可靠的, 无连接的, 基于数据报的服务</code></li>
+<li>一般需要自己处理<code>数据确认</code>和<code>超时重传</code>的问题</li>
+<li>通信两者不存储状态, 每次发送都需要指定地址信息. <code>有自己的长度</code></li>
+</ul>
+<p><strong>网络层</strong><br>实现了数据包的选路和转发.  只有数据包到不了目标地址, 就<code>下一跳</code>(hop by hop), 选择最近的.<br><em>IP协议(Internet Protocol)</em> 以及 <em>ICMP协议(Internet Control Message Protocol)</em><br>后者协议是IP协议的补充, 用来检测网络连接 1. 差错报文, 用来回应状态 2. 查询报文(ping程序就是使用的此报文来判断信息是否送达)</p>
+<p><strong>数据链路层</strong><br>实现了网卡接口的网络驱动程序. 这里驱动程序方便了厂商的下层修改, 只需要向上层提供规定的接口即可.<br>存在两个协议 <em>ARP协议(Address Resolve Protocol, 地址解析协议)</em>. 还有<em>RARP(Reverse ~, 逆地址解析协议)</em>.  由于网络层使用IP地址寻址机器, 但是数据链路层使用物理地址(通常为MAC地址), 之间的转化涉及到ARP协议<em>ARP欺骗, 可能与这个有关, 目前不去学习</em></p>
+<p><strong>封装</strong><br>上层协议发送到下层协议. 通过封装实现, 层与层之间传输的时候, 加上自己的头部信息.<br>被TCP封装的数据成为 <code>TCP报文段</code></p>
+<ul>
+<li>内核部分发送成功后删除数据</li>
+</ul>
+<p>被UDP封装的数据成为 <code>UDP数据报</code></p>
+<ul>
+<li>发送后即删除</li>
+</ul>
+<p>再经IP封装后成为<code>IP数据报</code><br>最后经过数据链路层封装后为 <code>帧</code></p>
+<p>以太网最大数据帧1518字节 抛去14头部 帧尾4校验<br>MTU: 帧的最大传输单元 一般为1500字节<br>MSS: TCP数据包最大的数据载量 1460字节 = 1500字节 - 20Ip头-20TCP头 还有额外的40字节可选部分</p>
+<p><strong>ARP</strong><br>ARP协议能实现任意网络层地址到任意物理地址的转换</p>
+<h2 id="第二章-IP协议详解"><a href="#第二章-IP协议详解" class="headerlink" title="第二章 IP协议详解"></a>第二章 IP协议详解</h2><p>IP协议是TCP/IP协议簇的核心协议, 是socket网络编程的基础之一<br>IP协议为上层协议提供无状态, 无连接, 不可靠的服务</p>
+<p>IP数据报最大长度是65535(2^16 - 1)字节, 但是有MTU的限制</p>
+<p>当IP数据报的长度超过MTU 将会被分片传输. 分片可能发生在发送端, 也可能发生在中转路由器, 还可能被多次分片. 只有在最终的目标机器上, 这些分片才会被内核中的ip模块重新组装</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%90%BA%E5%B8%A6ICMP%E6%8A%A5%E6%96%87%E7%9A%84IP%E6%95%B0%E6%8D%AE%E6%8A%A5%E8%A2%AB%E5%88%86%E7%89%87.png"></p>
+<p>路由机制</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E8%B7%AF%E7%94%B1%E6%9C%BA%E5%88%B6.png"></p>
+<p>给定了目标IP地址后, 将会匹配路由表中的哪一项呢? 分三个步骤</p>
+<ul>
+<li>查找路由表中和数据报的目标IP地址完全匹配的主机IP地址. 如果找到就使用该路由项. 否则下一步</li>
+<li>查找路由表中和数据报的目标IP地址具有相同网路ID的网络IP地址 找到……. 否则下一步</li>
+<li>选择默认路由项, 通常意味着下一跳路由是网关</li>
+</ul>
+<h2 id="第三章-TCP协议详解"><a href="#第三章-TCP协议详解" class="headerlink" title="第三章 TCP协议详解"></a>第三章 TCP协议详解</h2><p>Tcp读写都是针对缓冲区来说, 所以没有固定的读写次数对应关系.</p>
+<p>UDP没有缓冲区, 必须及时接受数据否则会丢包, 或者接收缓冲区过小就会造成数据报截断</p>
+<p>ISN-初始序号值<br>32位序号 后续的TCP报文段中序号值 seq = ISN + 报文段首字节在整个字节流中的偏移<br>32位确认号 收到的TCP报文序号值+1. 这个32位确认号每次发送的是上一次的应答</p>
+<p>ACK标志: 表示确认号是否有效. 携带ACK标志的报文段称为<code>确认报文段</code><br>PSH标志: 提示接收端应用程序从TCP接受缓冲区中读走数据, 为后续数据腾出空间<br>RST标志: 要求对方重新建立连接 携带……<code>复位报文段</code><br>SYN标志: 标志请求建立一个连接 携带……<code>同步报文段</code><br>FIN标志: 通知对方本端连接要关闭了, 携带..<code>结束报文段</code></p>
+<p>16位窗口大小: 窗口指的是接收通告窗口, 告诉对方本端的TCP 接收缓冲区还能容纳多少字节的数据<br>16位校验和: <code>可靠传输的重要保障</code>发送端填充, 接收端执行CRC算法校验是否损坏, 同时校验<code>TCP头部</code>和<code>数据部分</code></p>
+<p><strong>TCP连接的建立和关闭</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"># 三次握手</span><br><span class="line"># 客户端发送请求连接 ISN=seq + 0 = 3683340920</span><br><span class="line"># mss 最大数据载量1460</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [S], seq 3683340920, win 64240, </span><br><span class="line">options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0</span><br><span class="line"></span><br><span class="line"># 同意客户端连接</span><br><span class="line"># ack = 客户端发送 seq + 1</span><br><span class="line"># 同时发送服务端的seq</span><br><span class="line">IP ubuntu.8000 &gt; 192.168.80.1.7467: </span><br><span class="line">Flags [S.], seq 938535101, ack 3683340921, win 64240, </span><br><span class="line">options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0</span><br><span class="line"></span><br><span class="line"># 虽然这个报文段没有字节 但由于是同步报文段 需要占用一个序号值</span><br><span class="line"># 这里是tcpdump的处理 ack显示相对值 即 3683340921 - 3683340920 = 1</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [.], ack 938535102, win 4106, length 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 包含FIN标志 说明要求结束连接 也需要占用一个序号值</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [F.], seq 1, ack 1, win 4106, length 0</span><br><span class="line"></span><br><span class="line"># 服务端确认关闭连接</span><br><span class="line">IP ubuntu.8000 &gt; 192.168.80.1.7467: </span><br><span class="line">Flags [.], ack 2, win 502, length 0</span><br><span class="line"></span><br><span class="line"># 服务端发送关闭连接</span><br><span class="line">IP ubuntu.8000 &gt; 192.168.80.1.7467: </span><br><span class="line">Flags [F.], seq 1, ack 2, win 4105, length 0</span><br><span class="line"></span><br><span class="line"># 客户端确认</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [.], ack 2, win 503, length 0</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/" title="Linux高性能服务器|第1-3章-计算机网络部分" target="_blank" rel="external">http://icecorn.github.io/2022/04/27/Linux高性能服务器/Linux高性能服务器-计网部分-1-3章/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/04/30/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%BA%94%E7%AB%A0-Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80API/" title="Linux高性能服务器|第五章-Linux网络编程基础API"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/04/16/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E5%9B%9B%E8%AE%B2-%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9/" title="C++内存管理机制|第四讲-分配器/new&amp;delete"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
