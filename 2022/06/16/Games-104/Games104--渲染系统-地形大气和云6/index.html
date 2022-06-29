@@ -21,7 +21,7 @@
   <meta name="description" content="第六课 地形大气和云的渲染地形的几何Heightfield数学上的分形方法  每隔1m画一个10000*1000的网格，然后根据高度场，轮廓场等进行映射就可以  LOD技术 就是根据距离远近应用不同分辨率的网格，这里要根据FOV视角的范围进行各向异性的加密或简化网格。  细分方法 注意T-Junctions的问题  三角形剖分  四叉树细分  解决T-Junction问题，就把剖分次数多的一边中间">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Games-104|第六课-渲染系统-地形大气和云的渲染">
-<meta property="og:url" content="http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/index.html">
+<meta property="og:url" content="http://icecorn.github.io/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/index.html">
 <meta property="og:site_name" content="Blog of Icecorn">
 <meta property="og:description" content="第六课 地形大气和云的渲染地形的几何Heightfield数学上的分形方法  每隔1m画一个10000*1000的网格，然后根据高度场，轮廓场等进行映射就可以  LOD技术 就是根据距离远近应用不同分辨率的网格，这里要根据FOV视角的范围进行各向异性的加密或简化网格。  细分方法 注意T-Junctions的问题  三角形剖分  四叉树细分  解决T-Junction问题，就把剖分次数多的一边中间">
 <meta property="og:locale" content="en_US">
@@ -53,15 +53,15 @@
 <meta property="og:image" content="c:/Users/Jun/AppData/Roaming/Typora/typora-user-images/image-20220529191739233.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220529192645.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220529192851.png">
-<meta property="article:published_time" content="2022-06-05T09:25:10.000Z">
-<meta property="article:modified_time" content="2022-06-29T16:11:31.338Z">
+<meta property="article:published_time" content="2022-06-16T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T16:26:59.931Z">
 <meta property="article:author" content="Icecorn">
 <meta property="article:tag" content="Games-104">
 <meta property="article:tag" content="游戏引擎">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220529152911.png">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/index.html">
+  <link rel="canonical" href="http://icecorn.github.io/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
   
@@ -252,10 +252,25 @@
                 <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
               </p>
               <p class="item-title">
-                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染只是</a>
+                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染知识</a>
               </p>
               <p class="item-date">
                 <time datetime="2022-06-19T09:25:10.000Z" itemprop="datePublished">2022-06-19</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-16T09:25:10.000Z" itemprop="datePublished">2022-06-16</time>
               </p>
             </div>
           </li>
@@ -305,21 +320,6 @@
             </div>
           </li>
           
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
-              </p>
-              <p class="item-title">
-                <a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
-              </p>
-            </div>
-          </li>
-          
       </ul>
     </div>
   </div>
@@ -357,8 +357,8 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="article-date">
-	  <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
+	<a href="/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="article-date">
+	  <time datetime="2022-06-16T09:25:10.000Z" itemprop="datePublished">2022-06-16</time>
 	</a>
 </span>
         
@@ -383,7 +383,7 @@
 	</span>
 
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/#comments" class="article-comment-link">Comments</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/#comments" class="article-comment-link">Comments</a></span>
         
 	
 		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 1.4k(words)</span>
@@ -486,7 +486,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://icecorn.github.io/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" title="Games-104|第六课-渲染系统-地形大气和云的渲染" target="_blank" rel="external">http://icecorn.github.io/2022/06/05/Games-104/Games104--渲染系统-地形大气和云6/</a>
+      <a href="http://icecorn.github.io/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" title="Games-104|第六课-渲染系统-地形大气和云的渲染" target="_blank" rel="external">http://icecorn.github.io/2022/06/16/Games-104/Games104--渲染系统-地形大气和云6/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -533,12 +533,12 @@
   <ul class="pager pull-left">
     
     <li class="prev">
-      <a href="/2022/06/05/Games-104/Games104--%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E5%AF%BC%E8%AE%BA%E4%B8%8E%E6%9E%B6%E6%9E%84(1-3)/" title="Games-104|第1-3课-引擎架构分层&amp;数据组织管理"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+      <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" title="Games-104|第七课-渲染管线-后处理-其他渲染知识"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
     </li>
     
     
     <li class="next">
-      <a href="/2022/05/31/%E5%BF%AB%E6%89%8B%E5%AE%9E%E4%B9%A0%E6%80%BB%E7%BB%93/" title="快手实习总结|渲染&amp;shader"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2022/06/10/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%85%89%E7%85%A7%E5%92%8C%E6%9D%90%E8%B4%A85/" title="Games-104|第五课-渲染系统-光照与材质"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     

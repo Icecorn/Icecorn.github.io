@@ -17,10 +17,10 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>Games-104|第七课-渲染管线-后处理-其他渲染只是 | Blog of Icecorn</title>
+  <title>Games-104|第七课-渲染管线-后处理-其他渲染知识 | Blog of Icecorn</title>
   <meta name="description" content="第七课 渲染管线-后处理–其他渲染知识环境光遮蔽 AO 预计算出AO贴图  SSAO 在屏幕上存储深度信息，设置一些采样点，根据采样点和z-buffer的深度比较来计算最终的光强  SSAO+  HBAO  GTAO  雾效 Fog简单的fog，根据深度Z从近到远透明度逐渐减小  考虑到高度信息时，简单的fog公式就不起作用了   抗锯齿采样率不够就会导致走样  SSAA和MSAASSAA就是最简">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Games-104|第七课-渲染管线-后处理-其他渲染只是">
+<meta property="og:title" content="Games-104|第七课-渲染管线-后处理-其他渲染知识">
 <meta property="og:url" content="http://icecorn.github.io/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/index.html">
 <meta property="og:site_name" content="Blog of Icecorn">
 <meta property="og:description" content="第七课 渲染管线-后处理–其他渲染知识环境光遮蔽 AO 预计算出AO贴图  SSAO 在屏幕上存储深度信息，设置一些采样点，根据采样点和z-buffer的深度比较来计算最终的光强  SSAO+  HBAO  GTAO  雾效 Fog简单的fog，根据深度Z从近到远透明度逐渐减小  考虑到高度信息时，简单的fog公式就不起作用了   抗锯齿采样率不够就会导致走样  SSAA和MSAASSAA就是最简">
@@ -57,7 +57,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220531205652.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/20220531210350.png">
 <meta property="article:published_time" content="2022-06-19T09:25:10.000Z">
-<meta property="article:modified_time" content="2022-06-29T16:12:34.980Z">
+<meta property="article:modified_time" content="2022-06-29T16:26:46.061Z">
 <meta property="article:author" content="Icecorn">
 <meta property="article:tag" content="Games-104">
 <meta property="article:tag" content="游戏引擎">
@@ -255,10 +255,25 @@
                 <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
               </p>
               <p class="item-title">
-                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染只是</a>
+                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染知识</a>
               </p>
               <p class="item-date">
                 <time datetime="2022-06-19T09:25:10.000Z" itemprop="datePublished">2022-06-19</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-16T09:25:10.000Z" itemprop="datePublished">2022-06-16</time>
               </p>
             </div>
           </li>
@@ -308,21 +323,6 @@
             </div>
           </li>
           
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
-              </p>
-              <p class="item-title">
-                <a href="/2022/06/05/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2022-06-05T09:25:10.000Z" itemprop="datePublished">2022-06-05</time>
-              </p>
-            </div>
-          </li>
-          
       </ul>
     </div>
   </div>
@@ -352,7 +352,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Games-104|第七课-渲染管线-后处理-其他渲染只是
+      Games-104|第七课-渲染管线-后处理-其他渲染知识
     </h1>
   
 
@@ -479,7 +479,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://icecorn.github.io/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" title="Games-104|第七课-渲染管线-后处理-其他渲染只是" target="_blank" rel="external">http://icecorn.github.io/2022/06/19/Games-104/Games104--渲染系统-渲染管线后处理等7/</a>
+      <a href="http://icecorn.github.io/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" title="Games-104|第七课-渲染管线-后处理-其他渲染知识" target="_blank" rel="external">http://icecorn.github.io/2022/06/19/Games-104/Games104--渲染系统-渲染管线后处理等7/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -527,7 +527,7 @@
     
     
     <li class="next">
-      <a href="/2022/06/10/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%85%89%E7%85%A7%E5%92%8C%E6%9D%90%E8%B4%A85/" title="Games-104|第五课-渲染系统-光照与材质"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" title="Games-104|第六课-渲染系统-地形大气和云的渲染"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     
