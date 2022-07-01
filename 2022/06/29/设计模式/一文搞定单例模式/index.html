@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>单例模式|一文搞懂单例模式！ | Blog of Icecorn</title>
+  <meta name="description" content="一文搞定单例模式简介通过单例模式， 可以做到：确保一个类只有一个实例被建立 ，也就是C++中定义全局的东西的一个通用做法。 在实现单例的过程中要注意如下问题：  构造函数应该声明为非公有，从而禁止外界创建实例 拷贝操作和移动操作也该禁止 只能通过singleton的共有特定类操作访问它的唯一实例（c++中的一个公有静态成员函数）  本文实现常见的饿汉式及懒汉式，以及多线程懒汉式的单例模式 饿汉式饿">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单例模式|一文搞懂单例模式！">
+<meta property="og:url" content="http://icecorn.github.io/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="一文搞定单例模式简介通过单例模式， 可以做到：确保一个类只有一个实例被建立 ，也就是C++中定义全局的东西的一个通用做法。 在实现单例的过程中要注意如下问题：  构造函数应该声明为非公有，从而禁止外界创建实例 拷贝操作和移动操作也该禁止 只能通过singleton的共有特定类操作访问它的唯一实例（c++中的一个公有静态成员函数）  本文实现常见的饿汉式及懒汉式，以及多线程懒汉式的单例模式 饿汉式饿">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701124104249.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701124532493.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701125704906.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701125910795.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701130227454.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701130526478.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701132606657.png">
+<meta property="article:published_time" content="2022-06-29T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-07-01T06:17:38.760Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="单例模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701124104249.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/C/">C++</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/C/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">25</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-104/" rel="tag">Games-104</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openGL/" rel="tag">openGL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shader/" rel="tag">shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" rel="tag">单例模式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.33px;">C++内存管理机制</a> <a href="/tags/Games-101/" style="font-size: 13.17px;">Games-101</a> <a href="/tags/Games-104/" style="font-size: 13.5px;">Games-104</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.83px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Rasterizer/" style="font-size: 13.17px;">Rasterizer</a> <a href="/tags/openGL/" style="font-size: 13px;">openGL</a> <a href="/tags/shader/" style="font-size: 13px;">shader</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.33px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" style="font-size: 13px;">单例模式</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" style="font-size: 13.5px;">游戏引擎</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13px;">算法</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.67px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/C/">C++</a><i class="icon icon-angle-right"></i><a class="category-link" href="/categories/C/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="title">单例模式|一文搞懂单例模式！</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-29T09:25:10.000Z" itemprop="datePublished">2022-06-29</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" class="title">Games-104|第七课-渲染管线-后处理-其他渲染知识</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-19T09:25:10.000Z" itemprop="datePublished">2022-06-19</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/16/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%9C%B0%E5%BD%A2%E5%A4%A7%E6%B0%94%E5%92%8C%E4%BA%916/" class="title">Games-104|第六课-渲染系统-地形大气和云的渲染</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-16T09:25:10.000Z" itemprop="datePublished">2022-06-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/10/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E5%85%89%E7%85%A7%E5%92%8C%E6%9D%90%E8%B4%A85/" class="title">Games-104|第五课-渲染系统-光照与材质</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-10T09:25:10.000Z" itemprop="datePublished">2022-06-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/06/07/Games-104/Games104-%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E6%95%B0%E6%8D%AE%E7%BB%84%E7%BB%874/" class="title">Games-104|第四课-渲染数据组织</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-06-07T09:25:10.000Z" itemprop="datePublished">2022-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.</span> <span class="toc-text">一文搞定单例模式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A5%BF%E6%B1%89%E5%BC%8F"><span class="toc-number">1.2.</span> <span class="toc-text">饿汉式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#C98%E7%9A%84%E9%A5%BF%E6%B1%89%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.2.1.</span> <span class="toc-text">C98的饿汉模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C11%E7%9A%84%E9%A5%BF%E6%B1%89%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.2.2.</span> <span class="toc-text">C11的饿汉模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%87%92%E6%B1%89%E5%BC%8F"><span class="toc-number">1.3.</span> <span class="toc-text">懒汉式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%87%92%E6%B1%89%E6%A8%A1%E5%BC%8F%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.1.</span> <span class="toc-text">懒汉模式存在的问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%B1%E5%85%A5%E7%9A%84%E7%90%86%E8%A7%A3%E6%87%92%E6%B1%89%E5%92%8C%E9%A5%BF%E6%B1%89"><span class="toc-number">1.4.</span> <span class="toc-text">深入的理解懒汉和饿汉</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E7%9A%84%E6%87%92%E6%B1%89%E6%A8%A1%E5%BC%8F"><span class="toc-number">1.5.</span> <span class="toc-text">线程安全的懒汉模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%A2%E8%AF%95%E5%8D%95%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="toc-number">1.6.</span> <span class="toc-text">面试单例代码</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-设计模式/一文搞定单例模式" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      单例模式|一文搞懂单例模式！
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="article-date">
+	  <time datetime="2022-06-29T09:25:10.000Z" itemprop="datePublished">2022-06-29</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/C/">C++</a>►<a class="article-category-link" href="/categories/C/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" rel="tag">单例模式</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.9k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 11(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="一文搞定单例模式"><a href="#一文搞定单例模式" class="headerlink" title="一文搞定单例模式"></a>一文搞定单例模式</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>通过单例模式， 可以做到：确保一个类只有一个实例被建立 ，也就是C++中定义全局的东西的一个通用做法。</p>
+<p>在实现单例的过程中要注意如下问题：</p>
+<ul>
+<li>构造函数应该声明为非公有，从而禁止外界创建实例</li>
+<li>拷贝操作和移动操作也该禁止</li>
+<li>只能通过singleton的共有特定类操作访问它的唯一实例（c++中的一个公有静态成员函数）</li>
+</ul>
+<p>本文实现常见的饿汉式及懒汉式，以及多线程懒汉式的单例模式</p>
+<h2 id="饿汉式"><a href="#饿汉式" class="headerlink" title="饿汉式"></a>饿汉式</h2><p>饿汉式顾名思义，就是我先准备好一个全局的实例，等到你需要getInstance的时候就直接获取就行了，普通的饿汉式的缺点就是以”空间换时间”，就是说在编译阶段已经给这个类在<strong>全局数据区</strong>分配好了内存并初始化了。</p>
+<h3 id="C98的饿汉模式"><a href="#C98的饿汉模式" class="headerlink" title="C98的饿汉模式"></a>C98的饿汉模式</h3><p>在C++98版本，为了实现线程安全，要把istance实现成一个类内的成员变量，并且要在类外初始化它，不然编译器会报错。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//-------------C98饿汉模式单例-----------------------------------</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CSingleton98</span>    </span><br><span class="line">&#123;    </span><br><span class="line"><span class="keyword">private</span>:    </span><br><span class="line">    <span class="built_in">CSingleton98</span>()      </span><br><span class="line">    &#123;   </span><br><span class="line">		a = <span class="number">98</span>; </span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;c98饿汉模式单例使用全局静态对象，在编译时已经调用单例类构造函数分配内存并实例化出来了！&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;    </span><br><span class="line"><span class="keyword">public</span>:    </span><br><span class="line">    <span class="function"><span class="type">static</span> CSingleton98 * <span class="title">GetInstance</span><span class="params">()</span>    </span></span><br><span class="line"><span class="function">    </span>&#123;      </span><br><span class="line">        <span class="keyword">return</span> &amp;instance;    </span><br><span class="line">    &#125;    </span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">static</span> CSingleton98 instance;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="type">int</span> a; <span class="comment">//类中其他变量,这里懒得写get/set方法</span></span><br><span class="line">&#125;; </span><br><span class="line">CSingleton98 CSingleton98:: instance;<span class="comment">//在类外初始化</span></span><br></pre></td></tr></table></figure>
+
+<p>我们在main函数中什么都不做打印试试看：</p>
+<p>可以看到执行了单例类的构造函数，说明这种饿汉模式是在编译阶段已经在全局数据区分配了内存并初始化</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701124104249.png" alt="image-20220701124104249"></p>
+<p>接着我们用如下代码测试，可以看到两次获取实例对象的地址是一致的，单例ok！</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;	</span><br><span class="line">	CSingleton98* inst98= CSingleton98::<span class="built_in">GetInstance</span>();</span><br><span class="line">	CSingleton98* inst981= CSingleton98::<span class="built_in">GetInstance</span>();</span><br><span class="line">	cout &lt;&lt; inst98-&gt;a &lt;&lt; endl;</span><br><span class="line">	cout &lt;&lt; &amp;(*inst98) &lt;&lt; <span class="string">&quot;  &quot;</span> &lt;&lt; &amp;(*inst981) &lt;&lt; endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701124532493.png" alt="image-20220701124532493"></p>
+<h3 id="C11的饿汉模式"><a href="#C11的饿汉模式" class="headerlink" title="C11的饿汉模式"></a>C11的饿汉模式</h3><p>C11的饿汉模式表现在我们是将单例的instance作为一个局部static变量处理的（在函数内）</p>
+<p><strong>优点：</strong></p>
+<ul>
+<li><strong>只有在程序第一次执行到GetInstance()函数的时候才会在全局数据区开辟内存并且初始化，也就是说我们没有在编译的时候就开辟内存，节省了不必要的空间开销！</strong></li>
+<li><strong>解决了static变量初始化的问题</strong></li>
+</ul>
+<blockquote>
+<p>C++只能保证在同一个文件中声明的static变量的初始化顺序与其变量声明的顺序一致。但是不能保证不同的文件中的static变量的初始化顺序。</p>
+<p>然后对于单例模式而言，不同的单例对象之间进行调用也是常见的场景。比如我有一个单例，存储了程序启动时加载的配置文件的内容。另外有一个单例，掌管着一个全局唯一的日志管理器。在日志管理初始化的时候，要通过配置文件的单例对象来获取到某个配置项，实现日志打印。</p>
+<p>这时候两个单例在不同文件中各自实现，很有可能在日志管理器的单例使用配置文件单例的时候，配置文件的单例对象是没有被初始化的。这个未初始化可能产生的风险指的是C++变量的未初始化，而不是说配置文件未加载的之类业务逻辑上的未初始化导致的问题。</p>
+<p>而<code>Meyers&#39; Singleton</code>写法中，单例对象是第一次访问的时候（也就是第一次调用<code>getInstance()</code>函数的时候）才初始化的，但也是恰恰因为如此，因而能保证如果没有初始化，在该函数调用的时候，是能完成初始化的。所以先<code>getInstance()</code>再访问 这种形式的单例 其关键并不是在于这个形式。而是在于其内容，局部static变量能保证通过函数来获取static变量的时候，该函数返回的对象是肯定完成了初始化的！</p>
+<p>讲到这，我们对<code>Meyers&#39; Singleton</code>的盲目鼓吹也需冷静一下，因为C++同样能保证所有文件内（非函数内）的static变量在main()函数开始运行之后肯定是都能做完初始化的。所以如果你是在main()函数运行之后，用日志管理器的单例访问配置文件的单例，那么其实也是没有问题的… 这就引出<code>Meyers&#39; Singleton</code>的第二个优势，那就是当产生继承的时候。</p>
+</blockquote>
+<p><strong>这里有一个遗留问题：就是编译器在编译阶段如何决定先编译哪一个单例文件呢，由此产生的文件依赖问题怎么解决呢？</strong></p>
+<ul>
+<li>解决了单例的继承问题</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">on</span><span class="params">()</span> </span>&#123;Singleton::isOn = <span class="literal">true</span>;&#125;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">off</span><span class="params">()</span> </span>&#123;Singleton::isOn = <span class="literal">false</span>;&#125;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">bool</span> <span class="title">state</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> Singleton::isOn;&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">bool</span> isOn;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Monitor</span>: <span class="keyword">public</span> Singleton &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">addBrightness</span><span class="params">(<span class="type">int</span> val)</span> </span>&#123; brightness += val;&#125;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">subBrightness</span><span class="params">(<span class="type">int</span> val)</span> </span>&#123; brightness -= val;&#125;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">int</span> <span class="title">getBrightness</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> brightness;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> brightness;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>如果有子类继承这一父类，来拓展成新的子类，比如Monitor显示器类有开关状态，同时扩展了一个亮度的成员。但是父子类的static成员变量是共享的，其isOn成员会有问题。</p>
+<p>场景：比如一个显示器类，一个灯类。他们都是singleton的子类。但是灯是否打开，不应该影响显示器是否打开</p>
+<p><strong>静态局部对象：</strong></p>
+<ul>
+<li>在程序执行到该对象的定义处时，创建对象并调用相应的构造函数！</li>
+<li>如果在定义对象时没有提供初始指，则会暗中调用默认构造函数，如果没有默认构造函数，则自动初始化为0。</li>
+<li>如果在定义对象时提供了初始值，则会暗中调用类型匹配的带参的构造函数（包括拷贝构造函数），如果没有定义这样的构造函数，编译器可能报错！</li>
+<li>直到main（）结束后才会调用析构函数！</li>
+<li>静态局部变量在程序执行到该对象的声明处时被首次初始化，即以后的函数调用不再进行初始化！</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CSingleton11</span>    </span><br><span class="line">&#123;    </span><br><span class="line"><span class="keyword">private</span>:    </span><br><span class="line">    <span class="built_in">CSingleton11</span>()      </span><br><span class="line">    &#123;    </span><br><span class="line">		a = <span class="number">11</span>;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;C11饿汉模式使用的是局部static变量，是在调用的时候分配到全局存储区的，不是在编译时就分配哦！&quot;</span> &lt;&lt; endl;</span><br><span class="line">		cout &lt;&lt; <span class="string">&quot;这是因为C11的编译器可以帮我们保证线程安全，俺们就不用操心啦！&quot;</span> &lt;&lt; endl;</span><br><span class="line">    &#125;    </span><br><span class="line"><span class="keyword">public</span>:    </span><br><span class="line">    <span class="function"><span class="type">static</span> CSingleton11 * <span class="title">GetInstance</span><span class="params">()</span>    </span></span><br><span class="line"><span class="function">    </span>&#123;   </span><br><span class="line">		<span class="comment">//静态局部变量在程序执行到该对象的声明处时被首次初始化，即以后的函数调用不再进行初始化；</span></span><br><span class="line">        <span class="type">static</span> CSingleton11 instance;     </span><br><span class="line">        <span class="keyword">return</span> &amp;instance;    </span><br><span class="line">    &#125;</span><br><span class="line">	<span class="type">int</span> a;</span><br><span class="line">&#125;; </span><br></pre></td></tr></table></figure>
+
+<p>以下是测试：</p>
+<p>首先是main函数什么都不做：</p>
+<p>结果就是什么都不会发生（笑，想起了莫里亚篇索隆对山治说的话，和最近的CP0段子哈哈哈）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701125704906.png" alt="image-20220701125704906"></p>
+<p>调用GetInstance：</p>
+<p>此时会在全局数据区开辟内存，并调用构造函数初始化</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CSingleton11* inst11= CSingleton11::<span class="built_in">GetInstance</span>();</span><br><span class="line">cout &lt;&lt; inst11-&gt;a &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701125910795.png" alt="image-20220701125910795"></p>
+<p>调用两次GetInstance：</p>
+<p>此时只会调用一次构造函数，这正是局部static变量的特性（静态局部变量在程序执行到该对象的声明处时被首次初始化，即以后的函数调用不再进行初始化）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CSingleton11* inst11= CSingleton11::<span class="built_in">GetInstance</span>();	</span><br><span class="line">CSingleton11* inst112= CSingleton11::<span class="built_in">GetInstance</span>();</span><br><span class="line">cout &lt;&lt; inst11-&gt;a &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; &amp;(*inst11) &lt;&lt; <span class="string">&quot;  &quot;</span> &lt;&lt; &amp;(*inst112) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701130227454.png" alt="image-20220701130227454"></p>
+<p><strong>这里顺便加深下记忆：</strong></p>
+<p>如果是全局static变量声明两次的话，编译器会报错的！</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> a;</span><br><span class="line">std::cout &lt;&lt; &amp;a &lt;&lt; std::endl;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> a;                   <span class="comment">//打咩！</span></span><br><span class="line">std::cout &lt;&lt; &amp;a &lt;&lt; std::endl;  </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701130526478.png" alt="image-20220701130526478"></p>
+<p>这是C11下优化的饿汉模式单例，至于怎么保证线程安全的（不用加锁），这是C11编译器保证的！以后有时间再看！</p>
+<h2 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式"></a>懒汉式</h2><p>懒汉式的特点就是延迟加载，只有到用到的时候才实例化instance</p>
+<p><strong>这里又有一个疑问：这么考虑的话上文的C11饿汉模式不应该是懒汉模式嘛？</strong></p>
+<p>注意这里最下边一行实际上在编译之前实例化一个指针变量，但是相比于类变量，一个指针才4个字节而已，who cares！</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CSingletonL</span>  </span><br><span class="line">&#123;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">	<span class="function"><span class="type">static</span> CSingletonL* <span class="title">GetInstance</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">	</span>&#123;  </span><br><span class="line">		<span class="keyword">if</span> ( m_pInstance == <span class="literal">nullptr</span> )    </span><br><span class="line">			m_pInstance = <span class="keyword">new</span> <span class="built_in">CSingletonL</span>();  </span><br><span class="line">		<span class="keyword">return</span> m_pInstance;  </span><br><span class="line">	&#125;  </span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">    <span class="built_in">CSingletonL</span>()&#123;lazy = <span class="number">3</span>;&#125;  </span><br><span class="line">    <span class="type">static</span> CSingletonL* m_pInstance;  </span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="type">int</span> lazy;</span><br><span class="line">&#125;;</span><br><span class="line">CSingletonL* CSingletonL::m_pInstance;</span><br></pre></td></tr></table></figure>
+
+<p>测试：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CSingletonL* instlazy = CSingletonL::<span class="built_in">GetInstance</span>();</span><br><span class="line">CSingletonL* instlazy1 = CSingletonL::<span class="built_in">GetInstance</span>();</span><br><span class="line">cout &lt;&lt; instlazy-&gt;lazy &lt;&lt; endl;</span><br><span class="line">cout &lt;&lt; &amp; (*instlazy) &lt;&lt; <span class="string">&quot;  &quot;</span> &lt;&lt; &amp; (*instlazy1) &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220701132606657.png" alt="image-20220701132606657"></p>
+<h3 id="懒汉模式存在的问题"><a href="#懒汉模式存在的问题" class="headerlink" title="懒汉模式存在的问题"></a>懒汉模式存在的问题</h3><p>在懒汉式的单例类中，其实有两个状态，单例未初始化和单例已经初始化。假设单例还未初始化，有两个线程同时调用GetInstance方法，这时执行 m_pInstance == NULL 肯定为真，然后两个线程都初始化一个单例，最后得到的指针并不是指向同一个地方，不满足单例类的定义了，所以懒汉式的写法会出现线程安全的问题！在多线程环境下，要对其进行修改。</p>
+<h2 id="深入的理解懒汉和饿汉"><a href="#深入的理解懒汉和饿汉" class="headerlink" title="深入的理解懒汉和饿汉"></a>深入的理解懒汉和饿汉</h2><p>其实就是看定义的事静态成员对象变量还是静态成员对象指针变量，因为如果定义了静态成员对象变量，程序在运行之初已经分配了空间，就要调用构造函数了，而你在调用getinstance的时候，不会再调用构造函数了，因为之前已经调用过了，你就是用的现成的，就是所谓的饿汉模式，上来先把吃的准备好了，因为饿怕了，怕后期准备会挨饿。</p>
+<p>而定义了静态成员对象指针变量，程序运行之初也会分配空间，但是那个是指针的空间，而不是对象的空间，所以不会调用对象的构造函数，而只有调用getinstance进行new操作的时候，才会对其调用构造函数，就是现上轿现扎耳朵眼，比较懒惰，所以叫懒汉模式。</p>
+<h2 id="线程安全的懒汉模式"><a href="#线程安全的懒汉模式" class="headerlink" title="线程安全的懒汉模式"></a>线程安全的懒汉模式</h2><p>使用double-check来保证不会每次进来都去获取锁，来提高性能，先判断不为空的话，直接返回了数据。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Singleton</span>  </span><br><span class="line">&#123;  </span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">    <span class="type">static</span> Singleton* m_instance;  </span><br><span class="line">    <span class="built_in">Singleton</span>()&#123;&#125;  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">    <span class="function"><span class="type">static</span> Singleton* <span class="title">getInstance</span><span class="params">()</span></span>;  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line"><span class="function">Singleton* <span class="title">Singleton::getInstance</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"></span>&#123;  </span><br><span class="line">    <span class="keyword">if</span>(<span class="literal">NULL</span> == m_instance)  </span><br><span class="line">    &#123;  </span><br><span class="line">        <span class="built_in">Lock</span>();<span class="comment">//借用其它类来实现，如boost  </span></span><br><span class="line">        <span class="keyword">if</span>(<span class="literal">NULL</span> == m_instance)  </span><br><span class="line">        &#123;  </span><br><span class="line">            m_instance = <span class="keyword">new</span> Singleton;  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="built_in">UnLock</span>();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> m_instance;  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h2 id="面试单例代码"><a href="#面试单例代码" class="headerlink" title="面试单例代码"></a>面试单例代码</h2><p>最后是面试的简单单例代码，用C11饿汉实现哦！</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">singletonPractice</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> singletonPractice* <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="type">static</span> singletonPractice m_instance;</span><br><span class="line">        <span class="keyword">return</span> &amp;m_instance;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">singletonPractice</span>(<span class="type">const</span> singletonPractice&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    singletonPractice&amp; <span class="keyword">operator</span>=(<span class="type">const</span> singletonPractice&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">singletonPractice</span>()&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    singletonPractice* in1 = singletonPractice:: <span class="built_in">getInstance</span>();</span><br><span class="line">    singletonPractice* in2 = singletonPractice:: <span class="built_in">getInstance</span>();</span><br><span class="line">    cout &lt;&lt; &amp;(*in1) &lt;&lt; <span class="string">&quot;   &quot;</span> &lt;&lt; &amp;(*in2) &lt;&lt; endl;</span><br><span class="line">    <span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>参考资料：<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhanghuaichao/article/details/79459130">https://blog.csdn.net/zhanghuaichao/article/details/79459130</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/8oZT_4AOzjSOkBP9EvSPoA">https://mp.weixin.qq.com/s/8oZT_4AOzjSOkBP9EvSPoA</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" title="单例模式|一文搞懂单例模式！" target="_blank" rel="external">http://icecorn.github.io/2022/06/29/设计模式/一文搞定单例模式/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2022/06/19/Games-104/Games104--%E6%B8%B2%E6%9F%93%E7%B3%BB%E7%BB%9F-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%90%8E%E5%A4%84%E7%90%86%E7%AD%897/" title="Games-104|第七课-渲染管线-后处理-其他渲染知识"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
