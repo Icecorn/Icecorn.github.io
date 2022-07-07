@@ -17,26 +17,22 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>Linux高性能服务器|第1-3章-计算机网络部分 | Blog of Icecorn</title>
-  <meta name="description" content="第一章 TCP&#x2F;IP协议族TCP&#x2F;IP协议族体系结构和主要协议协议族中协议众多, 这本书只选取了IP和TCP协议 - 对网络编程影响最直接  同样七层是osi参考模型, 简化后得到四层不同层次之间, 通过接口互相交流, 这样方便了各层次的修改 应用层负责处理应用程序的逻辑 表示层定义了数据的格式及加密 会话层它定义了如何开始、控制和结束一个会话，包括对多个双向消息的控制和管理，以便在只完成连续消息">
+  <title>算法系列（三）|分治法 | Blog of Icecorn</title>
+  <meta name="description" content="分治算法详解算法思想分治发的基本思想是自上而下的去处理问题，将一个复杂问题分成一些子问题分解成规模较小的问题处理。本质就是先分，再治，至于算法的时间复杂度可以通过主定理求解，暂不叙述  divide  解题时找到divide的方式后，不要考虑太多，比如说处理一个字符串s，我们第一步将它分成left和right两段，那么就相当于我们有了left和right两个字串的求解结果，直接用就行，这样依次di">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux高性能服务器|第1-3章-计算机网络部分">
-<meta property="og:url" content="http://icecorn.github.io/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/index.html">
+<meta property="og:title" content="算法系列（三）|分治法">
+<meta property="og:url" content="http://icecorn.github.io/2022/06/27/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%E5%88%86%E6%B2%BB/index.html">
 <meta property="og:site_name" content="Blog of Icecorn">
-<meta property="og:description" content="第一章 TCP&#x2F;IP协议族TCP&#x2F;IP协议族体系结构和主要协议协议族中协议众多, 这本书只选取了IP和TCP协议 - 对网络编程影响最直接  同样七层是osi参考模型, 简化后得到四层不同层次之间, 通过接口互相交流, 这样方便了各层次的修改 应用层负责处理应用程序的逻辑 表示层定义了数据的格式及加密 会话层它定义了如何开始、控制和结束一个会话，包括对多个双向消息的控制和管理，以便在只完成连续消息">
+<meta property="og:description" content="分治算法详解算法思想分治发的基本思想是自上而下的去处理问题，将一个复杂问题分成一些子问题分解成规模较小的问题处理。本质就是先分，再治，至于算法的时间复杂度可以通过主定理求解，暂不叙述  divide  解题时找到divide的方式后，不要考虑太多，比如说处理一个字符串s，我们第一步将它分成left和right两段，那么就相当于我们有了left和right两个字串的求解结果，直接用就行，这样依次di">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%9B%9B%E5%B1%82%E7%BB%93%E6%9E%84.jpg">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%90%BA%E5%B8%A6ICMP%E6%8A%A5%E6%96%87%E7%9A%84IP%E6%95%B0%E6%8D%AE%E6%8A%A5%E8%A2%AB%E5%88%86%E7%89%87.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E8%B7%AF%E7%94%B1%E6%9C%BA%E5%88%B6.png">
-<meta property="article:published_time" content="2022-04-27T09:25:10.000Z">
-<meta property="article:modified_time" content="2022-06-29T15:22:52.187Z">
+<meta property="article:published_time" content="2022-06-27T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-07-07T14:56:51.500Z">
 <meta property="article:author" content="Icecorn">
-<meta property="article:tag" content="计算机网络">
-<meta property="article:tag" content="Linux高性能服务器">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="divide&amp;conquer">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%9B%9B%E5%B1%82%E7%BB%93%E6%9E%84.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://icecorn.github.io/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/index.html">
+  <link rel="canonical" href="http://icecorn.github.io/2022/06/27/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%E5%88%86%E6%B2%BB/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
   
@@ -310,21 +306,21 @@
   <div class="slimContent">
     <nav id="toc" class="article-toc">
       <h3 class="toc-title">Catalogue</h3>
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0-TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F"><span class="toc-number">1.</span> <span class="toc-text">第一章 TCP&#x2F;IP协议族</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TCP-IP%E5%8D%8F%E8%AE%AE%E6%97%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%92%8C%E4%B8%BB%E8%A6%81%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.1.</span> <span class="toc-text">TCP&#x2F;IP协议族体系结构和主要协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0-IP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-number">2.</span> <span class="toc-text">第二章 IP协议详解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E7%AB%A0-TCP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3"><span class="toc-number">3.</span> <span class="toc-text">第三章 TCP协议详解</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.</span> <span class="toc-text">分治算法详解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3"><span class="toc-number">1.1.</span> <span class="toc-text">算法思想</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="toc-number">1.2.</span> <span class="toc-text">归并排序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A8%E8%BE%BE%E5%BC%8F%E9%97%AE%E9%A2%98"><span class="toc-number">1.3.</span> <span class="toc-text">表达式问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B3%E9%9D%A2%E7%82%B9%E9%9B%86%E6%9C%80%E7%9F%AD%E8%B7%9D%E7%A6%BB%E9%97%AE%E9%A2%98"><span class="toc-number">1.4.</span> <span class="toc-text">平面点集最短距离问题</span></a></li></ol></li></ol>
     </nav>
   </div>
 </aside>
 
 <main class="main" role="main">
   <div class="content">
-  <article id="post-Linux高性能服务器/Linux高性能服务器-计网部分-1-3章" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+  <article id="post-算法/算法系列（三）分治" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
     <div class="article-header">
       
         
   
     <h1 class="article-title" itemprop="name">
-      Linux高性能服务器|第1-3章-计算机网络部分
+      算法系列（三）|分治法
     </h1>
   
 
@@ -332,20 +328,20 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/" class="article-date">
-	  <time datetime="2022-04-27T09:25:10.000Z" itemprop="datePublished">2022-04-27</time>
+	<a href="/2022/06/27/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%E5%88%86%E6%B2%BB/" class="article-date">
+	  <time datetime="2022-06-27T09:25:10.000Z" itemprop="datePublished">2022-06-27</time>
 	</a>
 </span>
         
   <span class="article-category">
     <i class="icon icon-folder"></i>
-    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
   </span>
 
         
   <span class="article-tag">
     <i class="icon icon-tags"></i>
-	<a class="article-tag-link-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a>, <a class="article-tag-link-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a>
+	<a class="article-tag-link-link" href="/tags/divide-conquer/" rel="tag">divide&conquer</a>, <a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
   </span>
 
 
@@ -358,67 +354,64 @@
 	</span>
 
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/#comments" class="article-comment-link">Comments</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/06/27/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%E5%88%86%E6%B2%BB/#comments" class="article-comment-link">Comments</a></span>
         
 	
-		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 1.8k(words)</span>
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 1.1k(words)</span>
 	
 	
-		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 6(minutes)</span>
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 5(minutes)</span>
 	
 
       </div>
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <h2 id="第一章-TCP-IP协议族"><a href="#第一章-TCP-IP协议族" class="headerlink" title="第一章 TCP/IP协议族"></a>第一章 TCP/IP协议族</h2><h3 id="TCP-IP协议族体系结构和主要协议"><a href="#TCP-IP协议族体系结构和主要协议" class="headerlink" title="TCP/IP协议族体系结构和主要协议"></a>TCP/IP协议族体系结构和主要协议</h3><p>协议族中协议众多, 这本书只选取了IP和TCP协议 - 对网络编程影响最直接</p>
-<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%9B%9B%E5%B1%82%E7%BB%93%E6%9E%84.jpg"></p>
-<p>同样七层是osi参考模型, 简化后得到四层<br>不同层次之间, 通过接口互相交流, 这样方便了各层次的修改</p>
-<p><strong>应用层</strong><br>负责处理应用程序的逻辑</p>
-<p><strong>表示层</strong><br>定义了数据的格式及加密</p>
-<p><strong>会话层</strong><br>它定义了如何开始、控制和结束一个会话，包括对多个双向消息的控制和管理，以便在只完成连续消息的一部分时可以通知应用，从而使表示层看到的数据是连续的</p>
-<p><strong>传输层</strong><br>为两台主机的应用提供端到端(end to end)的通信. 与网络层使用的下一跳不同, 他只关心起始和终止, 中转过程交给下层处理.<br>此层存在两大协议TCP协议和UDP协议<br>TCP协议(Transmission Control Protocol 传输控制协议)</p>
+        <h1 id="分治算法详解"><a href="#分治算法详解" class="headerlink" title="分治算法详解"></a>分治算法详解</h1><h2 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h2><p>分治发的基本思想是自上而下的去处理问题，将一个复杂问题分成一些子问题分解成规模较小的问题处理。<strong>本质就是先分，再治</strong>，至于算法的时间复杂度可以通过<strong>主定理</strong>求解，暂不叙述</p>
 <ul>
-<li>为应用层提供<code>可靠的, 面向连接, 基于流的服务</code></li>
-<li>通过<code>超时重传</code>和<code>数据确认</code>等确保数据正常送达.</li>
-<li>TCP需要存储一些必要的状态, 连接的状态, 读写缓冲区, 诸多定时器<br>UPD协议(User Datagram Protocol 用户数据报协议)</li>
-<li>为应用层提供<code>不可靠的, 无连接的, 基于数据报的服务</code></li>
-<li>一般需要自己处理<code>数据确认</code>和<code>超时重传</code>的问题</li>
-<li>通信两者不存储状态, 每次发送都需要指定地址信息. <code>有自己的长度</code></li>
-</ul>
-<p><strong>网络层</strong><br>实现了数据包的选路和转发.  只有数据包到不了目标地址, 就<code>下一跳</code>(hop by hop), 选择最近的.<br><em>IP协议(Internet Protocol)</em> 以及 <em>ICMP协议(Internet Control Message Protocol)</em><br>后者协议是IP协议的补充, 用来检测网络连接 1. 差错报文, 用来回应状态 2. 查询报文(ping程序就是使用的此报文来判断信息是否送达)</p>
-<p><strong>数据链路层</strong><br>实现了网卡接口的网络驱动程序. 这里驱动程序方便了厂商的下层修改, 只需要向上层提供规定的接口即可.<br>存在两个协议 <em>ARP协议(Address Resolve Protocol, 地址解析协议)</em>. 还有<em>RARP(Reverse ~, 逆地址解析协议)</em>.  由于网络层使用IP地址寻址机器, 但是数据链路层使用物理地址(通常为MAC地址), 之间的转化涉及到ARP协议<em>ARP欺骗, 可能与这个有关, 目前不去学习</em></p>
-<p><strong>封装</strong><br>上层协议发送到下层协议. 通过封装实现, 层与层之间传输的时候, 加上自己的头部信息.<br>被TCP封装的数据成为 <code>TCP报文段</code></p>
+<li><p>divide </p>
+<p>解题时找到divide的方式后，不要考虑太多，比如说处理一个字符串s，我们第一步将它分成left和right两段，那么就相当于我们有了left和right两个字串的求解结果，直接用就行，这样依次divide直到划分到最小为止<strong>（常常可以结合二分和dfs）</strong></p>
+</li>
+<li><p>conquer</p>
+<p>分完之后就要治了，考虑两个方面</p>
 <ul>
-<li>内核部分发送成功后删除数据</li>
+<li>其一是有了左右两个结果，怎么通过这两个来得到当前（最终）的结果</li>
+<li>其二是考虑边界情况，分到最小粒度了，有没有特殊处理</li>
 </ul>
-<p>被UDP封装的数据成为 <code>UDP数据报</code></p>
-<ul>
-<li>发送后即删除</li>
+</li>
 </ul>
-<p>再经IP封装后成为<code>IP数据报</code><br>最后经过数据链路层封装后为 <code>帧</code></p>
-<p>以太网最大数据帧1518字节 抛去14头部 帧尾4校验<br>MTU: 帧的最大传输单元 一般为1500字节<br>MSS: TCP数据包最大的数据载量 1460字节 = 1500字节 - 20Ip头-20TCP头 还有额外的40字节可选部分</p>
-<p><strong>ARP</strong><br>ARP协议能实现任意网络层地址到任意物理地址的转换</p>
-<h2 id="第二章-IP协议详解"><a href="#第二章-IP协议详解" class="headerlink" title="第二章 IP协议详解"></a>第二章 IP协议详解</h2><p>IP协议是TCP/IP协议簇的核心协议, 是socket网络编程的基础之一<br>IP协议为上层协议提供无状态, 无连接, 不可靠的服务</p>
-<p>IP数据报最大长度是65535(2^16 - 1)字节, 但是有MTU的限制</p>
-<p>当IP数据报的长度超过MTU 将会被分片传输. 分片可能发生在发送端, 也可能发生在中转路由器, 还可能被多次分片. 只有在最终的目标机器上, 这些分片才会被内核中的ip模块重新组装</p>
-<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%90%BA%E5%B8%A6ICMP%E6%8A%A5%E6%96%87%E7%9A%84IP%E6%95%B0%E6%8D%AE%E6%8A%A5%E8%A2%AB%E5%88%86%E7%89%87.png"></p>
-<p>路由机制</p>
-<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E8%B7%AF%E7%94%B1%E6%9C%BA%E5%88%B6.png"></p>
-<p>给定了目标IP地址后, 将会匹配路由表中的哪一项呢? 分三个步骤</p>
-<ul>
-<li>查找路由表中和数据报的目标IP地址完全匹配的主机IP地址. 如果找到就使用该路由项. 否则下一步</li>
-<li>查找路由表中和数据报的目标IP地址具有相同网路ID的网络IP地址 找到……. 否则下一步</li>
-<li>选择默认路由项, 通常意味着下一跳路由是网关</li>
-</ul>
-<h2 id="第三章-TCP协议详解"><a href="#第三章-TCP协议详解" class="headerlink" title="第三章 TCP协议详解"></a>第三章 TCP协议详解</h2><p>Tcp读写都是针对缓冲区来说, 所以没有固定的读写次数对应关系.</p>
-<p>UDP没有缓冲区, 必须及时接受数据否则会丢包, 或者接收缓冲区过小就会造成数据报截断</p>
-<p>ISN-初始序号值<br>32位序号 后续的TCP报文段中序号值 seq = ISN + 报文段首字节在整个字节流中的偏移<br>32位确认号 收到的TCP报文序号值+1. 这个32位确认号每次发送的是上一次的应答</p>
-<p>ACK标志: 表示确认号是否有效. 携带ACK标志的报文段称为<code>确认报文段</code><br>PSH标志: 提示接收端应用程序从TCP接受缓冲区中读走数据, 为后续数据腾出空间<br>RST标志: 要求对方重新建立连接 携带……<code>复位报文段</code><br>SYN标志: 标志请求建立一个连接 携带……<code>同步报文段</code><br>FIN标志: 通知对方本端连接要关闭了, 携带..<code>结束报文段</code></p>
-<p>16位窗口大小: 窗口指的是接收通告窗口, 告诉对方本端的TCP 接收缓冲区还能容纳多少字节的数据<br>16位校验和: <code>可靠传输的重要保障</code>发送端填充, 接收端执行CRC算法校验是否损坏, 同时校验<code>TCP头部</code>和<code>数据部分</code></p>
-<p><strong>TCP连接的建立和关闭</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"># 三次握手</span><br><span class="line"># 客户端发送请求连接 ISN=seq + 0 = 3683340920</span><br><span class="line"># mss 最大数据载量1460</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [S], seq 3683340920, win 64240, </span><br><span class="line">options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0</span><br><span class="line"></span><br><span class="line"># 同意客户端连接</span><br><span class="line"># ack = 客户端发送 seq + 1</span><br><span class="line"># 同时发送服务端的seq</span><br><span class="line">IP ubuntu.8000 &gt; 192.168.80.1.7467: </span><br><span class="line">Flags [S.], seq 938535101, ack 3683340921, win 64240, </span><br><span class="line">options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0</span><br><span class="line"></span><br><span class="line"># 虽然这个报文段没有字节 但由于是同步报文段 需要占用一个序号值</span><br><span class="line"># 这里是tcpdump的处理 ack显示相对值 即 3683340921 - 3683340920 = 1</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [.], ack 938535102, win 4106, length 0</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 包含FIN标志 说明要求结束连接 也需要占用一个序号值</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [F.], seq 1, ack 1, win 4106, length 0</span><br><span class="line"></span><br><span class="line"># 服务端确认关闭连接</span><br><span class="line">IP ubuntu.8000 &gt; 192.168.80.1.7467: </span><br><span class="line">Flags [.], ack 2, win 502, length 0</span><br><span class="line"></span><br><span class="line"># 服务端发送关闭连接</span><br><span class="line">IP ubuntu.8000 &gt; 192.168.80.1.7467: </span><br><span class="line">Flags [F.], seq 1, ack 2, win 4105, length 0</span><br><span class="line"></span><br><span class="line"># 客户端确认</span><br><span class="line">IP 192.168.80.1.7467 &gt; ubuntu.8000: </span><br><span class="line">Flags [.], ack 2, win 503, length 0</span><br></pre></td></tr></table></figure>
+<p><strong>总结起来就一句话，画图求解和dfs一样直接干，不要想太多，你的脑袋才能压几个栈啊！</strong></p>
+<hr>
+<h2 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h2><p>归并排序就是经典的分治问题：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_35344198/article/details/106857042">https://blog.csdn.net/qq_35344198/article/details/106857042</a></p>
+<p>利用二分进行divide，conquer时注意细节即可</p>
+<p>需要注意的是归并排序空间复杂度是O（n）的，需要开辟一个与原数组等长的数组</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge_sort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums, <span class="type">int</span> l, <span class="type">int</span> r, vector&lt;<span class="type">int</span>&gt;&amp; temp)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (l + <span class="number">1</span> &gt;= r) &#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// divide</span></span><br><span class="line">	<span class="type">int</span> m = l + (r - l) / <span class="number">2</span>;</span><br><span class="line">	<span class="built_in">merge_sort</span>(nums, l, m, temp);</span><br><span class="line">    <span class="built_in">merge_sort</span>(nums, m, r, temp);</span><br><span class="line">	<span class="comment">// conquer</span></span><br><span class="line">	<span class="type">int</span> p = l, q = m, i = l;</span><br><span class="line">	<span class="keyword">while</span> (i&lt;=r) &#123;</span><br><span class="line">		<span class="keyword">if</span> (q &gt;= r || (p &lt; m &amp;&amp; nums[p] &lt;= nums[q])) &#123;</span><br><span class="line">			temp[i++] = nums[p++];</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			temp[i++] = nums[q++];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (i = l; i &lt; r; ++i) &#123;</span><br><span class="line">		nums[i] = temp[i];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<hr>
+<h2 id="表达式问题"><a href="#表达式问题" class="headerlink" title="表达式问题"></a>表达式问题</h2><p>Lc-241</p>
+<p>这种问题一般是给一个字符串，有各种算式，问你加括号的方式有多少种。我们可以以每个算符作为分割点进行divide，算出左右两边的值的个数，然后在conquer</p>
+<p>这里要注意的是，分到最小粒度的时候我们直接把它作为结果存进去</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    </span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">diffWaysToCompute</span><span class="params">(string expression)</span> </span>&#123;</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt; res;</span><br><span class="line">        <span class="type">int</span> n = expression.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;n;++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(expression[i]==<span class="string">&#x27;+&#x27;</span>||expression[i]==<span class="string">&#x27;-&#x27;</span>||expression[i]==<span class="string">&#x27;*&#x27;</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                vector&lt;<span class="type">int</span>&gt; left = <span class="built_in">diffWaysToCompute</span>(expression.<span class="built_in">substr</span>(<span class="number">0</span>,i));</span><br><span class="line">                vector&lt;<span class="type">int</span>&gt; right = <span class="built_in">diffWaysToCompute</span>(expression.<span class="built_in">substr</span>(i+<span class="number">1</span>));</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">auto</span> l:left)</span><br><span class="line">                    <span class="keyword">for</span>(<span class="keyword">auto</span> r:right)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="type">char</span> c = expression[i];</span><br><span class="line">                        <span class="keyword">switch</span>(c)</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="keyword">case</span> <span class="string">&#x27;+&#x27;</span>: res.<span class="built_in">push_back</span>(l+r);<span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="string">&#x27;-&#x27;</span>: res.<span class="built_in">push_back</span>(l-r);<span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="string">&#x27;*&#x27;</span>: res.<span class="built_in">push_back</span>(l*r);<span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(res.<span class="built_in">empty</span>())&#123;</span><br><span class="line">            res.<span class="built_in">push_back</span>(<span class="built_in">stoi</span>(expression));</span><br><span class="line">        &#125;    </span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>当然因为在递归过程中我们有很多重复计算，可以使用记忆化搜索来优化一下：<br>实际上就是用一个hashmap来记录当前字符串s的返回结果</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    unordered_map&lt;string,vector&lt;<span class="type">int</span>&gt;&gt; memo;</span><br><span class="line">    <span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">diffWaysToCompute</span><span class="params">(string expression)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(memo.<span class="built_in">find</span>(expression)!=memo.<span class="built_in">end</span>()) <span class="keyword">return</span> memo[expression];</span><br><span class="line">        vector&lt;<span class="type">int</span>&gt; res;</span><br><span class="line">        <span class="type">int</span> n = expression.<span class="built_in">size</span>();</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;n;++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(expression[i]==<span class="string">&#x27;+&#x27;</span>||expression[i]==<span class="string">&#x27;-&#x27;</span>||expression[i]==<span class="string">&#x27;*&#x27;</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                vector&lt;<span class="type">int</span>&gt; left = <span class="built_in">diffWaysToCompute</span>(expression.<span class="built_in">substr</span>(<span class="number">0</span>,i));</span><br><span class="line">                vector&lt;<span class="type">int</span>&gt; right = <span class="built_in">diffWaysToCompute</span>(expression.<span class="built_in">substr</span>(i+<span class="number">1</span>));</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">auto</span> l:left)</span><br><span class="line">                    <span class="keyword">for</span>(<span class="keyword">auto</span> r:right)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="type">char</span> c = expression[i];</span><br><span class="line">                        <span class="keyword">switch</span>(c)</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="keyword">case</span> <span class="string">&#x27;+&#x27;</span>: res.<span class="built_in">push_back</span>(l+r);<span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="string">&#x27;-&#x27;</span>: res.<span class="built_in">push_back</span>(l-r);<span class="keyword">break</span>;</span><br><span class="line">                            <span class="keyword">case</span> <span class="string">&#x27;*&#x27;</span>: res.<span class="built_in">push_back</span>(l*r);<span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(res.<span class="built_in">empty</span>())&#123;</span><br><span class="line">            res.<span class="built_in">push_back</span>(<span class="built_in">stoi</span>(expression));</span><br><span class="line">        &#125;    </span><br><span class="line">        memo[expression] = res;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="平面点集最短距离问题"><a href="#平面点集最短距离问题" class="headerlink" title="平面点集最短距离问题"></a>平面点集最短距离问题</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44772995/article/details/93749863">https://blog.csdn.net/weixin_44772995/article/details/93749863</a></p>
+<blockquote>
+<p>题目描述<br>有一天，小明得到了二维平面上的若干个点，他现在想知道这些点中距离最近的两个点之间的距离是多少？</p>
+</blockquote>
+<blockquote>
+<p>输入<br>第一行输入一个整数T，共有T组测试数据（T&lt;=30)。<br>每组输入数据第一行输入一个n，表示有n个点。第二行有n*2的数字，相邻两个数代表一个点的x,y坐标。<br>1&lt;n&lt;=100, -100000000=&lt;x,y&lt;=100000000</p>
+</blockquote>
+<blockquote>
+<p>输出<br>输出有T行，每行包括一个整数，代表所有距离的最小值（因为小明不在意小数，所以结果向下取整）。</p>
+</blockquote>
+<blockquote>
+<p>样例输入 Copy<br>2<br>2<br>0 0 1 1<br>2<br>0 0 100000000 100000000<br>样例输出 Copy<br>1<br>141421356</p>
+</blockquote>
+<p>核心思路就是分治，divide使用二分法，conquer的技巧在于分割线两边的点之间的距离，另外还要注意的事划分到最小粒度是一边只有两个点或三个点</p>
 
       
     </div>
@@ -428,7 +421,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://icecorn.github.io/2022/04/27/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8-%E8%AE%A1%E7%BD%91%E9%83%A8%E5%88%86-1-3%E7%AB%A0/" title="Linux高性能服务器|第1-3章-计算机网络部分" target="_blank" rel="external">http://icecorn.github.io/2022/04/27/Linux高性能服务器/Linux高性能服务器-计网部分-1-3章/</a>
+      <a href="http://icecorn.github.io/2022/06/27/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%89%EF%BC%89%E5%88%86%E6%B2%BB/" title="算法系列（三）|分治法" target="_blank" rel="external">http://icecorn.github.io/2022/06/27/算法/算法系列（三）分治/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -475,12 +468,12 @@
   <ul class="pager pull-left">
     
     <li class="prev">
-      <a href="/2022/04/30/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%BA%94%E7%AB%A0-Linux%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80API/" title="Linux高性能服务器|第五章-Linux网络编程基础API"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+      <a href="/2022/06/29/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E4%B8%80%E6%96%87%E6%90%9E%E5%AE%9A%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" title="单例模式|一文搞懂单例模式！"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
     </li>
     
     
     <li class="next">
-      <a href="/2022/04/16/C++%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/%E7%AC%AC%E5%9B%9B%E8%AE%B2-%E5%85%B6%E4%BB%96%E5%86%85%E5%AE%B9/" title="C++内存管理机制|第四讲-分配器/new&amp;delete"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2022/06/25/%E7%AE%97%E6%B3%95/%E7%AE%97%E7%84%B6%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%8C%EF%BC%89%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" title="算法系列（二）|动态规划专题"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     
