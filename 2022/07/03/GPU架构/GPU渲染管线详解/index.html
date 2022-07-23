@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>GPU架构|GPU渲染管线详解 | Blog of Icecorn</title>
+  <meta name="description" content="GPU渲染管线详解顶点和片元着色器想必大家已然十分熟悉，但它们之间各种弯弯绕绕的固定管线操作，由于一直被GPU所承包，我们反倒陌生了起来。本文将以三角形的第一人称视角展开叙述，让读者更加沉浸式地踏上GPU这片土地，希望大家看得开心~ Ⅰ 从CPU到GPU：来自异世界的召唤从硬盘到显存：在故土的最后时光我，是一个三角形，跟周围成千上万个三角形没有什么不同。可能跟你们熟悉的世界不太一样，我们虽然都拥有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GPU架构|GPU渲染管线详解">
+<meta property="og:url" content="http://icecorn.github.io/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="GPU渲染管线详解顶点和片元着色器想必大家已然十分熟悉，但它们之间各种弯弯绕绕的固定管线操作，由于一直被GPU所承包，我们反倒陌生了起来。本文将以三角形的第一人称视角展开叙述，让读者更加沉浸式地踏上GPU这片土地，希望大家看得开心~ Ⅰ 从CPU到GPU：来自异世界的召唤从硬盘到显存：在故土的最后时光我，是一个三角形，跟周围成千上万个三角形没有什么不同。可能跟你们熟悉的世界不太一样，我们虽然都拥有">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1207f575b64a008e909658c8cf391488_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-6cbf847e12f18647edf329a866ac2700_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-377b734519bbf9484369d25a88dff10c_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-e4849ee7e591fd7821bc70b79f771dd0_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-ec9602e257abaf1a67d10a20c16b7e2e_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-85750a54bd8654c5a4778c6403484c4c_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-9748f581381396a4b061eab364f4d41e_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1ff785a541a2692cba1c53938c5d1d34_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-d10d5ac52530495a36fb46e3e7c972d0_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-f7f622e9b67a913784cb936397331811_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-47f66da373b0c96ec79e494671c82ef5_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/equation">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-8684905909ad2dd3f28df3fe9df02ad1_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-b63ee123780bbd1875cdcbc7665f74d0_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-5382bb711de5d04142963797cb4e55bc_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1ddda400bedd04459378f2b162f352d0_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710164101565.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710164135665.png">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=-+%5Cleft(+p_%7B1y%7D+-+p_%7B0y%7D++%5Cright)x+++%5Cleft(p_%7B1x%7D+-+p_%7B0x%7D+%5Cright)y+-+%5Cleft(+p_%7B1y%7D+++p_%7B0y%7D++%5Cright)p_%7B0x%7D+-+%5Cleft(p_%7B1x%7D+-+p_%7B0x%7D+%5Cright)p_%7B0y%7D=+0">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=e_%7B2%7D%5Cleft(+x,y+%5Cright)+=+a_%7B2%7Dx+++b_%7B2%7Dy++++c_%7B2%7D">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=e_%7B2%7D%5Cleft(+x,y+%5Cright)+=+0">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-e634c3130f1fb6508e769d051763a914_720w.jpg">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=e%5Cleft(+x+1,y+%5Cright)=a(x+1)+++by+++c+=+a+ax++by+++c=a++e%5Cleft(+x,y+%5Cright)">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1b68a07a9d1af32bb6ff04ebd71daaea_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-21f937a7c38881bf23431407fa80619c_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-d35a659a860aacecba7aa02ecf459d60_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-6366c72ad7da0102d4d0eedf04ad5fdb_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-f7c2e3e65d090dccc3b25f77f673bdcf_720w.jpg">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=a%5Cleft(+u,v+%5Cright)+=+%5Cleft(1-+u+-+v+%5Cright)a_0+ua_1+va_2">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-0d9ef4134bfc2fd32fd2791a6fbbb417_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710174245566.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-a0ee912e6a9b1af49f113d3c9543c332_720w.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710174335142.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-d9789027b8ac208100e0b2ae8cfb6254_720w.jpg">
+<meta property="article:published_time" content="2022-07-03T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-07-23T02:36:34.993Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="GPU渲染管线">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1207f575b64a008e909658c8cf391488_720w.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/C/">C++</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/C/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">25</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GPU%E6%9E%B6%E6%9E%84/" rel="tag">GPU架构</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">GPU渲染管线</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-104/" rel="tag">Games-104</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PBR%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">PBR渲染管线</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/divide-conquer/" rel="tag">divide&conquer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openGL/" rel="tag">openGL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shader/" rel="tag">shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" rel="tag">单例模式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" rel="tag">图形学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.33px;">C++内存管理机制</a> <a href="/tags/GPU%E6%9E%B6%E6%9E%84/" style="font-size: 13.17px;">GPU架构</a> <a href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" style="font-size: 13px;">GPU渲染管线</a> <a href="/tags/Games-101/" style="font-size: 13.17px;">Games-101</a> <a href="/tags/Games-104/" style="font-size: 13.5px;">Games-104</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.83px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/PBR%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" style="font-size: 13px;">PBR渲染管线</a> <a href="/tags/Rasterizer/" style="font-size: 13.17px;">Rasterizer</a> <a href="/tags/divide-conquer/" style="font-size: 13px;">divide&conquer</a> <a href="/tags/openGL/" style="font-size: 13px;">openGL</a> <a href="/tags/shader/" style="font-size: 13px;">shader</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.33px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" style="font-size: 13px;">动态规划</a> <a href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" style="font-size: 13px;">单例模式</a> <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" style="font-size: 13px;">图形学</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%8E%92%E5%BA%8F/" style="font-size: 13px;">排序</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" style="font-size: 13.5px;">游戏引擎</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.67px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">July 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/" class="title">图形学常见问题指针</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-05T09:25:10.000Z" itemprop="datePublished">2022-07-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/04/%E5%9B%BE%E5%BD%A2%E5%AD%A6/PBR%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" class="title">PBR渲染管线详解</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-04T09:25:10.000Z" itemprop="datePublished">2022-07-04</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" class="title">GPU架构|GPU渲染管线详解</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-03T09:25:10.000Z" itemprop="datePublished">2022-07-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/02/GPU%E6%9E%B6%E6%9E%84/GPU%E6%9E%B6%E6%9E%84%E7%B3%BB%E5%88%97(%E4%BA%8C%EF%BC%89Fermi%E6%9E%B6%E6%9E%84/" class="title">GPU架构（二）|Fermi架构</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-02T09:25:10.000Z" itemprop="datePublished">2022-07-02</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/01/GPU%E6%9E%B6%E6%9E%84/GPU%E6%9E%B6%E6%9E%84%E7%B3%BB%E5%88%97(%E4%B8%80)%20Tesla%E6%9E%B6%E6%9E%84/" class="title">GPU架构（一）|Tesla架构</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-01T09:25:10.000Z" itemprop="datePublished">2022-07-01</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.</span> <span class="toc-text">GPU渲染管线详解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%85%A0-%E4%BB%8ECPU%E5%88%B0GPU%EF%BC%9A%E6%9D%A5%E8%87%AA%E5%BC%82%E4%B8%96%E7%95%8C%E7%9A%84%E5%8F%AC%E5%94%A4"><span class="toc-number">1.1.</span> <span class="toc-text">Ⅰ 从CPU到GPU：来自异世界的召唤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E7%A1%AC%E7%9B%98%E5%88%B0%E6%98%BE%E5%AD%98%EF%BC%9A%E5%9C%A8%E6%95%85%E5%9C%9F%E7%9A%84%E6%9C%80%E5%90%8E%E6%97%B6%E5%85%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">从硬盘到显存：在故土的最后时光</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E5%9B%BE%E5%BD%A2API%E5%88%B0GPU%E6%8C%87%E4%BB%A4%EF%BC%9A%E4%B8%80%E5%88%87%E7%BB%9D%E9%9D%9E%E5%81%B6%E7%84%B6"><span class="toc-number">1.1.2.</span> <span class="toc-text">从图形API到GPU指令：一切绝非偶然</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%BE%E5%85%83%E5%88%86%E5%8F%91%EF%BC%88Primitive-Distributor%EF%BC%89%EF%BC%9A%E5%A4%A7%E5%AE%B6%E6%97%8F%E7%9A%84%E7%93%A6%E8%A7%A3"><span class="toc-number">1.1.3.</span> <span class="toc-text">图元分发（Primitive Distributor）：大家族的瓦解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B6%E7%82%B9%E8%8E%B7%E5%8F%96%EF%BC%88Vertex-Fetch%EF%BC%89%EF%BC%9A%E7%81%B5%E9%AD%82%E9%9C%80%E8%A6%81%E5%AE%89%E6%81%AF%E4%B9%8B%E6%89%80"><span class="toc-number">1.1.4.</span> <span class="toc-text">顶点获取（Vertex Fetch）：灵魂需要安息之所</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%85%A1-%E5%87%A0%E4%BD%95%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%A4%A7%E7%81%BE%E5%8F%98%E5%89%8D%E7%9A%84%E7%8B%82%E6%AC%A2"><span class="toc-number">1.2.</span> <span class="toc-text">Ⅱ 几何阶段：大灾变前的狂欢</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B6%E7%82%B9%E7%9D%80%E8%89%B2%E5%99%A8%EF%BC%9A%E5%85%B1%E8%BF%9B%E9%80%80%E4%BD%86%E6%97%A0%E6%B3%95%E8%81%94%E7%B3%BB%E7%9A%84%E4%BC%99%E4%BC%B4"><span class="toc-number">1.2.1.</span> <span class="toc-text">顶点着色器：共进退但无法联系的伙伴</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TCS-Hull%EF%BC%9A%E8%A3%82%E5%8F%98%E5%89%8D%E7%9A%84%E6%9C%80%E5%90%8E%E6%8A%89%E6%8B%A9"><span class="toc-number">1.2.2.</span> <span class="toc-text">TCS&#x2F;Hull：裂变前的最后抉择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Tessellator%EF%BC%9A%E8%A3%82%E5%8F%98%E4%B9%8B%E6%89%80"><span class="toc-number">1.2.3.</span> <span class="toc-text">Tessellator：裂变之所</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TES-Domain%EF%BC%9A%E8%A3%82%E5%8F%98%E5%90%8E%E7%9A%84%E6%96%B0%E7%94%9F"><span class="toc-number">1.2.4.</span> <span class="toc-text">TES&#x2F;Domain：裂变后的新生</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%A0%E4%BD%95%E7%9D%80%E8%89%B2%E5%99%A8%EF%BC%9A%E8%87%AA%E7%94%B1%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="toc-number">1.2.5.</span> <span class="toc-text">几何着色器：自由的代价</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E8%BE%93%E5%87%BA%EF%BC%9A%E6%8F%90%E5%89%8D%E8%B7%91%E8%B7%AF"><span class="toc-number">1.2.6.</span> <span class="toc-text">流输出：提前跑路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A1%B6%E7%82%B9%E5%90%8E%E5%A4%84%E7%90%86%EF%BC%9A%E6%9C%80%E5%90%8E%E7%9A%84%E7%AD%9B%E9%80%89"><span class="toc-number">1.2.7.</span> <span class="toc-text">顶点后处理：最后的筛选</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%85%A2-%E5%85%89%E6%A0%85%E9%98%B6%E6%AE%B5%EF%BC%9A%E9%BB%91%E6%9A%97%E9%99%8D%E4%B8%B4"><span class="toc-number">1.3.</span> <span class="toc-text">Ⅲ 光栅阶段：黑暗降临</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Work-Distribution-Crossbar%EF%BC%9A%E5%85%89%E6%A0%85%E5%8C%96%E5%89%8D%E7%9A%84%E6%B4%97%E7%A4%BC"><span class="toc-number">1.3.1.</span> <span class="toc-text">Work Distribution Crossbar：光栅化前的洗礼</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%B9%E8%AE%BE%E7%BD%AE%EF%BC%88%E4%B8%89%E8%A7%92%E5%BD%A2%E8%AE%BE%E7%BD%AE1%EF%BC%89%EF%BC%9A%E8%A2%AB%E6%89%93%E4%B8%8A%E7%83%99%E5%8D%B0"><span class="toc-number">1.3.2.</span> <span class="toc-text">边设置（三角形设置1）：被打上烙印</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88%E4%B8%89%E8%A7%92%E5%BD%A2%E9%81%8D%E5%8E%86%EF%BC%89%EF%BC%9A%E7%B2%89%E8%BA%AB%E7%A2%8E%E9%AA%A8%E6%B5%91%E4%B8%8D%E6%80%95"><span class="toc-number">1.3.3.</span> <span class="toc-text">光栅化（三角形遍历）：粉身碎骨浑不怕</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Z-Cull%EF%BC%9A%E8%A2%AB%E6%8A%B9%E5%8E%BB%E7%9A%84%E5%AD%98%E5%9C%A8"><span class="toc-number">1.3.4.</span> <span class="toc-text">Z-Cull：被抹去的存在</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%85%A3-%E7%89%87%E5%85%83%E9%98%B6%E6%AE%B5%EF%BC%9A%E7%BE%8E%E4%B8%BD%E6%96%B0%E4%B8%96%E7%95%8C"><span class="toc-number">1.4.</span> <span class="toc-text">Ⅳ 片元阶段：美丽新世界</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B1%9E%E6%80%A7%E8%AE%BE%E7%BD%AE-%EF%BC%88%E4%B8%89%E8%A7%92%E5%BD%A2%E8%AE%BE%E7%BD%AE2%EF%BC%89%EF%BC%9A%E8%90%BD%E5%9C%B0%E7%94%9F%E6%A0%B9"><span class="toc-number">1.4.1.</span> <span class="toc-text">属性设置 （三角形设置2）：落地生根</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%89%87%E5%85%83%E7%9D%80%E8%89%B2%E5%99%A8%EF%BC%9A%E4%BB%BB%E5%8A%B3%E4%BB%BB%E6%80%A8"><span class="toc-number">1.4.2.</span> <span class="toc-text">片元着色器：任劳任怨</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ROP%EF%BC%9A%E9%A3%9E%E8%9B%BE%E6%89%91%E7%81%AB"><span class="toc-number">1.4.3.</span> <span class="toc-text">ROP：飞蛾扑火</span></a></li></ol></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-GPU架构/GPU渲染管线详解" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      GPU架构|GPU渲染管线详解
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" class="article-date">
+	  <time datetime="2022-07-03T09:25:10.000Z" itemprop="datePublished">2022-07-03</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">GPU渲染管线</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 9.2k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 31(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="GPU渲染管线详解"><a href="#GPU渲染管线详解" class="headerlink" title="GPU渲染管线详解"></a>GPU渲染管线详解</h1><p>顶点和片元着色器想必大家已然十分熟悉，但它们之间<strong>各种弯弯绕绕的固定管线操作</strong>，由于一直被GPU所承包，我们反倒陌生了起来。本文将<strong>以三角形的第一人称视角展开叙述</strong>，让读者更加沉浸式地踏上GPU这片土地，希望大家看得开心~</p>
+<h2 id="Ⅰ-从CPU到GPU：来自异世界的召唤"><a href="#Ⅰ-从CPU到GPU：来自异世界的召唤" class="headerlink" title="Ⅰ 从CPU到GPU：来自异世界的召唤"></a>Ⅰ 从CPU到GPU：来自异世界的召唤</h2><h3 id="从硬盘到显存：在故土的最后时光"><a href="#从硬盘到显存：在故土的最后时光" class="headerlink" title="从硬盘到显存：在故土的最后时光"></a>从硬盘到显存：在故土的最后时光</h3><p>我，是一个三角形，跟周围成千上万个三角形没有什么不同。可能跟你们熟悉的世界不太一样，我们虽然都拥有三个顶点，但是<strong>顶点很可能需要跟其他三角形共用</strong>，真正能体现我作为个体而存在的，是三个<strong>顶点索引</strong>。如果我的样子让你觉得无趣，我很抱歉：</p>
+<ul>
+<li>顶点缓冲区：······、*<strong>vertex231*<strong>、</strong>*vertex232**<em>、vertex233、vertex234、vertex235、</em></strong>vertex236***、······</li>
+<li>索引缓冲区：······、231、232、233、*<strong>231*<strong>、</strong>*232**<em>、</em></strong>236***、······</li>
+</ul>
+<p>那一天，我同往常一样，和同伴们躺在广袤无垠而又冰冷刺骨的<strong>硬盘</strong>中。时间仿佛停滞一般，看不到来处也望不见尽头，我甚至都不记得自己是何时出现在这里。我对未来也没有什么期待，毕竟，在这拥挤的空间里，梦想根本无处落脚。</p>
+<p>似乎是来自CPU的指令，人群开始骚动，我跟着同伴不停辗转，温度逐渐升高起来。这里的人似乎都很忙碌，仿佛有着用不完的活力，可能因为这里是<strong>内存</strong>吧。</p>
+<p>正当我们不知所措的时候，天地骤变，我们来到了一个完全陌生的环境，这个叫做<strong>DRAM或是显存</strong>的地方。而危险，才刚刚开始。</p>
+<h3 id="从图形API到GPU指令：一切绝非偶然"><a href="#从图形API到GPU指令：一切绝非偶然" class="headerlink" title="从图形API到GPU指令：一切绝非偶然"></a>从图形API到GPU指令：一切绝非偶然</h3><p>我也是事后听前辈们叙述，才隐约知晓，原来这场突如其来的异世界之旅——并非偶然。这一切，都要从那些高居庙堂的图形API说起。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1207f575b64a008e909658c8cf391488_720w.jpg" alt="img"></p>
+<p>所有的不幸都来源于这些图形API<strong>，</strong>它们<strong>被驱动程序翻译成GPU可读编码，存放在Pushbuffer中</strong>。就像子弹上了膛，装满了或者来自高层的一声令下，就会被发射出去。最终GPU的<strong>Host Interface</strong>承接了这些指令，并把它们丢给了<strong>Front End</strong>处理。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-6cbf847e12f18647edf329a866ac2700_720w.jpg" alt="img"></p>
+<p>Front End将这些指令解码分类，我们从内存来到DRAM属于State类的操作：有一些会被立即执行，有一些会等到光栅化后再执行；有一些重复多余的状态设置则会被丢弃。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-377b734519bbf9484369d25a88dff10c_720w.jpg" alt="img"></p>
+<p>而万恶之源的Drawcall，则开启了我们不幸的旅途。</p>
+<h3 id="图元分发（Primitive-Distributor）：大家族的瓦解"><a href="#图元分发（Primitive-Distributor）：大家族的瓦解" class="headerlink" title="图元分发（Primitive Distributor）：大家族的瓦解"></a>图元分发（Primitive Distributor）：大家族的瓦解</h3><p>这个世界有它自己的规则，它<strong>厌恶一切巨大和完整，但却对细碎和海量情有独钟</strong>。于是，我们这个紧密团结的三角形大家族，在一开始就将面对必然解体的命运。</p>
+<p>我们被无情地撕碎，<strong>最多32个顶点或32个图元</strong>（在这个故事中，也就是我，三角形），被称为<strong>Batch</strong>，这是我们最后的体面了。</p>
+<p>先代表我们的顶点索引也被极限压缩，<strong>重复的索引被剔除</strong>，那我们岂不是要魂飞魄散了？幸好，我们还有利用价值，我们得到了<strong>更精简的顶点索引的索引</strong>来标识自己。因为原先的大家族已经不复存在了，原先那么长的索引也便失去了存在的意义，往后的路，我们几个可怜的三角形就要作为一个Batch，独自走下去了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-e4849ee7e591fd7821bc70b79f771dd0_720w.jpg" alt="img"></p>
+<p>其他三角形们会去哪里呢？我不知道，可能再也没有相见的机会了吧。或许有幸落入同一个SM，那么我们可能会在某次的Warp切换中擦肩而过；但更可能的情况是，我们会在不同的SM里甚至不同的GPC中，经历着相似但毫无联系的人生。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-ec9602e257abaf1a67d10a20c16b7e2e_720w.jpg" alt="img"></p>
+<p>那些在Batch边缘的顶点，在之前很可能是被不同三角形共用的，而现在被撕碎后天各一方，意味着<strong>这些顶点需要被重复计算</strong>，但是我想，对于这个并行高于一切的世界而言，这一切都是值得的。</p>
+<h3 id="顶点获取（Vertex-Fetch）：灵魂需要安息之所"><a href="#顶点获取（Vertex-Fetch）：灵魂需要安息之所" class="headerlink" title="顶点获取（Vertex Fetch）：灵魂需要安息之所"></a>顶点获取（<strong>Vertex Fetch</strong>）：灵魂需要安息之所</h3><p>我所在的Batch被分配到了某一个GPC的某一个SM中，看着密密麻麻的格子间，我预感，我将会在这个地方经历许多。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-85750a54bd8654c5a4778c6403484c4c_720w.jpg" alt="img"></p>
+<p>我的灵魂（顶点索引）在Primitive Distributor中被重组，并被发配到了这种地方；而我的肉体（顶点数据）总不能一直躺在DRAM中。好在这个世界在效率方面总是不会令人失望，当我被决定了目的地的时候，<strong>顶点数据也同步被Polymorph Engine的Vertex Fetch单元运到了SM中的L1 cache中</strong>。</p>
+<h2 id="Ⅱ-几何阶段：大灾变前的狂欢"><a href="#Ⅱ-几何阶段：大灾变前的狂欢" class="headerlink" title="Ⅱ 几何阶段：大灾变前的狂欢"></a>Ⅱ 几何阶段：大灾变前的狂欢</h2><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-9748f581381396a4b061eab364f4d41e_720w.jpg" alt="img"></p>
+<p>据说我来到的这个SM，相比<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/416334635">上一代</a>，有着诸多改进。格子间明显多了不少（不论是计算核心还是纹理单元），计算单元也变强了许多（<strong>FMA改进了MAD，支持双精度</strong>），<strong>Warp调度机制也变成了双调度以满足如此繁多的元器件指令需求</strong>。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1ff785a541a2692cba1c53938c5d1d34_720w.jpg" alt="img"></p>
+<p>每个周期中，Warp Scheduler可以将<strong>一个或两个</strong>Warp，发送到四个执行块中的任何两个：16CUDA核的块<em>2、4SFUs</em>2、16加载/存储单元*1。从图中可以发现，Fermi架构和Tesla架构一样，<strong>Warp的切换周期仍然是两个处理器周期</strong>。</p>
+<p>除了调度机制，最大的改变我想还是这个PolyMorph Engine，毕竟，就是它的Vertex Fetch把我们的顶点运送到这的。我对它颇有好感，我觉得我们之间还有许多故事要发生。</p>
+<h3 id="顶点着色器：共进退但无法联系的伙伴"><a href="#顶点着色器：共进退但无法联系的伙伴" class="headerlink" title="顶点着色器：共进退但无法联系的伙伴"></a>顶点着色器：共进退但无法联系的伙伴</h3><p>顶点数据已经就位，周围的环境也已经熟悉，紧接着，就进入了我们<strong>必经的</strong>顶点着色器阶段。我们一个Batch，满载的话是32个顶点，刚好是一个Warp。</p>
+<p>在这个Warp里，我将暂时忘记自己三角形的身份，作为顶点和其他31个顶点同生共死。虽然我们每次执行顶点着色器指令的时候，<strong>身处不同的Core中，彼此无法联系</strong>，但我知道它们也一定在和我做着相同的事。</p>
+<p>我们不会一次执行完所有的指令，<strong>大多数时候我们都是走走停停</strong>，因为我们所处的这个SM中还有许多其他的Warp：它们可能是跟我们一样正在执行顶点着色器的顶点，也可能是正在执行片元着色器的片元，甚至可能是CUDA核程序的32个线程……虽然我们出身不同，但在SM中并没有什么高低贵贱之分，都只是<strong>由Warp调度器拿捏</strong>的Warp罢了。</p>
+<p>Warp调度器一声令下，我们就由Dispatch单元指挥着，从寄存器文件中拿上我们之前暂存的数据，继续到各自的Core中执行下一条顶点着色器指令。执行了一条或者若干条指令后，Warp调度器可能又是一声令下，我们就得立刻放下手头的工作，把数据在寄存器文件中存好，乖乖回去睡觉，让其他Warp上场。</p>
+<p>我们在执行所有着色器指令的时候，都是这样一个流程，好在<strong>如何调度其实并不需要我们操心</strong>。我们只需要听从指令，行尸走肉般，在一个个格子间——Core中，做完着色器分配给我们的工作。</p>
+<p>如今的顶点着色器大多没有太过繁杂的指令，最主要的任务还是<strong>将我们这种在世界空间中自由自在惯了的顶点约束到一个裁剪空间中</strong>。不过，如果有细分和几何着色器的存在，那么这一重大任务交给它们来做也不是不行，因为只要在光栅化前转换到裁剪空间，之前的位置都只是中间过程罢了。</p>
+<p>很不幸的是，我的这趟旅程，是如此的完整，即使是可选的细分和几何着色器阶段，也逃不了了。</p>
+<h3 id="TCS-Hull：裂变前的最后抉择"><a href="#TCS-Hull：裂变前的最后抉择" class="headerlink" title="TCS/Hull：裂变前的最后抉择"></a>TCS/Hull：裂变前的最后抉择</h3><p>在经过了顶点着色器的一番热身之后，除了顶点被修整一番，我仍然是快乐的三角形。但接下来，可能就没那么轻松了。紧接着需要执行的是<strong>细分控制着色器</strong>，很幸运的是，我们不需要长途跋涉，在<strong>同一个SM</strong>中就可以执行。</p>
+<p>这次，我又可以换回自己三角形的身份了，准确的说，是patch。<strong>patch</strong>是类似primitive但只能用于细分的概念，在drawcall的时候指定，每个patch可以包含最多32个顶点（具体上限取决于实现，但肯定不超过32，毕竟我们一个batch也就32个顶点）。那既然我作为三角形一路走到了这里，那么这个drawcall指定的patch顶点数自然是3咯。</p>
+<p>TCS可以在着色器中通过layout指定要输出的顶点数，而<strong>这个输出的顶点数就是一个patch要开的线程数</strong>，每个线程分配一个gl_InvocationID。</p>
+<p>与顶点着色器每个线程对应一个顶点，输入输出彼此隔绝十分自闭不同，TCS自由得多，<strong>一个patch内的所有线程可以访问这个patch的所有输入（来自顶点着色器）和输出</strong>。这意味着可能会出现同步问题，需要用<strong>barrier()<strong>同步。因此，</strong>TCS更像一个有特殊任务在身的计算着色器</strong>。</p>
+<p>不过，不要被迷惑了，<strong>TCS输出的顶点只是数据</strong>，是作为之后TES里的输入，供TES插值用的，并不代表最终的顶点数。事实上，常见的TCS没那么多戏，只是当个工具人，把顶点着色器输入的顶点属性一一对应地传给TES罢了。</p>
+<p>身为细分控制着色器，它最重要的职责，是通过填写gl_TessLevelInner和gl_TessLevelOuter两组细分因子，<strong>告诉接下来的Tessellator该如何细分每一个patch</strong>。</p>
+<p>现在，让我们来整理一下心情，看看现在我们这些可怜的三角形（patch）究竟变成什么样了：我们目前仍然是一堆patch，patch数没有发生变化，然而顶点可能已经面目全非。事实上，这些顶点目前只是一堆数据，<strong>每个patch之后会被细分成多少个真正的顶点，只取决于细分因子，与TCS输出的顶点数据没有任何关系</strong>。如果把细分因子通过API提前设置好，TCS甚至都不是细分所必须的。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-d10d5ac52530495a36fb46e3e7c972d0_720w.jpg" alt="img"></p>
+<p>原本以为会在一个SM上孤独终老，没想到这么快就要重新踏上旅程了。我们会通过Work Distribution Crossbar在不同的SM之间穿梭，因为<strong>接下来我们的顶点数很可能急剧膨胀，当前的SM很可能承接不了</strong>。提前根据细分因子选择一个较为空闲的SM，是个明智之举。</p>
+<h3 id="Tessellator：裂变之所"><a href="#Tessellator：裂变之所" class="headerlink" title="Tessellator：裂变之所"></a><strong>Tessellator：裂变之所</strong></h3><p>我们刚一来到这个新SM，就进入了polymorph引擎中的Tessellator。</p>
+<p>Tessellator的工作除了需要之前TCS输出的至关重要的细分因子外，还需之后的TES中指定的各种参数：<strong>图元生成域、细分的顶点空间划分规则、图元面部朝向、是否开启点模式</strong>。</p>
+<p>而其中最重要的是图元生成域，它决定了Tessellator将在什么样的<strong>抽象patch</strong>中插入新的点，并生成对应的图元。有三种图元生成域：<strong>triangles、quads或isolines</strong>。前两种最终生成三角形，后一种生成线，开启点模式，全都能画成点。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-f7f622e9b67a913784cb936397331811_720w.jpg" alt="img"></p>
+<p>这个抽象patch，意味着TCS原来处理的patch有多少顶点、最后输出多少顶点，它们长啥样，全都不重要。Tessellator只会在一个抽象的三角形/正方形/等值线上，根据前面所需的那些信息去插入新的顶点，最终输出的是一些0到1之间的，标记<strong>其在抽象patch中相对位置的归一化坐标</strong>。</p>
+<h3 id="TES-Domain：裂变后的新生"><a href="#TES-Domain：裂变后的新生" class="headerlink" title="TES/Domain：裂变后的新生"></a><strong>TES/Domain：裂变后的新生</strong></h3><p>事实上，我们在Tessellator中并未提供任何顶点数据，我们现在仍然是之前的那副躯体。Tessellator只吐出来了一堆细分坐标gl_TessCoord，而这些就是<strong>新顶点的种子</strong>，它们会在我们旧的躯体上生根发芽。</p>
+<p>随着新顶点的诞生，我<strong>旧的躯体和灵魂（patch）也随之灰飞烟灭</strong>了。我的新灵魂在<strong>Task Distributor</strong>中，由最终确定的图元类型（在这趟旅途中新图元仍然是三角形）和图元面部朝向，重新构筑成了一个全新的三角形——我的一些顶点有可能和原来的顶点位置一样，而更可能的情况是，我所有的顶点全是无中生有凭空产生的。</p>
+<p>TES的每个线程负责一个新顶点的茁壮成长：它们可以拿到由TCS输出的，属于这个patch的所有顶点数据，<strong>通过gl_TessCoord插值后得到新的顶点数据</strong>。</p>
+<p>虽然都是三角形，但，我还是原来的我吗？一切都是那么的匆匆，已没有时间让我多加思考，因为很快，我将陷入更深的迷茫和混乱之中。</p>
+<h3 id="几何着色器：自由的代价"><a href="#几何着色器：自由的代价" class="headerlink" title="几何着色器：自由的代价"></a>几何着色器：自由的代价</h3><p>刚刚获得全新生命的我，就被<strong>Task Distributor</strong>分配了几何着色器的奇怪指令。</p>
+<p>这一次，我将以三角形图元的身份，和其他31个三角形，组成Warp，完成几何着色器的任务。这意味着，几何着色器的每一个线程对应的是一个图元，它可以拿到我的所有顶点数据。</p>
+<p>几何着色器可以做什么呢？它可以做的事过于疯狂：只需要提前定义好一个最大的顶点数，它就<strong>可以以任何顺序输出任意数量、任意类型的图元（点、线、三角形），并输出这些图元的顶点的各种属性</strong>。</p>
+<p>我很震惊，这样潇洒自由的操作，这样一条条的绘图指令，竟是存在于一个着色器之中的，看起来更像是一个CPU端一大串的API调用程序。我还很困惑，我一个渺小的三角形，经过这么一番折腾之后会变成什么？</p>
+<p>我可能还是一个三角形，也可能直接人间蒸发，又或是变成了多个三角形，甚至变成线、变成点，我有无数种可能。我甚至还可能<strong>实例化</strong>成多份：我的每一个分身，都运行一次几何着色器经历一番不同的捶打后，<strong>分层渲染</strong>到不同的帧缓冲，或者输出到多个流中。</p>
+<p>我不禁心生疑虑，这样自由的代价，究竟是什么？<strong>在一个以细碎和海量为生存原则的并行世界里，塞入这么多串行的绘制指令，本身就是大逆不道的</strong>。</p>
+<p>是的，几何着色器从出生开始，就是被诅咒的。为了<strong>维持图元绘制指令和其输出到帧缓冲的顺序一致性</strong>，必须缓存输出的所有顶点数据，以确保后续图形能按顺序进入光栅化器和ROP中。而<strong>几何着色器每个线程需要缓存的数据远高于顶点着色器和两个细分着色器</strong>！细分阶段虽然也会细分出大量的三角形和点，但是人家始终都是一个线程处理一个顶点的，不像几何着色器一样想着一口吃成胖子，结果吃撑了。</p>
+<p>需要超大的缓存，该怎么办呢？NVIDIA的方案：把缓存强行存在片内，片内寸土寸金的地自然存不下多少，很快就塞满了，塞满后SM能够塞下的Warp就会受限，仓库堵了，工厂不就得跟着堵么？而AMD换了一种思路：它咬咬牙把缓存写到DRAM里，仓库是不堵了，但是仓库在十万八千里远的地方，那工厂很快就会因为货物迟迟未到全部歇业摸鱼了。</p>
+<p>我把这个世界的原则铭记在心：对并行性的巨大破坏，终将受到惩罚。经历九九八十一难后的我，淡定地来到了我们熟悉的Polymorph Engine中。</p>
+<h3 id="流输出：提前跑路"><a href="#流输出：提前跑路" class="headerlink" title="流输出：提前跑路"></a>流输出：提前跑路</h3><p>一波三折之后，我已经不复当年模样。据说在另一个平行世界中，我的这趟旅行就此终止了，我回到了显存的缓冲区中。之后的命运是被回读到冰冷的硬盘冰封起来，还是继续流转到GPU中再次进入渲染管线来一次痛苦的轮回，这我就不得而知了。</p>
+<h3 id="顶点后处理：最后的筛选"><a href="#顶点后处理：最后的筛选" class="headerlink" title="顶点后处理：最后的筛选"></a>顶点后处理：最后的筛选</h3><p>在当前这条世界线中，我在Polymorph Engine中还得经历一道筛选流程：<strong>不在视锥范围内的三角形是不配继续在这个残酷的世界中存在的</strong>。</p>
+<p>在此之前，我们需要先进行<strong>图元装配</strong>，让灵魂归位，从此以后我将是一个被盖棺认定的独立自主的三角形了。虽然在细分和几何着色器之前，我早就进行过简单的图元装配了。</p>
+<p>作为一个独立的三角形，我将面临来自视锥的考验：</p>
+<ul>
+<li>如果我完全在视锥内：我得以通过测试，幸存下来</li>
+<li>如果我完全在视锥外：那毫无争议的，我将被<strong>剔除</strong>，我的旅途便到此结束了</li>
+<li>那么当我一半在视锥内一半在视锥外时：情况就比较尴尬了，我会被毫不留情地裁剪吗？</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-47f66da373b0c96ec79e494671c82ef5_720w.jpg" alt="img">guard-band clipping</p>
+<p>那得根据情况而定了：</p>
+<ol>
+<li><strong>如果我是和近平面相交：那么是一定要被裁剪的</strong>。理由有二：好算；不裁剪直接进行后续的透视除法会出错，整个三角形会被翻转。</li>
+<li>如果我和其他面（透视投影的Frustum并不是横平竖直的）相交：裁剪则并不好算，那么原则就是，<strong>能不裁剪就不裁剪</strong>，反正不裁剪也不会有什么问题，超出视口的区域也不会被光栅化。</li>
+<li>但是如果我大得离谱，导致顶点坐标大得离谱，超过了硬件的处理范围（硬件那肯定是抠抠搜搜的，坐标可不是用float来存的，也就上万，现实中的屏幕能多大它就给你设计多大，很会过日子）：那就不得不裁剪了。</li>
+</ol>
+<p>侥幸逃脱被剔除命运的我，苟延残喘至今，等待我的是什么呢？我先是进行了<strong>透视除法</strong>仪式：我的xyz坐标被除以w坐标；然后这个新坐标将进入Polymorph Engine的Viewport Transform模块中完成最后的<strong>视口变换</strong>仪式：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/equation" alt="[公式]"></p>
+<p>回望一路上的种种：先是大家族分崩离析的惨剧，紧接着不痛不痒的顶点着色器逐顶点变换后，经历过细分和几何着色器的各种折腾的我，获得了完全崭新的生命——作为一个全新的三角形，我最终闯过了剔除和裁剪的筛选，磕磕绊绊走到如今。我的<strong>三个顶点坐标被转化到NDC后，又立刻被转化到屏幕坐标</strong>，我预感到，我作为三角形的时间可能已经不多了。</p>
+<hr>
+<h2 id="Ⅲ-光栅阶段：黑暗降临"><a href="#Ⅲ-光栅阶段：黑暗降临" class="headerlink" title="Ⅲ 光栅阶段：黑暗降临"></a>Ⅲ 光栅阶段：黑暗降临</h2><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-8684905909ad2dd3f28df3fe9df02ad1_720w.jpg" alt="img"></p>
+<h3 id="Work-Distribution-Crossbar：光栅化前的洗礼"><a href="#Work-Distribution-Crossbar：光栅化前的洗礼" class="headerlink" title="Work Distribution Crossbar：光栅化前的洗礼"></a>Work Distribution Crossbar：光栅化前的洗礼</h3><p>接下来又是一段艰难的长途跋涉了，上一次离开SM的旅途还是在TCS之后，而这次我旅途的终点是——<strong>每个GPC中都有一个的Raster Engine</strong>。我们会就近被分配到当前GPC的Raster Engine吗？并不会。</p>
+<p><strong>OWDX：将三角形包围盒切块，分发到对应光栅化器中</strong></p>
+<p>是的，不止移动端在分块，Fermi的GPU既然有了多个Raster Engine，开始<strong>分块实现并行</strong>也是很自然的想法。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-b63ee123780bbd1875cdcbc7665f74d0_720w.jpg" alt="img"></p>
+<p>不过，与移动端不同的是，并行处理这些块的只是Raster Engine，而不是SM，SM并不对应任何特定的块，自然也没有专属的帧缓冲，来达到移动端减少带宽的目的；当然也不延迟，来一个三角形处理一个三角形。</p>
+<p>分块的大小还是有讲究的：切得太大，那并行性就差了；切得太小，三角形更容易横跨多块，而<strong>每一块都要做一次三角形设置</strong>，浪费会严重到得不偿失。</p>
+<p>我一到这，它们就开始用<strong>包围盒</strong>（应该只是矩形）把我紧紧包裹住，然后开始切块。没想到，在还没到达Raster Engine之前，我就已经四分五裂了。我的每一块被打上具体Raster Engine的索引，被发往对应的Raster Engine。</p>
+<blockquote>
+<p>面剔除未明确是在哪个阶段发生，有资料表明是在光栅化时，我个人觉得这个阶段就直接剔除最合理。</p>
+</blockquote>
+<p><strong>SWDX：排序</strong></p>
+<p>因为要<strong>保证按三角形提交顺序进入Raster Engine</strong>，所以在正式启程前，我还得先排队。为什么要排队呢，我很是不解，先到先得不好吗，ROP那里不是还会排序一次来保证三角形按照提交顺序输出到帧缓冲的吗？现在又是为什么呢？</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-5382bb711de5d04142963797cb4e55bc_720w.jpg" alt="img"></p>
+<p>这是为了避免三角形重叠时的闪烁问题：如果不排序先到先得，那么最终出现在屏幕上的是哪个三角形就无法唯一确定了。当然如果有十足的把握不会有重叠的三角形出现，现在<a href="https://link.zhihu.com/?target=https://gpuopen.com/learn/unlock-the-rasterizer-with-out-of-order-rasterization/">新的硬件</a>可以手动关掉排序，以提高效率。</p>
+<h3 id="边设置（三角形设置1）：被打上烙印"><a href="#边设置（三角形设置1）：被打上烙印" class="headerlink" title="边设置（三角形设置1）：被打上烙印"></a>边设置（三角形设置1）：被打上烙印</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1ddda400bedd04459378f2b162f352d0_720w.jpg" alt="img"></p>
+<p>终于轮到我了，我跟在上一个三角形后面进入了Raster Engine。准确地说，<strong>我只是三角形覆盖屏幕一定区域的某一块</strong>，其他块很可能在其他Raster Engine中排着队，或已经完成光栅化甚至渲染到了屏幕上，这就不得而知了。</p>
+<p>首先，我来到的是Raster Engine负责<strong>边设置</strong>的第一个小房间，在这里，它们给我打上了属于我这个三角形的烙印。因为<strong>在光栅化进行三角形遍历时，想知道我具体覆盖了哪些像素，总得知道我是个什么样的三角形吧</strong>。</p>
+<p>它们先为我的每一条边<strong>生成边方程</strong>：<img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710164101565.png" alt="image-20220710164101565"></p>
+<p>边上的某一点容易，我有顶点的嘛；而边法线则要麻烦一点，它们让我的两个顶点互减得到这条边的向量，然后将这个向量旋转90度，最后得到的法线为： </p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710164135665.png" alt="image-20220710164135665"></p>
+<p>代入边方程，稍作整理： <img src="https://www.zhihu.com/equation?tex=-+%5Cleft(+p_%7B1y%7D+-+p_%7B0y%7D++%5Cright)x+++%5Cleft(p_%7B1x%7D+-+p_%7B0x%7D+%5Cright)y+-+%5Cleft(+p_%7B1y%7D+++p_%7B0y%7D++%5Cright)p_%7B0x%7D+-+%5Cleft(p_%7B1x%7D+-+p_%7B0x%7D+%5Cright)p_%7B0y%7D=+0" alt="[公式]"></p>
+<p>而如果把方程的左边看成一个边函数： <img src="https://www.zhihu.com/equation?tex=e_%7B2%7D%5Cleft(+x,y+%5Cright)+=+a_%7B2%7Dx+++b_%7B2%7Dy++++c_%7B2%7D" alt="[公式]"> ，那么方程则可以看成是函数值 <img src="https://www.zhihu.com/equation?tex=e_%7B2%7D%5Cleft(+x,y+%5Cright)+=+0" alt="[公式]"> 时的式子，使<strong>函数值为0的点正是在边上的点。那么函数值大于0的点呢？则是与边法线同侧的点。函数值小于0的点则相反。</strong>这正是之后判断像素是否处于三角形之内的核心奥秘。</p>
+<p>而<strong>每个边函数所需要的这三个系数</strong>：a、b、c，它们全可以由顶点的屏幕空间坐标计算得到——这便是边设置阶段给我打上的烙印。</p>
+<h3 id="光栅化（三角形遍历）：粉身碎骨浑不怕"><a href="#光栅化（三角形遍历）：粉身碎骨浑不怕" class="headerlink" title="光栅化（三角形遍历）：粉身碎骨浑不怕"></a>光栅化（三角形遍历）：粉身碎骨浑不怕</h3><p><strong>Inside Test</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-e634c3130f1fb6508e769d051763a914_720w.jpg" alt="img"></p>
+<p>根据烙印，它们可以轻松地判断出屏幕上任何一点是否在我这个三角形内，<strong>只要这点代入我的三个边函数值都大于0，则证明该点在我体内</strong>。</p>
+<p>代入<strong>屏幕像素中心的坐标</strong>去验证整个像素是否被我覆盖，是十分自然的想法。不过下下代架构的<strong>保守光栅化</strong>还有其他不同的选择，这就是后话了。</p>
+<p>为了之后片元阶段能通过与邻居像素属性值求差来获得导数，像素都是4个一小队组成一个<strong>quad</strong>来工作的。它们<strong>一荣俱荣，只要一个像素被我覆盖，其他像素全部被拖下水</strong>，也会被光栅化成片元并占用之后warp的一个线程。</p>
+<p>有一个跟DDA画线算法一样，很常见的加速套路：<strong>每次只要在前一个像素结果上加一个值就行，而不用真的代入原始的边函数去重新算一堆乘法</strong>：</p>
+<p><img src="https://www.zhihu.com/equation?tex=e%5Cleft(+x+1,y+%5Cright)=a(x+1)+++by+++c+=+a+ax++by+++c=a++e%5Cleft(+x,y+%5Cright)" alt="[公式]"></p>
+<p>还有一个少见但却不得不考虑的特殊情况：像素坐标刚好落在我边上，即像素坐标代入后边函数恰好等于0的情况。这会有什么问题呢？<strong>需要有一个机制判断这个像素是否属于这个三角形</strong>。属不属于有那么重要吗？有的，就跟之前光栅化需要排序一个道理，当两个三角形共用一条边时：如果这个像素不属于任何一个三角形，那么就会出现缝隙；如果都属于，那前一个片元可能会被后一个片元覆盖，挺浪费的不够高效。</p>
+<p>总是需要一个tie-breaker规则来打破僵局，方法其实有很多：有DirectX的<strong>top-left规则</strong>（DirectX），归边为左侧边或水平上边界的三角形所有；或使用<strong>离屏点规则</strong>，归与离屏点同一侧的三角形所有。</p>
+<p>还有最后一个小问题，虽然我是一个三角形，可图元还可以是点和线呀，它们该如何被光栅化呢？事实上<strong>点和线被当成矩形</strong>，也就是两个三角形来对待了！给它们单独做一套算法和硬件当然会更快，但是整套硬件就变复杂了，在这个由各种昂贵元器件堆出来的世界里，<strong>没有什么十全十美，有的只是各种权衡</strong>：在三角形占据应用主流的情况下，<strong>所有图元共用一套三角形光栅化流水线</strong>，是明智的选择。</p>
+<p><strong>多重采样</strong></p>
+<p>基于抗锯齿的需要，一个像素只能非黑即白（要么被我覆盖要么不被我覆盖）的现状终究无法令人满意。因此一个像素多加几个采样点来最终判断这个像素的覆盖率的想法便出现了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-1b68a07a9d1af32bb6ff04ebd71daaea_720w.jpg" alt="img"></p>
+<p><strong>MSAA</strong>：每个像素需要多个样本被光栅化，但无论有多少样本被我覆盖，<strong>片元着色器都只会运行一次</strong>，深度值和最终的颜色值会被写到多个被我覆盖的样本对应的帧缓冲内存上。是的，唯一的代价就在于，需要更大的帧缓冲，多加多少采样点，就得多加多少帧缓冲内存去存放着色结果。</p>
+<p><strong>EQAA</strong>（AMD的方案）：以一层间接索引为代价，换来了帧缓冲内存的减少。</p>
+<p><strong>CSAA</strong>（NVIDIA的方案，没想象中那么牛，后来给砍了）：需要光栅化的点再*4，但只是用来估算权重，帧缓冲相比MSAA没有扩大。每个像素只需要多加16bit的覆盖信息，用以记录四个子像素最终的权重。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-21f937a7c38881bf23431407fa80619c_720w.jpg" alt="img"></p>
+<p><strong>分层遍历</strong></p>
+<p>实际上，它们在遍历每个像素（或子像素）是否被我覆盖时，比我想象中聪明得多。它们会将装我的盒子继续分块。我们称这每一块为tile吧（如果想，多分几级也是可以的，tile里还可以有更小粒度的tile）。</p>
+<p>每条边，<strong>只需要先遍历每个tile四个角中的一个点就行</strong>（具体是哪个点取决于边法线），在相当于一种<strong>加速结构</strong>：一个点可以代表该tile中所有64个点，它在边外其他点必然在边外，整个tile都不需要再遍历了。一样可以用<strong>增量</strong>的方式逐渐更新各个tile的顶点。</p>
+<p>tile也<strong>按Z顺序遍历</strong>，讲究！按tile遍历而不是按扫描线遍历还有个好处：<strong>提高了cache命中率</strong>。因为相邻的像素需要同一个纹素的概率更大，而且纹理在GPU中本身也是按块存储的。在同一个块内的片元被打包成Warp，在之后读写的纹理、深度、颜色缓冲更容易抱团取暖，拿到同一块内的纹素。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-d35a659a860aacecba7aa02ecf459d60_720w.jpg" alt="img"></p>
+<h3 id="Z-Cull：被抹去的存在"><a href="#Z-Cull：被抹去的存在" class="headerlink" title="Z-Cull：被抹去的存在"></a>Z-Cull：被抹去的存在</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-6366c72ad7da0102d4d0eedf04ad5fdb_720w.jpg" alt="img"></p>
+<p>实际上真正的逐像素（子像素）光栅化前，还会先进行一个对块的<strong>粗糙光栅化</strong>过程。（这个块和遍历时分的块不是一个概念）</p>
+<p>Z-Cull单元会维护每一块的深度最大值，如果我在这一块里，光栅化出来的像素最小值大于它，那意味着我必然被之前的三角形遮挡了，那这一块也就没有继续逐像素光栅化的必要了。</p>
+<p>保守评估我在每一块上的深度最小值的两种方法：</p>
+<ol>
+<li>我三个顶点的最小值</li>
+<li>我在该块四个顶点处插值出来的深度值的最小值</li>
+</ol>
+<p>组合上面的两种方法，取各自最小值的最大值，可以得到更加高效的剔除效果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-f7c2e3e65d090dccc3b25f77f673bdcf_720w.jpg" alt="img"></p>
+<p>不过，Z-Cull只是用来节省逐像素深度测试的方法，而并不会节省后面的片元着色器，因为还有<strong>early-z</strong>挡着呢。</p>
+<blockquote>
+<p><strong>early-z</strong>：整套剔除要有比较好的效果，还是需要依赖从前往后的顺序提交三角形，移动端tdbr或者z-prepass算法才能无需排序。</p>
+<p>关于early-z，z-culling，z-perpass，hi-z</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/a1047120490/article/details/106761430">https://blog.csdn.net/a1047120490/article/details/106761430</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/whitebreeze/article/details/118688150">https://blog.csdn.net/whitebreeze/article/details/118688150</a></p>
+</blockquote>
+<p>还可以反过来再做一次Z-Cull：存最小值，拿最大值，如果通过了，说明不会有任何遮挡，也能节省逐像素的深度测试时的读取（只要能提前确定，<strong>百分百被遮挡和百分百不被遮挡都可以节省无谓的深度测试</strong>）</p>
+<p>整个块被我覆盖的可以直接更新其维护的最值，否则还得之后根据该块内逐像素深度的最值来更新（这会带来一定的延迟）</p>
+<p>可以这么理解与分层遍历的区别：<strong>分层遍历是在屏幕空间上的加速，而Z-Cull则是在深度方向上的加速，它们二者都是基于块的思想，用一个块的比较来快速跳过块内每个像素的比较</strong>。</p>
+<hr>
+<h2 id="Ⅳ-片元阶段：美丽新世界"><a href="#Ⅳ-片元阶段：美丽新世界" class="headerlink" title="Ⅳ 片元阶段：美丽新世界"></a>Ⅳ 片元阶段：美丽新世界</h2><p>往日里，人们提到光栅化，脑子里也就只有那么一张简单的图：一个三角形被切成一个个像素。可是，当我亲身经历后，才发现压根就没有那么简单，<strong>硬件为了高效地将我四分五裂，穷尽各种可能来提高效率</strong>，以至于流程复杂得让我晕眩。</p>
+<h3 id="属性设置-（三角形设置2）：落地生根"><a href="#属性设置-（三角形设置2）：落地生根" class="headerlink" title="属性设置 （三角形设置2）：落地生根"></a>属性设置 （三角形设置2）：落地生根</h3><p>现在有哪些像素（子像素）会被我覆盖已经一清二楚，但在真正发往片元着色器之前，还有一件很重要的事情需要完成。这些被覆盖的像素所需要的属性，还都没有着落呢，它们需要<strong>由我的三个顶点插值得到</strong>。</p>
+<p>与三角形边设置一样，属性插值也需要提前计算一些值，这个过程发生在Polymorph Engine的<strong>属性设置</strong>单元中。我都已经记不清这是第几次踏入Polymorph Engine了，而且每一次踏入的还不一定是同一个，不过我想，这应该是最后一个了。</p>
+<p>在Tesla架构中由一个单元全盘负责的三角形设置，在Fermi架构中被拆成了边设置和属性设置，一个位于Raster Engine中，一个位于Polymorph Engine中。</p>
+<p>边设置有边方程，属性设置自然需要属性平面方程： <img src="https://www.zhihu.com/equation?tex=a%5Cleft(+u,v+%5Cright)+=+%5Cleft(1-+u+-+v+%5Cright)a_0+ua_1+va_2" alt="[公式]"></p>
+<p>其中最重要的，是<strong>求得每个像素的质心坐标（u, v, w）</strong>，因为三者和为1，只需要求得两个即可。只要有了质心坐标，插值就是轻而易举的事了（在片元着色器阶段，由SM中的SFU负责）。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-0d9ef4134bfc2fd32fd2791a6fbbb417_720w.jpg" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710174245566.png" alt="image-20220710174245566"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-a0ee912e6a9b1af49f113d3c9543c332_720w.jpg" alt="img"></p>
+<p>可是，该死的透视变换，让一切变得复杂了起来，我们需要对属性做<strong>透视校正</strong>：分别插值 属性/w 和 1/w，然后将两者的结果相除。</p>
+<p>因此，我们需要对质心坐标进行调整，而调整后的面积和也就不再是常数了，需要逐像素老老实实计算三个质心坐标了：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710174335142.png" alt="image-20220710174335142"></p>
+<p>不过，深度值除外，它不需要透视校正。因为<strong>被扭曲过的深度值（在透视除法中已经被w除了），其在屏幕空间上刚好是线性的</strong>（<strong>还方便之后压缩</strong>），因此直接线性插值就可以。</p>
+<blockquote>
+<p>之所以深度特殊，是因为它要存的值本身就是要除以w的，之后自然线性插值即可；而其他属性除以w再插值则只是为了让属性过渡能符合近大远小的规律，但是顶点处要存的值仍然是原来的属性值，因此还得映射回去。</p>
+</blockquote>
+<h3 id="片元着色器：任劳任怨"><a href="#片元着色器：任劳任怨" class="headerlink" title="片元着色器：任劳任怨"></a><strong>片元着色器：任劳任怨</strong></h3><p>现在每个片元所需要的所有属性值已经准备齐全了，我已经从一个三角形彻底变成了一个单纯的小片元。我和其他三个片元一起组成了一个<strong>quad</strong>，我们是彼此需要互相利用求差取得导数的塑料姐妹花，因为除此之外，我们并不能做其他任何的交流。最后我们和其他quad被打包成一个warp，发往了片元着色器。</p>
+<p>图形的大部分任务据说都是在这里完成的，这可能也是我这一趟旅途中<strong>最繁忙</strong>的一个阶段了。不过正因为它的复杂性完全来自于程序员们在shader中的天马行空，对于硬件而言，反倒没有什么过多可以赘述之事。因为无论多复杂，于我而言，无非都是听从Warp调度器行尸走肉般的节拍器生活罢了。</p>
+<h3 id="ROP：飞蛾扑火"><a href="#ROP：飞蛾扑火" class="headerlink" title="ROP：飞蛾扑火"></a>ROP：飞蛾扑火</h3><p>结束了片元着色器工厂流水线的繁重作业后，我终于来到了旅途的真正终点。分布在GPC外的L2 Cache附近，密密麻麻的ROP中的某一个，将会是我的最终归宿。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-d9789027b8ac208100e0b2ae8cfb6254_720w.jpg" alt="img"></p>
+<p>和Raster Engine一样，每一个ROP单元分管屏幕像素的某些块，而我落在哪一块中，就会被发往哪一个ROP中。分块带来的好处显而易见，每个ROP只需要在负责的block里维持三角形的顺序就行了。</p>
+<p>它们负责<strong>late depth test、模板测试、混合</strong>等，可谓是十分忙碌。如果开启了多重采样，它们还负责最终每个像素的<strong>resolve</strong>，混合多个子样本的颜色得到最终的像素值。</p>
+<p>一路上见过了太多生离死别，能一直走到现在我已经看淡了许多。原本只是在硬盘中了无生趣的几个数据，能够拥有这么一段跌宕起伏的人生我已然足够幸运。</p>
+<p>即便跨越重重险阻，颠沛流离至今，到最后也可能只是<strong>影响了数百万像素中某一个像素的些许光亮</strong>。但为了这十几毫秒的些许光亮，就足以让我们这些懵懂无知的三角形，一次又一次地踏上旅途——因为如果三角形没有梦想，那和咸鱼还有什么区别呢？</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" title="GPU架构|GPU渲染管线详解" target="_blank" rel="external">http://icecorn.github.io/2022/07/03/GPU架构/GPU渲染管线详解/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/07/04/%E5%9B%BE%E5%BD%A2%E5%AD%A6/PBR%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" title="PBR渲染管线详解"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/07/02/GPU%E6%9E%B6%E6%9E%84/GPU%E6%9E%B6%E6%9E%84%E7%B3%BB%E5%88%97(%E4%BA%8C%EF%BC%89Fermi%E6%9E%B6%E6%9E%84/" title="GPU架构（二）|Fermi架构"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

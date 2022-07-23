@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>图形学常见问题指针 | Blog of Icecorn</title>
+  <meta name="description" content="图形学常见问题指针透视矫正的推导https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;403259571 透视除法与齐次坐标https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;7e701d7bfd79 法向变换矩阵的推导在计算机图形学中，法向量（垂直于某个面的向量）有着广泛的应用，比如处理光照需要用到法向量来计算光线的入射角，最终渲染出逼真的场景。 3D建模工具设计出的模型文件一般都是包含了顶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图形学常见问题指针">
+<meta property="og:url" content="http://icecorn.github.io/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="图形学常见问题指针透视矫正的推导https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;403259571 透视除法与齐次坐标https:&#x2F;&#x2F;www.jianshu.com&#x2F;p&#x2F;7e701d7bfd79 法向变换矩阵的推导在计算机图形学中，法向量（垂直于某个面的向量）有着广泛的应用，比如处理光照需要用到法向量来计算光线的入射角，最终渲染出逼真的场景。 3D建模工具设计出的模型文件一般都是包含了顶">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-5c43f49040ee3be76a3534cba778ec79_b.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710212522068.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-98f85d18e640a0f742d14ace76b8d6db_b.jpg">
+<meta property="og:image" content="https://pic1.zhimg.com/v2-e0a4566106fae5036ca7b4ccb6c157b4_b.jpg">
+<meta property="og:image" content="https://pic2.zhimg.com/v2-0c050d77bc6f8ca87ba4b5fb1d1dc851_b.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-9b64678336e9bc95f6b606528ee7a86b_b.jpg">
+<meta property="og:image" content="https://pic1.zhimg.com/v2-bc61269f943a6c50cad79936bd44a318_b.jpg">
+<meta property="article:published_time" content="2022-07-05T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-07-23T02:39:05.345Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-5c43f49040ee3be76a3534cba778ec79_b.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/C/">C++</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/C/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">25</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">9</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GPU%E6%9E%B6%E6%9E%84/" rel="tag">GPU架构</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">GPU渲染管线</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-104/" rel="tag">Games-104</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PBR%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">PBR渲染管线</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/divide-conquer/" rel="tag">divide&conquer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openGL/" rel="tag">openGL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shader/" rel="tag">shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" rel="tag">单例模式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" rel="tag">图形学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.33px;">C++内存管理机制</a> <a href="/tags/GPU%E6%9E%B6%E6%9E%84/" style="font-size: 13.17px;">GPU架构</a> <a href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" style="font-size: 13px;">GPU渲染管线</a> <a href="/tags/Games-101/" style="font-size: 13.17px;">Games-101</a> <a href="/tags/Games-104/" style="font-size: 13.5px;">Games-104</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.83px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/PBR%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" style="font-size: 13px;">PBR渲染管线</a> <a href="/tags/Rasterizer/" style="font-size: 13.17px;">Rasterizer</a> <a href="/tags/divide-conquer/" style="font-size: 13px;">divide&conquer</a> <a href="/tags/openGL/" style="font-size: 13px;">openGL</a> <a href="/tags/shader/" style="font-size: 13px;">shader</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.33px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" style="font-size: 13px;">动态规划</a> <a href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" style="font-size: 13px;">单例模式</a> <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" style="font-size: 13px;">图形学</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%8E%92%E5%BA%8F/" style="font-size: 13px;">排序</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" style="font-size: 13.5px;">游戏引擎</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.67px;">计算机网络</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">July 2022</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/" class="title">图形学常见问题指针</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-05T09:25:10.000Z" itemprop="datePublished">2022-07-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/04/%E5%9B%BE%E5%BD%A2%E5%AD%A6/PBR%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" class="title">PBR渲染管线详解</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-04T09:25:10.000Z" itemprop="datePublished">2022-07-04</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/03/GPU%E6%9E%B6%E6%9E%84/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" class="title">GPU架构|GPU渲染管线详解</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-03T09:25:10.000Z" itemprop="datePublished">2022-07-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/02/GPU%E6%9E%B6%E6%9E%84/GPU%E6%9E%B6%E6%9E%84%E7%B3%BB%E5%88%97(%E4%BA%8C%EF%BC%89Fermi%E6%9E%B6%E6%9E%84/" class="title">GPU架构（二）|Fermi架构</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-02T09:25:10.000Z" itemprop="datePublished">2022-07-02</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/01/GPU%E6%9E%B6%E6%9E%84/GPU%E6%9E%B6%E6%9E%84%E7%B3%BB%E5%88%97(%E4%B8%80)%20Tesla%E6%9E%B6%E6%9E%84/" class="title">GPU架构（一）|Tesla架构</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-01T09:25:10.000Z" itemprop="datePublished">2022-07-01</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88"><span class="toc-number">1.</span> <span class="toc-text">图形学常见问题指针</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%8F%E8%A7%86%E7%9F%AB%E6%AD%A3%E7%9A%84%E6%8E%A8%E5%AF%BC"><span class="toc-number">1.1.</span> <span class="toc-text">透视矫正的推导</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%8F%E8%A7%86%E9%99%A4%E6%B3%95%E4%B8%8E%E9%BD%90%E6%AC%A1%E5%9D%90%E6%A0%87"><span class="toc-number">1.2.</span> <span class="toc-text">透视除法与齐次坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%95%E5%90%91%E5%8F%98%E6%8D%A2%E7%9F%A9%E9%98%B5%E7%9A%84%E6%8E%A8%E5%AF%BC"><span class="toc-number">1.3.</span> <span class="toc-text">法向变换矩阵的推导</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-图形学/图形学常见问题指针" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      图形学常见问题指针
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/" class="article-date">
+	  <time datetime="2022-07-05T09:25:10.000Z" itemprop="datePublished">2022-07-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" rel="tag">图形学</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 851(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 3(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="图形学常见问题指针"><a href="#图形学常见问题指针" class="headerlink" title="图形学常见问题指针"></a>图形学常见问题指针</h1><h2 id="透视矫正的推导"><a href="#透视矫正的推导" class="headerlink" title="透视矫正的推导"></a>透视矫正的推导</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/403259571">https://zhuanlan.zhihu.com/p/403259571</a></p>
+<h2 id="透视除法与齐次坐标"><a href="#透视除法与齐次坐标" class="headerlink" title="透视除法与齐次坐标"></a>透视除法与齐次坐标</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/7e701d7bfd79">https://www.jianshu.com/p/7e701d7bfd79</a></p>
+<h2 id="法向变换矩阵的推导"><a href="#法向变换矩阵的推导" class="headerlink" title="法向变换矩阵的推导"></a>法向变换矩阵的推导</h2><p>在计算机图形学中，<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E6%B3%95%E5%90%91%E9%87%8F&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">法向量</a>（垂直于某个面的向量）有着广泛的应用，比如处理光照需要用到法向量来计算光线的<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%85%A5%E5%B0%84%E8%A7%92&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">入射角</a>，最终渲染出逼真的场景。</p>
+<p>3D<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%BB%BA%E6%A8%A1&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">建模</a>工具设计出的模型文件一般都是包含了顶点坐标和每个面的法向量信息，也就是说法向量是已知的，模型一旦确定，每个面的法向量就确定了。但是，事情没有那么简单，场景要动起来才会丰富多彩，完全静止的东西往往缺乏生气，这就需要用到<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E6%A8%A1%E5%9E%8B%E5%8F%98%E6%8D%A2&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">模型变换</a>，比如平移、缩放（等比例/不等比例）、旋转等，而不管如何变换，法向量和对应面的<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%9E%82%E7%9B%B4&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">垂直</a>关系必须成立，否则场景渲染的效果就会失真甚至完全不正常。</p>
+<p>3D模型是由大量的<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E9%A1%B6%E7%82%B9%E5%9D%90%E6%A0%87&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">顶点坐标</a>组成的，只要模型变换矩阵乘以顶点坐标就完成了模型的变换，但是法向量却不能直接与模型变换矩阵相乘，因为向量是有向的线段，而顶点坐标仅仅表示一个点，这个本质的不同导致<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%8F%98%E6%8D%A2%E7%9F%A9%E9%98%B5&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">变换矩阵</a>与法向量相乘后很可能不再和变换后的面垂直。</p>
+<p>举个简单的例子，参见下图，假设针对3D模型做沿y轴向上平移1个单位的变换，向量p为垂直于其中某个面的法向量。如果向量p=(1,0)执行同样的平移操作，则变成了向量p’=(1,1)，p和p’并不是平行关系，显然针对法向量做相同的<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%B9%B3%E7%A7%BB%E5%8F%98%E6%8D%A2&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">平移变换</a>之后，p’不可能再垂直于平移后的平面，因为平面沿y轴向上平移1个单位之后仍然与变换前平面平行。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-5c43f49040ee3be76a3534cba778ec79_b.jpg" alt="img"></p>
+<p>这仅仅是平移变换带来的问题，还有众多其他类型的变换，不太可能分析所有变换对法向量的影响是怎样的，然后进行一一修正。显然，需要找到一种通用的方法来处理法向量的变换。</p>
+<p>假设p0与p1是变换前某平面上的两个点，<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%88%87%E5%90%91%E9%87%8F&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">切向量</a>s=p1−p0，与之垂直的法向量为n；p0’和p1’为p0和p1变换后的点，变换后的切向量s′=p1′−p0′，变换后法向量为n’，其中模型变换矩阵为M，<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E6%B3%95%E5%90%91%E9%87%8F%E5%8F%98%E6%8D%A2&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">法向量变换</a>矩阵为M’，变换后n’与s’需要互相垂直。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220710212522068.png" alt="image-20220710212522068"> </p>
+<p>使用公式可以表示为：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-98f85d18e640a0f742d14ace76b8d6db_b.jpg" alt="img"></p>
+<p>s’和n’互相垂直，可以得知n’和s’的点积为0，所以有：</p>
+<p><img src="https://pic1.zhimg.com/v2-e0a4566106fae5036ca7b4ccb6c157b4_b.jpg" alt="img"></p>
+<p>进一步对公式进行变换，可以得出：</p>
+<p><img src="https://pic2.zhimg.com/v2-0c050d77bc6f8ca87ba4b5fb1d1dc851_b.jpg" alt="img"></p>
+<blockquote>
+<p>T表示矩阵的转置，就是将原矩阵的<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E8%A1%8C%E5%88%97%E4%BA%92%E6%8D%A2&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">行列互换</a></p>
+</blockquote>
+<p>由于n⋅s=nT×s可以得出M′×M=I，因为只有I×s=s，这样就可以保证公式始终成立。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/v2-9b64678336e9bc95f6b606528ee7a86b_b.jpg" alt="img"></p>
+<blockquote>
+<p>I表示<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?q=%E5%8D%95%E4%BD%8D%E7%9F%A9%E9%98%B5&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22:%22article%22,%22sourceId%22:%22479809019%22%7D">单位矩阵</a></p>
+</blockquote>
+<p>由M′T×M=I可得M′T=M−1，最终得出M′=(M−1)T，即法向量的变换矩阵为模型变换矩阵的逆转置矩阵。</p>
+<p><img src="https://pic1.zhimg.com/v2-bc61269f943a6c50cad79936bd44a318_b.jpg" alt="img"></p>
+<p>本文来自知乎：<br>作者：一点鑫得<br>链接：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/479809019">https://zhuanlan.zhihu.com/p/479809019</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/" title="图形学常见问题指针" target="_blank" rel="external">http://icecorn.github.io/2022/07/05/图形学/图形学常见问题指针/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2022/07/04/%E5%9B%BE%E5%BD%A2%E5%AD%A6/PBR%E7%AE%A1%E7%BA%BF%E8%AF%A6%E8%A7%A3/" title="PBR渲染管线详解"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
