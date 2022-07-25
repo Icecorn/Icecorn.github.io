@@ -17,30 +17,21 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>Linux高性能服务器|第八章-Linux高性能服务器框架 | Blog of Icecorn</title>
-  <meta name="description" content="第八章高性能服务器程序框架服务器模型-CS模型 优点  实现起来简单缺点 服务器是通信的中心, 访问过大的时候会导致响应过慢  模式图 编写的demo 没有用到fork函数. 后续待完善 服务器框架 IO模型  这个模型大概能够理解, 自己也算是学了半年的Javaweb. socket在创建的时候默认是阻塞的, 不过可以通过传SOCK_NONBLOCK参解决非阻塞调用都会立即返回 但可能事件没有发">
+  <title>算法系列（六）|二叉树前中后序遍历--迭代法 | Blog of Icecorn</title>
+  <meta name="description" content="二叉树的前中后序遍历迭代法的二叉树前中后序遍历 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux高性能服务器|第八章-Linux高性能服务器框架">
-<meta property="og:url" content="http://icecorn.github.io/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/index.html">
+<meta property="og:title" content="算法系列（六）|二叉树前中后序遍历--迭代法">
+<meta property="og:url" content="http://icecorn.github.io/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%89%8D%E4%B8%AD%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86/index.html">
 <meta property="og:site_name" content="Blog of Icecorn">
-<meta property="og:description" content="第八章高性能服务器程序框架服务器模型-CS模型 优点  实现起来简单缺点 服务器是通信的中心, 访问过大的时候会导致响应过慢  模式图 编写的demo 没有用到fork函数. 后续待完善 服务器框架 IO模型  这个模型大概能够理解, 自己也算是学了半年的Javaweb. socket在创建的时候默认是阻塞的, 不过可以通过传SOCK_NONBLOCK参解决非阻塞调用都会立即返回 但可能事件没有发">
+<meta property="og:description" content="二叉树的前中后序遍历迭代法的二叉树前中后序遍历 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233248719.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E6%9C%AC%E6%A1%86%E6%9E%B6.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/Reactor%E6%A8%A1%E5%BC%8F.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233354924.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233409090.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233423078.png">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%8D%8A%E5%8F%8D%E5%BA%94%E5%A0%86%E6%A8%A1%E5%BC%8F.png">
-<meta property="article:published_time" content="2022-05-05T09:25:10.000Z">
-<meta property="article:modified_time" content="2022-06-29T15:34:50.041Z">
+<meta property="article:published_time" content="2022-07-08T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-07-25T06:05:58.520Z">
 <meta property="article:author" content="Icecorn">
-<meta property="article:tag" content="Linux高性能服务器">
-<meta property="article:tag" content="socket编程">
+<meta property="article:tag" content="算法">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233248719.png">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://icecorn.github.io/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/index.html">
+  <link rel="canonical" href="http://icecorn.github.io/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%89%8D%E4%B8%AD%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
   
@@ -314,21 +305,21 @@
   <div class="slimContent">
     <nav id="toc" class="article-toc">
       <h3 class="toc-title">Catalogue</h3>
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E5%85%AB%E7%AB%A0%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6"><span class="toc-number">1.</span> <span class="toc-text">第八章高性能服务器程序框架</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E9%AB%98%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%80%A7%E8%83%BD%E7%9A%84%E5%85%B6%E4%BB%96%E5%BB%BA%E8%AE%AE-%E6%B1%A0-%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6-%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%E5%92%8C%E9%94%81"><span class="toc-number">1.1.</span> <span class="toc-text">提高服务器性能的其他建议 池 数据复制 上下文切换和锁</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%89%8D%E4%B8%AD%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86"><span class="toc-number">1.</span> <span class="toc-text">二叉树的前中后序遍历</span></a></li></ol>
     </nav>
   </div>
 </aside>
 
 <main class="main" role="main">
   <div class="content">
-  <article id="post-Linux高性能服务器/Linux高性能服务器第八章-Linux高性能服务器框架" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+  <article id="post-算法/算法系列（六）二叉树的前中后序遍历" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
     <div class="article-header">
       
         
   
     <h1 class="article-title" itemprop="name">
-      Linux高性能服务器|第八章-Linux高性能服务器框架
+      算法系列（六）|二叉树前中后序遍历--迭代法
     </h1>
   
 
@@ -336,20 +327,20 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" class="article-date">
-	  <time datetime="2022-05-05T09:25:10.000Z" itemprop="datePublished">2022-05-05</time>
+	<a href="/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%89%8D%E4%B8%AD%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86/" class="article-date">
+	  <time datetime="2022-07-08T09:25:10.000Z" itemprop="datePublished">2022-07-08</time>
 	</a>
 </span>
         
   <span class="article-category">
     <i class="icon icon-folder"></i>
-    <a class="article-category-link" href="/categories/ReadingNotes/">ReadingNotes</a>►<a class="article-category-link" href="/categories/ReadingNotes/Linux/">Linux</a>
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
   </span>
 
         
   <span class="article-tag">
     <i class="icon icon-tags"></i>
-	<a class="article-tag-link-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a>, <a class="article-tag-link-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a>
+	<a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
   </span>
 
 
@@ -362,10 +353,10 @@
 	</span>
 
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/#comments" class="article-comment-link">Comments</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%89%8D%E4%B8%AD%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86/#comments" class="article-comment-link">Comments</a></span>
         
 	
-		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 884(words)</span>
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 756(words)</span>
 	
 	
 		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 3(minutes)</span>
@@ -375,41 +366,9 @@
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <h2 id="第八章高性能服务器程序框架"><a href="#第八章高性能服务器程序框架" class="headerlink" title="第八章高性能服务器程序框架"></a>第八章高性能服务器程序框架</h2><p><strong>服务器模型-CS模型</strong></p>
-<p><strong>优点</strong></p>
-<ul>
-<li>实现起来简单<br><strong>缺点</strong></li>
-<li>服务器是通信的中心, 访问过大的时候会导致响应过慢</li>
-</ul>
-<p>模式图<br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233248719.png" alt="image-20220629233248719"></p>
-<p>编写的demo 没有用到fork函数. 后续待完善</p>
-<p><strong>服务器框架 IO模型</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%9F%BA%E6%9C%AC%E6%A1%86%E6%9E%B6.png"></p>
-<p>这个模型大概能够理解, 自己也算是学了半年的Javaweb.</p>
-<p>socket在创建的时候默认是阻塞的, 不过可以通过传<code>SOCK_NONBLOCK</code>参解决<br>非阻塞调用都会立即返回 但可能事件没有发生(recv没有接收到信息), 没有发生和出错都会<code>返回-1</code> 所以需要通过<code>errno</code>来区分这些错误.<br><strong>事件未发生</strong><br>accept, send,recv errno被设置为 <code>EAGAIN(再来一次)</code>或<code>EWOULDBLOCK(期望阻塞)</code><br>connect 被设置为 <code>EINPROGRESS(正在处理中)</code></p>
-<p>需要在事件已经发生的情况下 去调用非阻塞IO, 才能提高性能</p>
-<p>常用IO复用函数 <code>select</code> <code>poll</code> <code>epoll_wait</code> 将在第九章后面说明<br>信号将在第十章说明</p>
-<p><strong>两种高效的事件处理模式和并发模式</strong><br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/Reactor%E6%A8%A1%E5%BC%8F.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233354924.png" alt="image-20220629233354924"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233409090.png" alt="image-20220629233409090"></p>
-<p>程序分为计算密集型(CPU使用很多, IO资源使用很少)和IO密集型(反过来).<br>前者使用并发编程反而会降低效率, 后者则会提升效率<br>并发编程有多进程和多线程两种方式</p>
-<p>并发模式 - IO单元和多个逻辑单元之间协调完成任务的方法.<br>服务器主要有两种并发模式</p>
-<ul>
-<li>半同步/半异步模式</li>
-<li>领导者/追随者模式</li>
-</ul>
-<p><strong>半同步/半异步模式</strong><br>在IO模型中, 异步和同步的区分是内核向应用程序通知的是何种IO事件(就绪事件还是完成事件), 以及由谁来完成IO读写(应用程序还是内核)</p>
-<p>而在这里(并发模式)<br>同步指的是完全按照代码序列的顺序执行 - 按照同步方式运行的线程称为同步线程<br>异步需要系统事件(中断, 信号)来驱动 - 按照异步方式运行的线程称为异步线程<br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220629233423078.png" alt="image-20220629233423078"></p>
-<p>服务器(需要较好的实时性且能同时处理多个客户请求) - 一般使用同步线程和异步线程来实现,即为半同步/半异步模式<br>同步线程 - 处理客户逻辑, 处理请求队列中的对象<br>异步线程 - 处理IO事件, 接收到客户请求后将其封装成请求对象并插入请求队列</p>
-<p>半同步/半异步模式 存在变体 <code>半同步/半反应堆模式</code><br><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%8D%8A%E5%8F%8D%E5%BA%94%E5%A0%86%E6%A8%A1%E5%BC%8F.png"></p>
-<p>异步线程 - 主线程 - 负责监听所有socket上的事件</p>
-<p><strong>领导者/追随者模式</strong><br>略</p>
-<p><strong>高效编程方法 - 有限状态机</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态独立的有限状态机</span></span><br><span class="line">STATE_MACHINE(Package _pack) &#123;</span><br><span class="line">	</span><br><span class="line">	PackageType _type = _pack.GetType();</span><br><span class="line">	<span class="keyword">switch</span>(_type) &#123;</span><br><span class="line">		<span class="keyword">case</span> type_A:</span><br><span class="line">			xxxx;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> type_B:</span><br><span class="line">			xxxx;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 带状态转移的有限状态机</span></span><br><span class="line">STATE_MACHINE() &#123;</span><br><span class="line">	State cur_State = type_A;</span><br><span class="line">	<span class="keyword">while</span>(cur_State != type_C) &#123;</span><br><span class="line">	</span><br><span class="line">		Package _pack = getNewPackage();</span><br><span class="line">		<span class="keyword">switch</span>(cur_State) &#123;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">case</span> type_A:</span><br><span class="line">				process_package_state_A(_pack);</span><br><span class="line">				cur_State = type_B;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> type_B:</span><br><span class="line">				xxxx;</span><br><span class="line">				cur_State = type_C;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h1 id="二叉树的前中后序遍历"><a href="#二叉树的前中后序遍历" class="headerlink" title="二叉树的前中后序遍历"></a>二叉树的前中后序遍历</h1><p>迭代法的二叉树前中后序遍历</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">TreeNode</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    TreeNode *left = <span class="literal">nullptr</span>;</span><br><span class="line">    TreeNode *right = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="built_in">TreeNode</span>();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//迭代法前序遍历二叉树</span></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">preyorderTraversal</span><span class="params">(TreeNode *root)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; vec;</span><br><span class="line">    stack&lt;TreeNode *&gt; stk;</span><br><span class="line">    stk.<span class="built_in">push</span>(root);</span><br><span class="line">    <span class="keyword">while</span> (!stk.<span class="built_in">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        TreeNode *node = stk.<span class="built_in">top</span>();</span><br><span class="line">        stk.<span class="built_in">pop</span>();</span><br><span class="line">        vec.<span class="built_in">push_back</span>(node-&gt;val);</span><br><span class="line">        <span class="keyword">if</span> (node-&gt;right)</span><br><span class="line">            stk.<span class="built_in">push</span>(node-&gt;right);</span><br><span class="line">        <span class="keyword">if</span> (node-&gt;left)</span><br><span class="line">            stk.<span class="built_in">push</span>(node-&gt;left);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> vec;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//迭代法中序遍历二叉树</span></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">inorderTraversal</span><span class="params">(TreeNode *root)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; ans;</span><br><span class="line">    stack&lt;TreeNode *&gt; s;</span><br><span class="line">    TreeNode *cur = root;</span><br><span class="line">    <span class="comment">//当前结点不为空或者栈不为空</span></span><br><span class="line">    <span class="comment">//也就是说，循环结束条件是：</span></span><br><span class="line">    <span class="comment">//当前结点为空且栈为空</span></span><br><span class="line">    <span class="keyword">while</span> (cur != <span class="literal">nullptr</span> || !s.<span class="built_in">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//如果当前结点不为空，那么就放入栈，</span></span><br><span class="line">        <span class="comment">//然后当前指针指向其左孩子结点</span></span><br><span class="line">        <span class="keyword">if</span> (cur != <span class="literal">nullptr</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            s.<span class="built_in">push</span>(cur);</span><br><span class="line">            cur = cur-&gt;left;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果当前结点为空，说明已经到目前最左的尽头，</span></span><br><span class="line">        <span class="comment">//那么指向栈顶元素</span></span><br><span class="line">        <span class="comment">//此时的栈顶元素为以当前结点为根的子树的根</span></span><br><span class="line">        <span class="comment">//其左孩子因为已经为空，所以目前遍历根</span></span><br><span class="line">        <span class="comment">//遍历完后再让当前指针指向其右孩子结点</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            cur = s.<span class="built_in">top</span>();</span><br><span class="line">            s.<span class="built_in">pop</span>();</span><br><span class="line">            ans.<span class="built_in">push_back</span>(cur-&gt;val);</span><br><span class="line">            cur = cur-&gt;right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//迭代法后续遍历二叉树</span></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">postorderTraversal</span><span class="params">(TreeNode *root)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; ret;      <span class="comment">// ret保存遍历结果</span></span><br><span class="line">    stack&lt;TreeNode *&gt; st; <span class="comment">// st保存树的节点指针</span></span><br><span class="line">    TreeNode *prev = <span class="literal">nullptr</span>;</span><br><span class="line">    TreeNode *cur = root; <span class="comment">// cur指向当前遍历到的节点</span></span><br><span class="line">    <span class="comment">// cur不为空代表树没访问完， st不为空代表栈中还有数据</span></span><br><span class="line">    <span class="keyword">while</span> (cur || !st.<span class="built_in">empty</span>())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//遍历左子树</span></span><br><span class="line">        <span class="keyword">while</span> (cur)</span><br><span class="line">        &#123;</span><br><span class="line">            st.<span class="built_in">push</span>(cur);    <span class="comment">//当前节点入栈</span></span><br><span class="line">            cur = cur-&gt;left; <span class="comment">//继续遍历左子树</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//左子树遍历完，从栈顶取出cur并指向右子树继续遍历</span></span><br><span class="line">        TreeNode *top = st.<span class="built_in">top</span>();</span><br><span class="line">        <span class="comment">//右子树为null代表当前节点top左右子树都为空则输出，</span></span><br><span class="line">        <span class="comment">//但是可能死循环，因为判断节点右子树时可能会被访问两次</span></span><br><span class="line">        <span class="comment">//访问两次的标志就是当前节点的右树等于上一次访问的节点</span></span><br><span class="line">        <span class="keyword">if</span> (top-&gt;right == <span class="literal">nullptr</span> || top-&gt;right == prev)</span><br><span class="line">        &#123;</span><br><span class="line">            ret.<span class="built_in">push_back</span>(top-&gt;val);</span><br><span class="line">            st.<span class="built_in">pop</span>();</span><br><span class="line">            prev = top;</span><br><span class="line">            cur = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            cur = top-&gt;right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TreeNode *root = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    root-&gt;val = <span class="number">3</span>;</span><br><span class="line">    TreeNode *n1 = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    n1-&gt;val = <span class="number">4</span>;</span><br><span class="line">    TreeNode *n2 = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    n2-&gt;val = <span class="number">5</span>;</span><br><span class="line">    TreeNode *n3 = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    n3-&gt;val = <span class="number">6</span>;</span><br><span class="line">    TreeNode *n4 = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    n4-&gt;val = <span class="number">7</span>;</span><br><span class="line">    TreeNode *n5 = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    n5-&gt;val = <span class="number">8</span>;</span><br><span class="line">    TreeNode *n6 = (TreeNode *)<span class="built_in">malloc</span>(<span class="built_in">sizeof</span>(TreeNode));</span><br><span class="line">    n6-&gt;val = <span class="number">9</span>;</span><br><span class="line">    root-&gt;left = n1;</span><br><span class="line">    root-&gt;right = n2;</span><br><span class="line">    n1-&gt;left = n3;</span><br><span class="line">    n1-&gt;right = n4;</span><br><span class="line">    n2-&gt;left = n5;</span><br><span class="line">    n2-&gt;right = n6;</span><br><span class="line">    n3-&gt;left = <span class="literal">nullptr</span>;</span><br><span class="line">    n3-&gt;right = <span class="literal">nullptr</span>;</span><br><span class="line">    n4-&gt;left = <span class="literal">nullptr</span>;</span><br><span class="line">    n4-&gt;right = <span class="literal">nullptr</span>;</span><br><span class="line">    n5-&gt;left = <span class="literal">nullptr</span>;</span><br><span class="line">    n5-&gt;right = <span class="literal">nullptr</span>;</span><br><span class="line">    n6-&gt;left = <span class="literal">nullptr</span>;</span><br><span class="line">    n6-&gt;right = <span class="literal">nullptr</span>;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; preyIt = <span class="built_in">preyorderTraversal</span>(root);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; inIt = <span class="built_in">inorderTraversal</span>(root);</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; postIt = <span class="built_in">postorderTraversal</span>(root);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; inIt.<span class="built_in">size</span>(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; postIt[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="提高服务器性能的其他建议-池-数据复制-上下文切换和锁"><a href="#提高服务器性能的其他建议-池-数据复制-上下文切换和锁" class="headerlink" title="提高服务器性能的其他建议 池 数据复制 上下文切换和锁"></a>提高服务器性能的其他建议 池 数据复制 上下文切换和锁</h3><p><strong>池</strong> - 用空间换取时间<br>进程池和线程池</p>
-<p><strong>数据复制</strong> - 高性能的服务器应该尽量避免不必要的复制</p>
-<p><strong>上下文切换和锁</strong><br>减少<code>锁</code>的作用区域. 不应该创建太多的工作进程, 而是使用专门的业务逻辑线程.</p>
 
       
     </div>
@@ -419,7 +378,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://icecorn.github.io/2022/05/05/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E5%85%AB%E7%AB%A0-Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A1%86%E6%9E%B6/" title="Linux高性能服务器|第八章-Linux高性能服务器框架" target="_blank" rel="external">http://icecorn.github.io/2022/05/05/Linux高性能服务器/Linux高性能服务器第八章-Linux高性能服务器框架/</a>
+      <a href="http://icecorn.github.io/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E5%85%AD%EF%BC%89%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%89%8D%E4%B8%AD%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86/" title="算法系列（六）|二叉树前中后序遍历--迭代法" target="_blank" rel="external">http://icecorn.github.io/2022/07/08/算法/算法系列（六）二叉树的前中后序遍历/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -466,12 +425,12 @@
   <ul class="pager pull-left">
     
     <li class="prev">
-      <a href="/2022/05/09/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC%E4%B9%9D%E7%AB%A0-IO%E5%A4%8D%E7%94%A8/" title="Linux高性能服务器|第九章-IO复用"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+      <a href="/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%E8%82%A1%E7%A5%A8%E4%BA%A4%E6%98%93/" title="算法系列（五）|股票交易"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
     </li>
     
     
     <li class="next">
-      <a href="/2022/05/03/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AC%AC6-7%E7%AB%A0-Linux%E9%AB%98%E7%BA%A7IO%E5%87%BD%E6%95%B0&Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E8%A7%84%E8%8C%83/" title="Linux高性能服务器|第6-7章-Linux高级IO函数&amp;Linux服务器程序规范"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2022/07/05/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E6%8C%87%E9%92%88/" title="图形学常见问题指针"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     
