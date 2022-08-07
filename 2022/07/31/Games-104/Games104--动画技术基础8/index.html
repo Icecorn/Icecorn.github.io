@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Games-104|第八课-动画技术基础 | Blog of Icecorn</title>
+  <meta name="description" content="动画技术基础2D动画Live2D：  图元设置深度值，控制图元是否可见 用网格来控制图元，比如说眉毛舒展还是皱起来，其实就是参数化映射    3D动画动画的核心就是对刚体运动的表达，刚体在不同自由度上运动 6D眼镜其实就是6个自由度，上下左右前后 基于顶点的动画模拟旗帜随风飘扬是，除了基于物理的动画，也有基于顶点的动画 把每一个顶点随着时间变化的位置存下来，一般会存两个texture 横坐标就是顶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Games-104|第八课-动画技术基础">
+<meta property="og:url" content="http://icecorn.github.io/2022/07/31/Games-104/Games104--%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%808/index.html">
+<meta property="og:site_name" content="Blog of Icecorn">
+<meta property="og:description" content="动画技术基础2D动画Live2D：  图元设置深度值，控制图元是否可见 用网格来控制图元，比如说眉毛舒展还是皱起来，其实就是参数化映射    3D动画动画的核心就是对刚体运动的表达，刚体在不同自由度上运动 6D眼镜其实就是6个自由度，上下左右前后 基于顶点的动画模拟旗帜随风飘扬是，除了基于物理的动画，也有基于顶点的动画 把每一个顶点随着时间变化的位置存下来，一般会存两个texture 横坐标就是顶">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730005858572.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730010412043.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730092617176.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730092912146.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730093016506.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730093434835.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730093720822.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094220210.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094411736.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094630221.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094914993.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730095125114.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730095307892.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730095413210.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730140354962.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731112128417.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731112933833.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731113633247.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731172218251.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731175021665.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731175918805.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731180307791.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731182233249.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731182535101.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731183901635.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801084322449.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801154854015.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801155312506.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801162412672.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801171149017.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802091127322.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802091629132.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802092233235.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802092752687.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802093342224.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802093959360.png">
+<meta property="article:published_time" content="2022-07-31T09:25:10.000Z">
+<meta property="article:modified_time" content="2022-08-07T16:19:51.150Z">
+<meta property="article:author" content="Icecorn">
+<meta property="article:tag" content="Games-104">
+<meta property="article:tag" content="游戏引擎">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730005858572.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://icecorn.github.io/2022/07/31/Games-104/Games104--%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%808/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Blog of Icecorn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="images/logo.jpg" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/Icecorn" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Icecorn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Life is Fantastic ~</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> DaLian, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="Search" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="Type something..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">Home</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">Archives</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">Categories</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">Tags</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">About</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">Board</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>QAQ~</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/C/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/GPU%E6%9E%B6%E6%9E%84/">GPU架构</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/">ReadingNotes</a><span class="category-list-count">25</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/C/">C++</a><span class="category-list-count">17</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/">Linux</a><span class="category-list-count">8</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/ReadingNotes/Linux/%E7%B3%BB%E7%BB%9F%E7%BC%96%E7%A8%8B/">系统编程</a><span class="category-list-count">1</span></li></ul></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a><span class="category-list-count">11</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B8%B2%E6%9F%93/">渲染</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">计算机基础</a><span class="category-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-Primer/" rel="tag">C++ Primer</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" rel="tag">C++内存管理机制</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GPU%E6%9E%B6%E6%9E%84/" rel="tag">GPU架构</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">GPU渲染管线</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-101/" rel="tag">Games-101</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Games-104/" rel="tag">Games-104</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">Linux高性能服务器</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PBR%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" rel="tag">PBR渲染管线</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rasterizer/" rel="tag">Rasterizer</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/divide-conquer/" rel="tag">divide&conquer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openGL/" rel="tag">openGL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shader/" rel="tag">shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket%E7%BC%96%E7%A8%8B/" rel="tag">socket编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" rel="tag">内存池</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" rel="tag">单例模式</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" rel="tag">图形学</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" rel="tag">多进程</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" rel="tag">思维导图</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">操作系统</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag">计算机网络</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/" rel="tag">面试八股</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/C-Primer/" style="font-size: 14px;">C++ Primer</a> <a href="/tags/C-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%9C%BA%E5%88%B6/" style="font-size: 13.33px;">C++内存管理机制</a> <a href="/tags/GPU%E6%9E%B6%E6%9E%84/" style="font-size: 13.17px;">GPU架构</a> <a href="/tags/GPU%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" style="font-size: 13px;">GPU渲染管线</a> <a href="/tags/Games-101/" style="font-size: 13.17px;">Games-101</a> <a href="/tags/Games-104/" style="font-size: 13.67px;">Games-104</a> <a href="/tags/Linux%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 13.83px;">Linux高性能服务器</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/PBR%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/" style="font-size: 13px;">PBR渲染管线</a> <a href="/tags/Rasterizer/" style="font-size: 13.17px;">Rasterizer</a> <a href="/tags/divide-conquer/" style="font-size: 13px;">divide&conquer</a> <a href="/tags/openGL/" style="font-size: 13px;">openGL</a> <a href="/tags/shader/" style="font-size: 13px;">shader</a> <a href="/tags/socket%E7%BC%96%E7%A8%8B/" style="font-size: 13.33px;">socket编程</a> <a href="/tags/%E5%86%85%E5%AD%98%E6%B1%A0/" style="font-size: 13px;">内存池</a> <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" style="font-size: 13.17px;">动态规划</a> <a href="/tags/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" style="font-size: 13px;">单例模式</a> <a href="/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/" style="font-size: 13px;">图形学</a> <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 13px;">多线程</a> <a href="/tags/%E5%A4%9A%E8%BF%9B%E7%A8%8B/" style="font-size: 13px;">多进程</a> <a href="/tags/%E6%80%9D%E7%BB%B4%E5%AF%BC%E5%9B%BE/" style="font-size: 13px;">思维导图</a> <a href="/tags/%E6%8E%92%E5%BA%8F/" style="font-size: 13px;">排序</a> <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 13px;">操作系统</a> <a href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" style="font-size: 13.67px;">游戏引擎</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.83px;">算法</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 13.5px;">计算机网络</a> <a href="/tags/%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/" style="font-size: 13px;">面试八股</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Archive</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/08/">August 2022</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/07/">July 2022</a><span class="archive-list-count">10</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">March 2022</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/02/">February 2022</a><span class="archive-list-count">13</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/C/">C++</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/08/03/%E9%9D%A2%E8%AF%95%E5%85%AB%E8%82%A1/" class="title">面试八股|C++篇</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-08-03T09:25:10.000Z" itemprop="datePublished">2022-08-03</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/08/01/Games-104/Games104--%E9%AB%98%E7%BA%A7%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF9/" class="title">Games-104|第九课-高级动画计数</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-08-01T09:25:10.000Z" itemprop="datePublished">2022-08-01</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/31/Games-104/Games104--%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%808/" class="title">Games-104|第八课-动画技术基础</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-31T09:25:10.000Z" itemprop="datePublished">2022-07-31</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/09/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%20%E7%BB%8F%E5%85%B8%E9%A2%98%E7%9B%AE%E5%90%88%E9%9B%86/" class="title">算法系列|经典题目合集</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-09T09:25:10.000Z" itemprop="datePublished">2022-07-09</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/07/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%EF%BC%88%E4%BA%94%EF%BC%89%E8%82%A1%E7%A5%A8%E4%BA%A4%E6%98%93/" class="title">算法系列（五）|股票交易</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-07-08T09:25:10.000Z" itemprop="datePublished">2022-07-08</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">Catalogue</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80"><span class="toc-number">1.</span> <span class="toc-text">动画技术基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2D%E5%8A%A8%E7%94%BB"><span class="toc-number">1.1.</span> <span class="toc-text">2D动画</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3D%E5%8A%A8%E7%94%BB"><span class="toc-number">1.2.</span> <span class="toc-text">3D动画</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E9%A1%B6%E7%82%B9%E7%9A%84%E5%8A%A8%E7%94%BB"><span class="toc-number">1.2.1.</span> <span class="toc-text">基于顶点的动画</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Morph-Target-%E9%A1%B6%E7%82%B9%E5%8A%A8%E7%94%BB"><span class="toc-number">1.2.2.</span> <span class="toc-text">Morph Target 顶点动画</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%92%99%E7%9A%AE%E5%8A%A8%E7%94%BB"><span class="toc-number">1.2.3.</span> <span class="toc-text">蒙皮动画</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E7%89%A9%E7%90%86%E7%9A%84%E5%8A%A8%E7%94%BB"><span class="toc-number">1.2.4.</span> <span class="toc-text">基于物理的动画</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="toc-number">1.2.5.</span> <span class="toc-text">动画实现方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%92%99%E7%9A%AE%E5%8A%A8%E7%94%BB%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.</span> <span class="toc-text">蒙皮动画的实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3D%E6%97%8B%E8%BD%AC%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86"><span class="toc-number">1.4.</span> <span class="toc-text">3D旋转数学原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2D%E6%97%8B%E8%BD%AC"><span class="toc-number">1.4.1.</span> <span class="toc-text">2D旋转</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3D%E6%97%8B%E8%BD%AC"><span class="toc-number">1.4.2.</span> <span class="toc-text">3D旋转</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AC%A7%E6%8B%89%E8%A7%92"><span class="toc-number">1.4.2.1.</span> <span class="toc-text">欧拉角</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9B%E5%85%83%E6%95%B0"><span class="toc-number">1.4.2.2.</span> <span class="toc-text">四元数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E8%8A%82%E4%B8%8E%E8%92%99%E7%9A%AE"><span class="toc-number">1.5.</span> <span class="toc-text">关节与蒙皮</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E6%A0%B9%E9%AA%A8%E9%AA%BC%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">1.5.1.</span> <span class="toc-text">多根骨骼的情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E6%8F%92%E5%80%BC"><span class="toc-number">1.5.2.</span> <span class="toc-text">动画插值</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#NLERP"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">NLERP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SLERP"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">SLERP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E7%AE%A1%E7%BA%BF"><span class="toc-number">1.5.2.3.</span> <span class="toc-text">动画管线</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E7%9A%84%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.6.</span> <span class="toc-text">动画的压缩</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%B8%A7%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.6.1.</span> <span class="toc-text">关键帧压缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.6.2.</span> <span class="toc-text">数据压缩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%AF%E5%B7%AE%E5%A4%84%E7%90%86"><span class="toc-number">1.6.3.</span> <span class="toc-text">误差处理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E7%94%BB%E5%88%B6%E4%BD%9C%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-number">1.7.</span> <span class="toc-text">动画制作的流程</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Games-104/Games104--动画技术基础8" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Games-104|第八课-动画技术基础
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2022/07/31/Games-104/Games104--%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%808/" class="article-date">
+	  <time datetime="2022-07-31T09:25:10.000Z" itemprop="datePublished">2022-07-31</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E5%9B%BE%E5%BD%A2%E5%AD%A6/">图形学</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Games-104/" rel="tag">Games-104</a>, <a class="article-tag-link-link" href="/tags/%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E/" rel="tag">游戏引擎</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2022/07/31/Games-104/Games104--%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%808/#comments" class="article-comment-link">Comments</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">Word Count: 2.1k(words)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">Read Count: 7(minutes)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h1 id="动画技术基础"><a href="#动画技术基础" class="headerlink" title="动画技术基础"></a>动画技术基础</h1><h2 id="2D动画"><a href="#2D动画" class="headerlink" title="2D动画"></a>2D动画</h2><p>Live2D：</p>
+<ul>
+<li>图元设置深度值，控制图元是否可见</li>
+<li>用网格来控制图元，比如说眉毛舒展还是皱起来，其实就是参数化映射</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730005858572.png" alt="image-20220730005858572"></p>
+<hr>
+<h2 id="3D动画"><a href="#3D动画" class="headerlink" title="3D动画"></a>3D动画</h2><p>动画的核心就是对刚体运动的表达，刚体在不同自由度上运动</p>
+<p>6D眼镜其实就是6个自由度，上下左右前后</p>
+<h3 id="基于顶点的动画"><a href="#基于顶点的动画" class="headerlink" title="基于顶点的动画"></a>基于顶点的动画</h3><p>模拟旗帜随风飘扬是，除了基于物理的动画，也有基于顶点的动画</p>
+<p>把每一个顶点随着时间变化的位置存下来，一般会存两个texture</p>
+<p>横坐标就是顶点数量，比如10000个顶点，纵坐标是每一帧的offset，这样每一帧顶点位置有改变，那么法向就会改变，所以为了方便，可以再来一张texture，来存每个顶点的法向每一帧的变化</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730010412043.png" alt="image-20220730010412043"></p>
+<h3 id="Morph-Target-顶点动画"><a href="#Morph-Target-顶点动画" class="headerlink" title="Morph Target 顶点动画"></a>Morph Target 顶点动画</h3><p>关键帧插值</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730092617176.png" alt="image-20220730092617176"></p>
+<h3 id="蒙皮动画"><a href="#蒙皮动画" class="headerlink" title="蒙皮动画"></a>蒙皮动画</h3><p>通过骨骼驱动网格形变</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730092912146.png" alt="image-20220730092912146"></p>
+<h3 id="基于物理的动画"><a href="#基于物理的动画" class="headerlink" title="基于物理的动画"></a>基于物理的动画</h3><p>比如衣服模拟，流体模拟</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730093016506.png" alt="image-20220730093016506"></p>
+<h3 id="动画实现方式"><a href="#动画实现方式" class="headerlink" title="动画实现方式"></a>动画实现方式</h3><ul>
+<li>关键帧动画</li>
+<li>动捕</li>
+</ul>
+<hr>
+<h2 id="蒙皮动画的实现"><a href="#蒙皮动画的实现" class="headerlink" title="蒙皮动画的实现"></a>蒙皮动画的实现</h2><p>一般在VS中去算顶点位置</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730093434835.png" alt="image-20220730093434835"></p>
+<p>模型坐标系，世界坐标系，局部坐标系localSpace（每一根骨骼的坐标系）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730093720822.png" alt="image-20220730093720822"></p>
+<p>骨骼树状图，一般根设置在胯部</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094220210.png" alt="image-20220730094220210"></p>
+<p>实际上我们存储的是关节，两个关节之间定义一根骨骼</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094411736.png" alt="image-20220730094411736"></p>
+<p>一个标准角色骨骼大概100个左右，但是为了实现复杂的表情变化，面部可能搞了一堆骨骼</p>
+<p>root骨骼一般放在两脚之间，四足动物的话放在肚子下面</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094630221.png" alt="image-20220730094630221"></p>
+<p>绑定动画，绑定两个模型，比如人进入汽车，那么就会有一帧人的屁股绑定在车上，他俩一起动</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730094914993.png" alt="image-20220730094914993"></p>
+<p>关节pos</p>
+<p>有9个自由度，区别于刚体只有平移旋转，还可以放缩</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730095125114.png" alt="image-20220730095125114"></p>
+<hr>
+<h2 id="3D旋转数学原理"><a href="#3D旋转数学原理" class="headerlink" title="3D旋转数学原理"></a>3D旋转数学原理</h2><h3 id="2D旋转"><a href="#2D旋转" class="headerlink" title="2D旋转"></a>2D旋转</h3><p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730095307892.png" alt="image-20220730095307892"></p>
+<h3 id="3D旋转"><a href="#3D旋转" class="headerlink" title="3D旋转"></a>3D旋转</h3><h4 id="欧拉角"><a href="#欧拉角" class="headerlink" title="欧拉角"></a>欧拉角</h4><p>沿着x,y,z轴分别旋转，在叠加起来，这就是欧拉角</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730095413210.png" alt="image-20220730095413210"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220730140354962.png" alt="image-20220730140354962"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731112128417.png" alt="image-20220731112128417"></p>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>欧拉角的计算有严格的顺序依赖，必须约定好顺序，比如z,x,y（所以排列组合一共有6种顺规）</li>
+<li>万象锁：当沿着Y轴旋转90度后，x轴和z轴会重合，使得欧拉角退化变成两个自由度</li>
+<li>很难去插值</li>
+<li>很难去叠加，就是先旋转多少度，再旋转多少度</li>
+<li>不能沿着任意轴旋转</li>
+</ul>
+<h4 id="四元数"><a href="#四元数" class="headerlink" title="四元数"></a>四元数</h4><p>对于二维空间的旋转，我们把向量alpha = a +bi, beta = c+di，用复平面表示，这时可以看出a就是cos(alpha),b就是sin(alpha)，所以看右下角构造旋转矩阵作用于beta向量就完成了旋转，而且这个结果恰恰等于两复数相乘！</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731112933833.png" alt="image-20220731112933833"></p>
+<p>对于三维空间</p>
+<p>四元数表达，一个实部，三个虚部，从二维推广一下，两个四元数相乘可以转化为坐下角的左乘一个矩阵这样。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731113633247.png" alt="image-20220731113633247"></p>
+<p>欧拉角转换成四元数，用的都是半角</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731172218251.png" alt="image-20220731172218251"></p>
+<p>如果是一个4维空间的向量，旋转的话直接两个四元数相乘就可以</p>
+<p>但是对于一个三维空间的向量V,使用四元数旋转的话要类似SVD分解那样，左乘q又乘q的逆。这个也可以理解成因为我们要的三维向量时有三个系数（虚部的三个），但是四元数是一个vec4，我们要把它的实部变成0，这样它才是一个在三维空间有意义的向量，如果实部不为0，那么实际上它是一个四维空间的矢量，我们就不能用了。而用一个q作用与V时，得到的结果实部是不为0的，或者说我们旋转到4维空间上去了，这是后我们应该再用一个q的逆取作用在结果上，两次旋转就把实部的值给抵消掉，变成0了，这样我们就得到了一个旋转后的三维空间的向量，这也是为什么要旋转半角的原因。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731175021665.png" alt="image-20220731175021665"></p>
+<p>几种应用场景：</p>
+<ul>
+<li>逆旋转，就是虚部相反的q即可，即共轭</li>
+<li>旋转的叠加，连着乘就行</li>
+<li>求两个单位向量的旋转四元数，先求出旋转轴W作为虚部，在用下方公式算出实部</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731175918805.png" alt="image-20220731175918805"></p>
+<p>给定轴计算四元数，和旋转后向量，实部就是cos(theta/2),虚部就是sin(theta/2)*对应轴的分量，至于为什么是半角，上边有说，就是要把结果的实部抵消成0</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731180307791.png" alt="image-20220731180307791"></p>
+<hr>
+<h2 id="关节与蒙皮"><a href="#关节与蒙皮" class="headerlink" title="关节与蒙皮"></a>关节与蒙皮</h2><p>动画JointPose，主要是旋转的变化，平移（人的蹲起，弓箭）和放缩（大眼镜）不常用</p>
+<p>旋转用四元数表达，可转化为3*4的矩阵，平移和放缩也可以用矩阵表达，最后组合成一个矩阵</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731182233249.png" alt="image-20220731182233249"></p>
+<p>从根节点开始，一个骨骼一个骨骼算上来</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731182535101.png"></p>
+<p>为了保证正确插值旋转，要在local space里进行插值，而不是Model space</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220731183901635.png" alt="image-20220731183901635"></p>
+<p>关节点动了，皮肤上的点要跟着动，当然这是一根骨骼的情况</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801084322449.png" alt="image-20220801084322449"></p>
+<p>变换的时候要乘一个绑定矩阵的逆矩阵</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801154854015.png" alt="image-20220801154854015"></p>
+<p>从右往左看，一个模型空间的点（它绑定了一根骨骼），先左乘这根骨骼的逆绑定矩阵，变成local space中的点，然后左乘关节到模型空间的矩阵，变成新的模型空间的点，然后再左乘世界空间变换矩阵，变换到世界空间的点</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801155312506.png" alt="image-20220801155312506"></p>
+<h3 id="多根骨骼的情况"><a href="#多根骨骼的情况" class="headerlink" title="多根骨骼的情况"></a>多根骨骼的情况</h3><p>皮肤上的点可以绑定多根骨骼（一般不超过4个），他们的权重加起来要等于1，计算时根据每一个关节逆矩阵和当前的关节模型位置矩阵计算出皮肤上的点相对每一个绑定关节的<strong>模型空间上的坐标，然后进行插值，注意这个插值一定要在模型空间</strong>（因为local space每一个关节都不一样）</p>
+<h3 id="动画插值"><a href="#动画插值" class="headerlink" title="动画插值"></a>动画插值</h3><h4 id="NLERP"><a href="#NLERP" class="headerlink" title="NLERP"></a>NLERP</h4><p>插值后要除以模，才是正确的NLERP</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801162412672.png" alt="image-20220801162412672"></p>
+<p>最短路径插值：因为旋转可以正反两个方向都行，所以我们规定一下，两个四元数点乘&gt;=0直接插值，&lt;0反向插值</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220801171149017.png" alt="image-20220801171149017"></p>
+<h4 id="SLERP"><a href="#SLERP" class="headerlink" title="SLERP"></a>SLERP</h4><p>由于插值过程中角度变化不均匀，所以可以用slerp就是用角度来插值，但角度太小就会不敏感</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802091127322.png" alt="image-20220802091127322"></p>
+<p><strong>实际动画中，角度大的时候用slerp，角度小的时候直接用nlerp，可以设置一个门限两种插值过度</strong></p>
+<h4 id="动画管线"><a href="#动画管线" class="headerlink" title="动画管线"></a>动画管线</h4><p>CPU工作：</p>
+<p>首先输入一堆clips（就是骨架的pos），然后我们就可以插值出它的上一帧和下一帧<br>然后算出每一个关节在local space的坐标<br>然后计算出在model space的坐标</p>
+<p>GPU工作：</p>
+<p>对每一个点（包括皮肤上的），应用上面算出的各种矩阵，算出当前帧在世界空间的坐标</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802091629132.png" alt="image-20220802091629132"></p>
+<hr>
+<h2 id="动画的压缩"><a href="#动画的压缩" class="headerlink" title="动画的压缩"></a>动画的压缩</h2><h3 id="关键帧压缩"><a href="#关键帧压缩" class="headerlink" title="关键帧压缩"></a>关键帧压缩</h3><p>对于动画来说，假设1s30帧，70个关节，那么就要存30*70个关节的放缩，平移，旋转的数据，这个数据量很大。</p>
+<p>大部分的关节的放缩和平移其实都不变，可以不存</p>
+<p>另外可以使用关键帧来处理，在关键帧之间插值，大部分是旋转</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802092233235.png" alt="image-20220802092233235"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802092752687.png" alt="image-20220802092752687"></p>
+<p>这里感觉就是用一个三次样条（catmull曲线）来确定旋转的关键帧是哪些</p>
+<h3 id="数据压缩"><a href="#数据压缩" class="headerlink" title="数据压缩"></a>数据压缩</h3><p>四元数4个float，要32个字节，比较费，用一些trick可以做到15个字节就能存了</p>
+<h3 id="误差处理"><a href="#误差处理" class="headerlink" title="误差处理"></a>误差处理</h3><p>既然有压缩，就会损失一些精度，不同骨骼对于误差的敏感度是不同的，解决方案先不看了==</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802093342224.png" alt="image-20220802093342224"></p>
+<h2 id="动画制作的流程"><a href="#动画制作的流程" class="headerlink" title="动画制作的流程"></a>动画制作的流程</h2><p>使用3dsMax，Maya等软件进行骨骼和网格的绑定，然后设计师会设置关键帧和时间间隔，这时候动画资产就可以导出了</p>
+<p>要注意的是有人物跳跃时，我们要单独给root节点存一个位移曲线</p>
+<p>然后可以进行导出，这也是引擎程序员做的主要工作，比如导出乘FBX格式文件</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Icecorn/icecorn-pic/img/image-20220802093959360.png" alt="image-20220802093959360"></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://icecorn.github.io/2022/07/31/Games-104/Games104--%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%808/" title="Games-104|第八课-动画技术基础" target="_blank" rel="external">http://icecorn.github.io/2022/07/31/Games-104/Games104--动画技术基础8/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/Icecorn" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/Icecorn" target="_blank"><span class="text-dark">Icecorn</span><small class="ml-1x">Life is Fantastic ~</small></a></h3>
+        <div>一个喜欢推理小说和coding的宝可梦训练家~</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2022/08/01/Games-104/Games104--%E9%AB%98%E7%BA%A7%E5%8A%A8%E7%94%BB%E6%8A%80%E6%9C%AF9/" title="Games-104|第九课-高级动画计数"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;Newer</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2022/07/09/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95%E7%B3%BB%E5%88%97%20%E7%BB%8F%E5%85%B8%E9%A2%98%E7%9B%AE%E5%90%88%E9%9B%86/" title="算法系列|经典题目合集"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="Catalogue" role="button">    <span>[&nbsp;</span><span>Catalogue</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        &copy; 2022 Icecorn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
